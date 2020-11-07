@@ -1,0 +1,7 @@
+config.cfg
+*.cfg
+__pycache__/
+*.ini
+*.db
+info.txt
+cert/
