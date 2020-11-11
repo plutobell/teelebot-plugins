@@ -40,7 +40,7 @@ def Schedule(bot, message):
         "30d": 2592000
     }
 
-    if prefix in text and str(chat_id) != bot.config["root"]:
+    if prefix in text and str(user_id) != bot.config["root"]:
         status = bot.sendMessage(chat_id, text="无权限", parse_mode="HTML",
             reply_to_message_id=message_id)
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])
