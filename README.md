@@ -6,7 +6,6 @@
 ## 插件列表 ##
 
 1. Menu - 自动生成的插件菜单
-
 2. Chat - 调用 [青云客聊天机器人API](http://api.qingyunke.com/) 实现的对话功能
 3. About - 关于
 4. Uptime - 获取Bot运行状态
@@ -26,3 +25,4 @@
 18. Dwz - Dwz插件，调用 [ALAPI](https://www.alapi.net/) 生成短网址
 19. Acg - Acg插件，调用 [ALAPI](https://www.alapi.net/) 随机获取一张ACG图
 20. Whois - Whois插件，调用 [ALAPI](https://www.alapi.net/) 查询域名whois信息
+21. Schedule - Schedule插件，周期性执行特定任务，目前仅支持文本类消息
