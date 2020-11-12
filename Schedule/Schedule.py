@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-11
-last_modify: 2020-11-12
+last_modify: 2020-11-13
 '''
 import time
 
@@ -55,11 +55,12 @@ def Schedule(bot, message):
         return
 
     if text.split(" ")[0] == prefix:
-        msg = "<b>Schedule 插件功能</b>" + "%0A%0A" + \
-            "<b>/schedadd</b> 添加任务 格式：指令+空格+周期+消息" + "%0A" + \
-            "<b>/scheddel</b> 移除任务 格式：指令+空格+标识" + "%0A" + \
-            "<b>/schedclear</b> 移除所有任务" + "%0A" + \
-            "<b>/schedstatus</b> 查看队列信息" + "%0A%0A" + \
+        msg = "<b>Schedule 插件功能</b>" + "\n\n" + \
+            "<b>/schedadd</b> 添加任务 格式：指令+空格+周期+消息" + "\n" + \
+            "<b>/scheddel</b> 移除任务 格式：指令+空格+标识" + "\n" + \
+            "<b>/schedfind</b> 查找任务 格式：指令+空格+标识" + "\n" + \
+            "<b>/schedclear</b> 移除所有任务" + "\n" + \
+            "<b>/schedstatus</b> 查看队列信息" + "\n\n" + \
             "<i>支持的周期指令：1s 2s 5s 10s 15s 30s 45s | "+ \
             "1m 2m 5m 10m 15m 30m 45m | " + \
             "1h 2h 4h 6h 8h 10h 12h | " + \
@@ -70,35 +71,36 @@ def Schedule(bot, message):
 
     elif text.split(" ")[0] == prefix + "add":
         if  len(text.split(" ")) == 3:
+            msg = ""
             gap_key = str(text.split(" ")[1])
             if gap_key not in gaps.keys():
-                msg = "<b>错误的周期，支持的周期指令：</b> %0A%0A" + \
-                    "<b>1s 2s 5s 10s 15s 30s 45s %0A" + \
-                    "1m 2m 5m 10m 15m 30m 45m %0A" + \
-                    "1h 2h 4h 6h 8h 10h 12h %0A" + \
+                msg = "<b>错误的周期，支持的周期指令：</b> \n\n" + \
+                    "<b>1s 2s 5s 10s 15s 30s 45s \n" + \
+                    "1m 2m 5m 10m 15m 30m 45m \n" + \
+                    "1h 2h 4h 6h 8h 10h 12h \n" + \
                     "1d 3d 5d 7d 10d 15d 20d 30d" + "</b>"
-                bot.sendMessage(chat_id, text=msg, parse_mode="HTML",
+                status = bot.sendMessage(chat_id, text=msg, parse_mode="HTML",
                     reply_to_message_id=message_id)
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
                 return
 
             gap = gaps[gap_key]
-            msg = str(text.split(" ")[2]) + "%0A%0A" + "<i>此消息为定时发送，周期 " + str(gap_key) + "</i>"
-            msg = msg.replace("#", " ")
+            msg = str(text.split(" ")[2]) + "\n\n" + "<code>此消息为定时发送，周期" + str(gap_key) + "</code>"
             ok, uid = bot.add_schedule(gap, event, (bot, message["chat"]["id"], msg, "HTML"))
             timestamp = time.strftime('%Y/%m/%d %H:%M:%S',time.localtime(time.time()))
             if ok:
-                msg = "<b>任务已加入队列</b>%0A%0A" + \
-                    "<b>周期: " + gap_key + "</b>%0A" + \
-                    "<b>目标: " + str(chat_id) + "</b>%0A" + \
-                    "<b>标识: " + str(uid) + "</b>%0A" + \
-                    "<b>时间: " + str(timestamp) + "</b>%0A%0A" + \
-                    "<i>此消息将在 <b>60秒</b> 后销毁，请尽快 <b>保存标识</b></i>%0A"
+                msg = "<b>任务已加入队列</b>\n\n" + \
+                    "周期: <code>" + gap_key + "</code>\n" + \
+                    "目标: <code>" + str(chat_id) + "</code>\n" + \
+                    "标识: <code>" + str(uid) + "</code>\n" + \
+                    "时间: <code>" + str(timestamp) + "</code>\n\n" + \
+                    "<code>此消息将在<b>60秒</b>后销毁，请尽快保存标识</code>\n"
             else:
+                msg = ""
                 if uid == "Full":
                     msg = "<b>队列已满</b>"
-                elif uid == "Failure":
-                    msg = "<b>遇到错误</b> %0A%0A <i>" + uid + "</i>"
+                else:
+                    msg = "<b>遇到错误</b> \n\n <i>" + uid + "</i>"
             status = bot.sendMessage(chat_id, text=msg, parse_mode="HTML",
                 reply_to_message_id=message_id)
             bot.message_deletor(60, status["chat"]["id"], status["message_id"])
@@ -110,6 +112,7 @@ def Schedule(bot, message):
 
     elif text.split(" ")[0] == prefix + "del":
         if len(text.split(" ")) == 2:
+            msg = ""
             uid = str(text.split(" ")[1])
             ok, uid = bot.del_schedule(uid)
             if ok:
@@ -128,7 +131,29 @@ def Schedule(bot, message):
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
+    elif text.split(" ")[0] == prefix + "find":
+        if len(text.split(" ")) == 2:
+            msg = ""
+            uid = str(text.split(" ")[1])
+            ok, uid = bot.find_schedule(uid)
+            if ok:
+                msg = "<b>任务存在于队列中</b>"
+            else:
+                if uid == "Empty":
+                    msg = "<b>队列为空</b>"
+                elif uid == "NotFound":
+                    msg = "<b>任务未找到</b>"
+            status = bot.sendMessage(chat_id, text=msg,
+                parse_mode="HTML", reply_to_message_id=message_id)
+            bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+        else:
+            status = bot.sendMessage(chat_id,
+                text="<b>指令格式错误 (e.g.: " + prefix + "del uid)</b>",
+                parse_mode="HTML", reply_to_message_id=message_id)
+            bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+
     elif text.split(" ")[0] == prefix + "clear":
+        msg = ""
         ok, msgg = bot.clear_schedule()
         if ok:
             msg = "<b>已清空队列</b>"
@@ -136,23 +161,26 @@ def Schedule(bot, message):
             if msgg == "Empty":
                 msg = "<b>队列为空</b>"
             elif msgg != "Cleared":
-                msg = "<b>遇到错误</b> %0A%0A <i>" + msgg + "</i>"
+                msg = "<b>遇到错误</b> \n\n <i>" + msgg + "</i>"
 
         status = bot.sendMessage(chat_id, text=msg,
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
     elif text.split(" ")[0] == prefix + "status":
+        msg = ""
         ok, result = bot.stat_schedule()
         if ok:
-            msg = "<b>空闲: " + str(result["free"]) + "%0A" + \
-                "使用: " + str(result["used"]) + "%0A" + \
-                "容量: " + str(result["size"]) + "</b>%0A"
+            msg = "<code>使用: " + str(result["used"]) + "\n" + \
+                "空闲: " + str(result["free"]) + "\n" + \
+                "容量: " + str(result["size"]) + "</code>\n"
         else:
-            msg = "<b>遇到错误</b> %0A%0A <i>" + result["exception"] + "</i>"
+            msg = "<b>遇到错误</b> \n\n <i>" + result["exception"] + "</i>"
         status = bot.sendMessage(chat_id, text=msg,
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+
+
 
 def event(bot, chat_id, msg, parse_mode):
     status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML")

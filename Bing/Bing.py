@@ -14,7 +14,7 @@ def Bing(bot, message):
             startdate = img["startdate"]
             date = startdate[:4] + '-' + startdate[4:6] + '-' + startdate[6:]
             status = bot.sendChatAction(message["chat"]["id"], "typing")
-            status = bot.sendPhoto(chat_id=message["chat"]["id"], photo=img_url, caption=copyright_+"%0A%0A"+date, parse_mode="HTML", reply_to_message_id=message["message_id"])
+            status = bot.sendPhoto(chat_id=message["chat"]["id"], photo=img_url, caption=copyright_+"\n\n"+date, parse_mode="HTML", reply_to_message_id=message["message_id"])
         else:
             status = bot.sendChatAction(message["chat"]["id"], "typing")
             status = bot.sendMessage(chat_id=message["chat"]["id"], text="获取失败，请重试!", parse_mode="HTML", reply_to_message_id=message["message_id"])

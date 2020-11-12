@@ -27,8 +27,8 @@ def TodayInHistory(bot, message):
                     }
                     msg = ""
                     for sec in today_data:
-                        msg += "<i>" + str(sec["year"]) + "年</i> - " + str(sec["title"]) + "%0A%0A"
-                    msg = "<b>历史上的今天: " + str(today_data[0]["today"]) + "</b>%0A%0A" + msg
+                        msg += "<i>" + str(sec["year"]) + "年</i> - " + str(sec["title"]) + "\n\n"
+                    msg = "<b>历史上的今天: " + str(today_data[0]["today"]) + "</b>\n\n" + msg
                     status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=msg, parse_mode="HTML", reply_markup=reply_markup)
                     status = bot.answerCallbackQuery(message["callback_query_id"])
             else:
@@ -46,7 +46,7 @@ def TodayInHistory(bot, message):
                     "inline_keyboard": inlineKeyboard
                     }
                     sec = today_data[0]
-                    msg = "<b>历史上的今天: " + str(today_data[0]["today"]) + "</b>%0A%0A"
+                    msg = "<b>历史上的今天: " + str(today_data[0]["today"]) + "</b>\n\n"
                     status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=msg, parse_mode="HTML", reply_markup=reply_markup)
                     status = bot.answerCallbackQuery(message["callback_query_id"])
             else:
@@ -65,8 +65,8 @@ def TodayInHistory(bot, message):
             }
             msg = ""
             for sec in today_data[:5]:
-                msg += "<i>" + str(sec["year"]) + "年</i> - " + str(sec["title"]) + "%0A%0A"
-            msg = "<b>历史上的今天: " + str(today_data[0]["today"]) + "</b>%0A%0A" + msg + "..."
+                msg += "<i>" + str(sec["year"]) + "年</i> - " + str(sec["title"]) + "\n\n"
+            msg = "<b>历史上的今天: " + str(today_data[0]["today"]) + "</b>\n\n" + msg + "..."
             status = bot.sendChatAction(chat_id, "typing")
             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message_id, reply_markup=reply_markup)
             bot.message_deletor(60, chat_id, status["message_id"])

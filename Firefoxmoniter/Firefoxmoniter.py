@@ -8,7 +8,7 @@ def Firefoxmoniter(bot, message):
         h = f.readline()[1:]
     if len(message["text"]) < len(h):
         status = bot.sendChatAction(message["chat"]["id"], "typing")
-        status = bot.sendMessage(message["chat"]["id"], "查询失败！%0A邮件地址为空!", parse_mode="HTML", reply_to_message_id=message["message_id"])
+        status = bot.sendMessage(message["chat"]["id"], "查询失败！\n邮件地址为空!", parse_mode="HTML", reply_to_message_id=message["message_id"])
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])
         return False
     email = message["text"][len(h)-1:]
@@ -18,7 +18,7 @@ def Firefoxmoniter(bot, message):
         emailhash = ehash.hexdigest()
     else:
         status = bot.sendChatAction(message["chat"]["id"], "typing")
-        status = bot.sendMessage(message["chat"]["id"], "查询失败！%0A请检查邮件格式!", parse_mode="HTML", reply_to_message_id=message["message_id"])
+        status = bot.sendMessage(message["chat"]["id"], "查询失败！\n请检查邮件格式!", parse_mode="HTML", reply_to_message_id=message["message_id"])
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])
         return False
 
@@ -40,7 +40,7 @@ def Firefoxmoniter(bot, message):
     r_session = requests.Session()
     with r_session.get(url, proxies=proxies) as page:
         if not page.status_code == requests.codes.ok:
-            status = bot.editMessageText(chat_id=message["chat"]["id"],message_id=txt_message_id, text="查询失败！%0A操作过于频繁，请稍后再试!", parse_mode="text")
+            status = bot.editMessageText(chat_id=message["chat"]["id"],message_id=txt_message_id, text="查询失败！\n操作过于频繁，请稍后再试!", parse_mode="text")
             bot.message_deletor(15, message["chat"]["id"], status["message_id"])
             return False
         page.encoding = "utf-8"
@@ -68,17 +68,17 @@ def Firefoxmoniter(bot, message):
         soup = BeautifulSoup(page.text, "lxml")
 
     if "扫描结果" in soup.find("title").text:
-        result += "电子邮件地址" + email +"出现在" + str(soup.find("span", class_="bold").text) + "次已知数据外泄事件中。%0A%0A"
+        result += "电子邮件地址" + email +"出现在" + str(soup.find("span", class_="bold").text) + "次已知数据外泄事件中。\n\n"
         for section in soup.find_all("div", class_="flx flx-col"):
-            source = section.find_all("span")[0].text + "%0A"
-            date = "事件记录时间:%0A" + section.find_all("span")[2].text + "%0A"
-            data = "泄露的数据:%0A" + section.find_all("span")[4].text + "%0A"
-            result += source + date + data + "%0A"
+            source = section.find_all("span")[0].text + "\n"
+            date = "事件记录时间:\n" + section.find_all("span")[2].text + "\n"
+            data = "泄露的数据:\n" + section.find_all("span")[4].text + "\n"
+            result += source + date + data + "\n"
 
         status = bot.editMessageText(chat_id=message["chat"]["id"],message_id=txt_message_id, text=result, parse_mode="text")
         bot.message_deletor(60, message["chat"]["id"], status["message_id"])
     else:
-        status = bot.editMessageText(chat_id=message["chat"]["id"], text="查询失败！%0A请检测命令格式!", parse_mode="text")
+        status = bot.editMessageText(chat_id=message["chat"]["id"], text="查询失败！\n请检测命令格式!", parse_mode="text")
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])
 
 def get_ip():

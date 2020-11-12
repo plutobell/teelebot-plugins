@@ -28,8 +28,8 @@ def IPinfo(bot, message):
                 if result != False:
                     msg = ""
                     for r in result.keys():
-                        msg += str(r) + " : <i>" + str(result[r]) + "</i>%0A"
-                    msg = "IP地址 <b>" + str(ip) + "</b> 的信息如下：%0A%0A" + msg
+                        msg += str(r) + ":<i> " + str(result[r]) + "</i>\n"
+                    msg = "IP地址 <b>" + str(ip) + "</b> 的信息如下：\n\n" + msg
                     msg = msg.replace("country", "国家或地区")
                     msg = msg.replace("国家或地区Code", "国家或地区代码")
                     msg = msg.replace("region", "区域")
@@ -40,6 +40,7 @@ def IPinfo(bot, message):
                     msg = msg.replace("lon", "经度")
                     msg = msg.replace("timezone", "时区")
                     msg = msg.replace("isp", "ISP")
+                    msg = "<code>" + msg + "</code>"
                     status = bot.editMessageText(chat_id=chat_id, message_id=txt_message_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(60, chat_id, txt_message_id)
                 else:

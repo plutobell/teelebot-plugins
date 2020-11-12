@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-6-4
-last_modify: 2020-6-23
+last_modify: 2020-11-13
 '''
 
 def Admin(bot, message):
@@ -52,14 +52,14 @@ def Admin(bot, message):
         bot.message_deletor(gap, chat_id, status["message_id"])
     elif text[1:len(prefix)+1] == prefix and count == 0: #菜单
         status = bot.sendChatAction(chat_id, "typing")
-        msg = "<b>===== Admin 插件功能 =====</b>%0A%0A" +\
-            "<b>/adminkick</b> - 踢人。格式:以回复要踢用户的消息的形式发送指令%0A" +\
-            "<b>/admindel</b> - 删除消息。格式:以回复要删除的消息的形式发送指令%0A" +\
-            "<b>/adminpin</b> - 置顶消息。格式:以回复要置顶的消息的形式发送指令%0A" +\
-            "<b>/adminunpin</b> - 取消置顶。格式:以回复要取消置顶的消息的形式发送指令%0A" +\
-            "<b>/adminmute</b> - 禁言用户。格式:以回复要禁言用户的消息的形式发送指令，指令后跟禁言时间(支持的时间：1m,10m,1h,1d,forever)，以空格作为分隔符%0A" +\
-            "<b>/adminunmute</b> - 解除用户禁言。格式:以回复要解除禁言用户的消息的形式发送指令%0A" +\
-            "%0A"
+        msg = "<b>Admin 插件功能</b>\n\n" +\
+            "<b>/adminkick</b> - 踢人。格式:以回复要踢用户的消息的形式发送指令\n" +\
+            "<b>/admindel</b> - 删除消息。格式:以回复要删除的消息的形式发送指令\n" +\
+            "<b>/adminpin</b> - 置顶消息。格式:以回复要置顶的消息的形式发送指令\n" +\
+            "<b>/adminunpin</b> - 取消置顶。格式:以回复要取消置顶的消息的形式发送指令\n" +\
+            "<b>/adminmute</b> - 禁言用户。格式:以回复要禁言用户的消息的形式发送指令，指令后跟禁言时间(支持的时间：1m,10m,1h,1d,forever)，以空格作为分隔符\n" +\
+            "<b>/adminunmute</b> - 解除用户禁言。格式:以回复要解除禁言用户的消息的形式发送指令\n" +\
+            "\n"
         status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message["message_id"])
 
         bot.message_deletor(30, chat_id, status["message_id"])

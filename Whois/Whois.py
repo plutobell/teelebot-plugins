@@ -21,8 +21,8 @@ def Whois(bot, message):
                 if result != False:
                     msg = ""
                     for r in result.keys():
-                        msg += str(r) + " : <i>" + str(result[r]) + "</i>%0A"
-                    msg = "域名 <b>" + str(domain) + "</b> 的Whois信息如下：%0A%0A" + msg
+                        msg += str(r) + ": <i>" + str(result[r]) + "</i>\n"
+                    msg = "域名 <b>" + str(domain) + "</b> 的Whois信息如下：\n\n" + msg
                     msg = msg.replace("is_reg", "是否注册")
                     msg = msg.replace("domain", "域名")
                     msg = msg.replace("suffix", "后缀")
@@ -38,6 +38,7 @@ def Whois(bot, message):
                     msg = msg.replace("[", "")
                     msg = msg.replace("]", "")
                     msg = msg.replace("'", "")
+                    msg = "<code>" + msg + "</code>"
                     status = bot.editMessageText(chat_id=chat_id, message_id=txt_message_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(60, chat_id, txt_message_id)
                 else:

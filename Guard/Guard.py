@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-5-28
-last_modify: 2020-11-6
+last_modify: 2020-11-13
 '''
 from collections import defaultdict
 import re
@@ -53,12 +53,10 @@ def Guard(bot, message):
 
         if "first_name" in user.keys():  # Optional (first_name or last_name)
             first_name = user["first_name"].strip()
-            first_name = first_name.replace("#", " ")
         else:
             first_name = ""
         if "last_name" in user.keys():
             last_name = user["last_name"].strip()
-            last_name = last_name.replace("#", " ")
         else:
             last_name = ""
 
@@ -174,12 +172,10 @@ def Guard(bot, message):
             user_id = str(new_chat_member["id"])
             if "first_name" in new_chat_member.keys():  # Optional (first_name or last_name)
                 first_name = new_chat_member["first_name"].strip()
-                first_name = first_name.replace("#", " ")
             else:
                 first_name = ""
             if "last_name" in new_chat_member.keys():
                 last_name = new_chat_member["last_name"].strip()
-                last_name = last_name.replace("#", " ")
             else:
                 last_name = ""
             name = str(first_name + last_name).strip()
@@ -249,16 +245,14 @@ def Guard(bot, message):
             status = bot.deleteMessage(
                 chat_id=message["chat"]["id"], message_id=result[3])
             db.delete(chat_id=message["chat"]["id"],
-                      user_id=message["left_chat_member"]["id"])
+                    user_id=message["left_chat_member"]["id"])
         user_id = message["left_chat_member"]["id"]
         if "first_name" in message["left_chat_member"]:
             first_name = message["left_chat_member"]["first_name"].strip()
-            first_name = first_name.replace("#", " ")
         else:
             first_name = ""
         if "last_name" in message["left_chat_member"]:
             last_name = message["left_chat_member"]["last_name"].strip()
-            last_name = last_name.replace("#", " ")
         else:
             last_name = ""
         name = str(first_name + last_name).strip()
@@ -297,21 +291,21 @@ def Guard(bot, message):
                 if req[3] < 3:
                     req[3] += 1
                     db.user_update(chat_id=chat_id, user_id=user_id,
-                                   message_times=req[3], spam_times=req[4])
+                                message_times=req[3], spam_times=req[4])
 
                     result = DFA.filter(text.strip(), repl)
-                    if (repl in result and len(text) > 9) or (len(text) > 100):
+                    if (repl in result and len(text) > 9) or (len(text) > 200):
                         req[4] += 2
                         db.user_update(chat_id=chat_id, user_id=user_id,
-                                       message_times=req[3], spam_times=req[4])
+                                    message_times=req[3], spam_times=req[4])
                     if req[3] == 1 and "forward_from_message_id" in message.keys():
                         req[4] += 2
                         db.user_update(chat_id=chat_id, user_id=user_id,
-                                       message_times=req[3], spam_times=req[4])
+                                    message_times=req[3], spam_times=req[4])
                     if "t.me/" in text.strip().replace('"', "").replace("'", ""):
                         req[4] += 1
                         db.user_update(chat_id=chat_id, user_id=user_id,
-                                       message_times=req[3], spam_times=req[4])
+                                    message_times=req[3], spam_times=req[4])
                     if (req[3] == 1 and req[4] == 1) or req[4] >= 2:
                         bot.kickChatMember(
                             chat_id=req[1], user_id=req[2], until_date=35)
@@ -350,9 +344,9 @@ def Guard(bot, message):
             bot.message_deletor(gap, chat_id, status["message_id"])
         elif text[1:len(prefix)+1] == prefix and count == 0:  # 菜单
             status = bot.sendChatAction(chat_id, "typing")
-            msg = "<b>===== Guard 插件功能 =====</b>%0A%0A" +\
-                "<b>/guardadd</b> - 新增过滤关键词，一次只能添加一个。格式：命令后接关键词，以空格作为分隔符%0A" +\
-                "%0A"
+            msg = "<b>Guard 插件功能</b>\n\n" +\
+                "<b>/guardadd</b> - 新增过滤关键词，一次只能添加一个。格式：命令后接关键词，以空格作为分隔符\n" +\
+                "\n"
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message["message_id"])
 
@@ -391,7 +385,7 @@ def Guard(bot, message):
                 else:
                     status = bot.sendChatAction(chat_id, "typing")
                     status = bot.sendMessage(chat_id=chat_id, text="操作失败，请检查命令格式!",
-                                             parse_mode="text", reply_to_message_id=message["message_id"])
+                                            parse_mode="text", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
 
 
@@ -517,25 +511,24 @@ def handle_logging(bot, content, log_group_id, user_id, chat_id, message_id, rea
     else:
         chat_title = "@" + chat_username
 
-    content_len_limit = 100
+    content_len_limit = 200
     if content is not None and len(content) > content_len_limit:
         content = content[:content_len_limit] + "..."
 
     timestamp = time.strftime('%Y/%m/%d %H:%M:%S',time.localtime(time.time()))
 
-    msg = "存档时间: <i>" + str(timestamp) + "</i> %0A" + \
+    msg = "存档时间: <i>" + str(timestamp) + "</i> \n" + \
         "事件编号: <i><a href='https://t.me/" + \
-        str(chat_username) + "/" + str(message_id) +"'>" + str(message_id) + "</a></i> %0A" + \
+        str(chat_username) + "/" + str(message_id) +"'>" + str(message_id) + "</a></i> \n" + \
         "涉及用户: <i><a href='tg://user?id=" + \
-        str(user_id) + "'>" + str(user_id) + "</a></i> %0A" + \
+        str(user_id) + "'>" + str(user_id) + "</a></i> \n" + \
         "涉及群组: <i><a href='https://t.me/" + \
-        str(chat_username) + "'>" + str(chat_title) + "</a></i> %0A" + \
-        "触发原因: <i>" + str(reason) + "</i> %0A" + \
-        "处理方式: <i>" + str(handle) + "</i> %0A"
+        str(chat_username) + "'>" + str(chat_title) + "</a></i> \n" + \
+        "触发原因: <i>" + str(reason) + "</i> \n" + \
+        "处理方式: <i>" + str(handle) + "</i> \n"
 
     if content is not None:
-        content = content.replace("#", " ")
-        msg += "消息内容: %0A <i>" + str(content) + "</i>"
+        msg += "消息内容: \n <i>" + str(content) + "</i>"
 
 
     status = bot.sendMessage(chat_id=log_group_id, text=msg, parse_mode="HTML", disable_web_page_preview=True)

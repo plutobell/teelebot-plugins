@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-3-21
-last_modify: 2020-11-7
+last_modify: 2020-11-13
 '''
 import requests
 
@@ -48,14 +48,14 @@ def Top(bot, message):
                     hd_used = Hard_disk[0]
                     hd_avail = Hard_disk[1]
 
-                    msg = "<b>服务器：" + str(Hostname) + "</b>%0A" + \
-                        "查询时间：<i>" + str(top_time_head) + " " + str(top_time_tail) + "</i>%0A%0A" + \
-                        "登入用户：<b>" + str(top_user) + "</b> 个%0A" + \
-                        "运行时间：<b>" + str(top_up) + "</b>%0A" + \
-                        "平均负载：<b>" + str(top_load_average[0]) + " " + str(top_load_average[1]) + " " + str(top_load_average[2]) + "</b>%0A" + \
-                        "CPU温度：<b>" + str(Cpu_temperature) + " ℃</b>%0A" + \
-                        "CPU用量：<b>" + str(round(100.0-float(cpu_id), 2)) + "</b> 已用，<b>" + str(round(float(cpu_id), 2)) + "</b> 空闲%0A" + \
-                        "内存用量：<b>" + str(round((float(memory_total)-float(avail_memory))/1024, 2)) + "G</b> 已用，<b>" + str(round(float(avail_memory)/1024,2)) + "G</b> 空闲%0A" + \
+                    msg = "<b>服务器：" + str(Hostname) + "</b>\n" + \
+                        "查询时间：<i>" + str(top_time_head) + " " + str(top_time_tail) + "</i>\n\n" + \
+                        "登入用户：<b>" + str(top_user) + "</b> 个\n" + \
+                        "运行时间：<b>" + str(top_up) + "</b>\n" + \
+                        "平均负载：<b>" + str(top_load_average[0]) + " " + str(top_load_average[1]) + " " + str(top_load_average[2]) + "</b>\n" + \
+                        "CPU温度：<b>" + str(Cpu_temperature) + " ℃</b>\n" + \
+                        "CPU用量：<b>" + str(round(100.0-float(cpu_id), 2)) + "</b> 已用，<b>" + str(round(float(cpu_id), 2)) + "</b> 空闲\n" + \
+                        "内存用量：<b>" + str(round((float(memory_total)-float(avail_memory))/1024, 2)) + "G</b> 已用，<b>" + str(round(float(avail_memory)/1024,2)) + "G</b> 空闲\n" + \
                         "硬盘用量：<b>" + str(hd_used) + "</b> 已用，<b>" + str(hd_avail) + "</b> 空闲"
 
                     status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id, text=msg, parse_mode="HTML")

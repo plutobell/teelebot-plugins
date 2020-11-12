@@ -13,10 +13,10 @@ def Dwz(bot, message):
             if "https://" in text.split(' ')[1] or "http://" in text.split(' ')[1]:
                 dwz_data = dwz(text.split(' ')[1])
                 if dwz_data != False:
-                    msg = "<b>短网址生成：</b>%0A" +\
-                        "%0A原网址: " + str(dwz_data["long_url"]) +\
-                        "%0A短网址: " + str(dwz_data["short_url"]) +\
-                        "%0A%0A请保存短网址，本消息不久将被销毁"
+                    msg = "<b>短网址生成：</b>\n" +\
+                        "\n原网址: " + str(dwz_data["long_url"]) +\
+                        "\n短网址: " + str(dwz_data["short_url"]) +\
+                        "\n\n请保存短网址，本消息不久将被销毁"
                     status = bot.sendChatAction(chat_id, "typing")
                     status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message_id)
                     bot.message_deletor(30, chat_id, status["message_id"])
