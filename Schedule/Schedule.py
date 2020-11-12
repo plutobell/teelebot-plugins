@@ -71,7 +71,6 @@ def Schedule(bot, message):
     elif text.split(" ")[0] == prefix + "add":
         if  len(text.split(" ")) == 3:
             gap_key = str(text.split(" ")[1])
-            gap = gaps[gap_key]
             if gap_key not in gaps.keys():
                 msg = "<b>错误的周期，支持的周期指令：</b> %0A%0A" + \
                     "<b>1s 2s 5s 10s 15s 30s 45s %0A" + \
@@ -83,6 +82,7 @@ def Schedule(bot, message):
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
                 return
 
+            gap = gaps[gap_key]
             msg = str(text.split(" ")[2]) + "%0A%0A" + "<i>此消息为定时发送，周期 " + str(gap_key) + "</i>"
             msg = msg.replace("#", " ")
             ok, uid = bot.add_schedule(gap, event, (bot, message["chat"]["id"], msg, "HTML"))
