@@ -26,3 +26,4 @@
 19. Acg - Acg插件，调用 [ALAPI](https://www.alapi.net/) 随机获取一张ACG图
 20. Whois - Whois插件，调用 [ALAPI](https://www.alapi.net/) 查询域名whois信息
 21. Schedule - Schedule插件，周期性执行特定任务，目前仅支持文本类消息
+22. Speaker - Speaker插件，群发消息至Bot存在的群组，目前仅支持文本类消息
