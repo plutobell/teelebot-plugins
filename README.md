@@ -9,10 +9,10 @@
 2. Chat - 调用 [青云客聊天机器人API](http://api.qingyunke.com/) 实现的对话功能
 3. About - 关于
 4. Uptime - 获取Bot运行状态
-5. ID - 获取你的用户ID
-6. PluginCTL - 插件开关控制
+5. ID - 获取用户ID
+6. PluginCTL - 插件分群开关控制
 7. Hello - Hello World插件例子
-8. Firefoxmoniter - 调用 [Firefox Moniter](https://monitor.firefox.com/) ,搜索自2007年起的公开数据外泄事件当中是否包含你的电子邮件
+8. Firefoxmoniter - 调用 [Firefox Moniter](https://monitor.firefox.com/) , 搜索自2007年起的公开数据外泄事件当中是否包含你的电子邮件
 9. Bing - 调用第三方Bing壁纸接口 [Bing](https://asilu.com) 获取每日必应壁纸
 10. Top - 调用top命令查看服务器状态
 11. Translate - 调用 [有道翻译](http://fanyi.youdao.com/) API 对文字进行翻译
