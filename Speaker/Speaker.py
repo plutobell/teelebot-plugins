@@ -20,7 +20,7 @@ def Speaker(bot, message):
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])
         return
 
-    if text.split(" ")[0] == prefix:
+    if text.split(" ")[0][:len(prefix)] == prefix:
         if  len(text.split(" ")) == 2:
             send_msg = text.split(" ")[1]
             send_msg = send_msg + " \n\n<code>此消息为群发消息</code>"

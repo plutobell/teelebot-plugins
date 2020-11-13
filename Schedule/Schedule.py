@@ -11,8 +11,6 @@ def Schedule(bot, message):
     message_id = message["message_id"]
     text = message["text"]
 
-    prefix = "/sched"
-
     gaps = {
         "1s": 1,
         "2s": 2,
@@ -48,13 +46,26 @@ def Schedule(bot, message):
         "30d": 2592000
     }
 
+    prefix = "/sched"
+    command = { #命令注册
+            "/schedadd": "kick",
+            "/scheddel": "del",
+            "/schedfind": "find",
+            "/schedclear": "clear",
+            "/schedstatus": "status"
+        }
+    count = 0
+    for c in command.keys():
+        if c in str(text):
+            count += 1
+
     if text.split(" ")[0] != prefix and prefix in text and str(user_id) != bot.config["root"]:
         status = bot.sendMessage(chat_id, text="无权限", parse_mode="HTML",
             reply_to_message_id=message_id)
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])
         return
 
-    if text.split(" ")[0] == prefix:
+    if text[:len(prefix)] == prefix and count == 0:
         msg = "<b>Schedule 插件功能</b>" + "\n\n" + \
             "<b>/schedadd</b> 添加任务 格式：指令+空格+周期+消息" + "\n" + \
             "<b>/scheddel</b> 移除任务 格式：指令+空格+标识" + "\n" + \
@@ -69,7 +80,7 @@ def Schedule(bot, message):
             reply_to_message_id=message_id)
         bot.message_deletor(60, status["chat"]["id"], status["message_id"])
 
-    elif text.split(" ")[0] == prefix + "add":
+    elif text[:len(prefix + "add")] == prefix + "add":
         if  len(text.split(" ")) == 3:
             msg = ""
             gap_key = str(text.split(" ")[1])
@@ -85,6 +96,7 @@ def Schedule(bot, message):
                 return
 
             gap = gaps[gap_key]
+            gap_key = gap_key.replace("s", "秒").replace("m", "分钟").replace("h", "小时").replace("d", "天")
             msg = str(text.split(" ")[2]) + "\n\n" + "<code>此消息为定时发送，周期" + str(gap_key) + "</code>"
             ok, uid = bot.add_schedule(gap, event, (bot, message["chat"]["id"], msg, "HTML"))
             timestamp = time.strftime('%Y/%m/%d %H:%M:%S',time.localtime(time.time()))
@@ -110,7 +122,7 @@ def Schedule(bot, message):
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
-    elif text.split(" ")[0] == prefix + "del":
+    elif text[:len(prefix + "del")] == prefix + "del":
         if len(text.split(" ")) == 2:
             msg = ""
             uid = str(text.split(" ")[1])
@@ -131,7 +143,7 @@ def Schedule(bot, message):
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
-    elif text.split(" ")[0] == prefix + "find":
+    elif text[:len(prefix + "find")] == prefix + "find":
         if len(text.split(" ")) == 2:
             msg = ""
             uid = str(text.split(" ")[1])
@@ -152,7 +164,7 @@ def Schedule(bot, message):
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
-    elif text.split(" ")[0] == prefix + "clear":
+    elif text[:len(prefix + "clear")] == prefix + "clear":
         msg = ""
         ok, msgg = bot.clear_schedule()
         if ok:
@@ -167,7 +179,7 @@ def Schedule(bot, message):
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
-    elif text.split(" ")[0] == prefix + "status":
+    elif text[:len(prefix + "status")] == prefix + "status":
         msg = ""
         ok, result = bot.stat_schedule()
         if ok:
