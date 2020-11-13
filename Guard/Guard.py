@@ -5,6 +5,7 @@ last_modify: 2020-11-13
 '''
 from collections import defaultdict
 import re
+import os
 import string
 import sqlite3
 import time
@@ -36,6 +37,10 @@ def Guard(bot, message):
     db = SqliteDB(bot)
     gap = 60
     bot_id = bot.key.split(':')[0]
+
+    if not os.path.exists(bot.path_converter(bot.plugin_dir + "Guard/config.ini")):
+        print("Guard: configuration file not found.")
+        return
 
     with open(bot.path_converter(bot.plugin_dir + "Guard/config.ini")) as f:
         config_data = f.read().strip().split(",")
