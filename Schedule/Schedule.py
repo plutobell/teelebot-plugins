@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-11
-last_modify: 2020-11-13
+last_modify: 2020-11-14
 '''
 import time
 
@@ -60,7 +60,7 @@ def Schedule(bot, message):
             count += 1
 
     if text.split(" ")[0] != prefix and prefix in text and str(user_id) != bot.config["root"]:
-        status = bot.sendMessage(chat_id, text="无权限", parse_mode="HTML",
+        status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
             reply_to_message_id=message_id)
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])
         return
@@ -98,7 +98,7 @@ def Schedule(bot, message):
             gap = gaps[gap_key]
             gap_key = gap_key.replace("s", "秒").replace("m", "分钟").replace("h", "小时").replace("d", "天")
             msg = str(text.split(" ")[2]) + "\n\n" + "<code>此消息为定时发送，周期" + str(gap_key) + "</code>"
-            ok, uid = bot.add_schedule(gap, event, (bot, message["chat"]["id"], msg, "HTML"))
+            ok, uid = bot.schedule.add(gap, event, (bot, message["chat"]["id"], msg, "HTML"))
             timestamp = time.strftime('%Y/%m/%d %H:%M:%S',time.localtime(time.time()))
             if ok:
                 msg = "<b>任务已加入队列</b>\n\n" + \
@@ -126,7 +126,7 @@ def Schedule(bot, message):
         if len(text.split(" ")) == 2:
             msg = ""
             uid = str(text.split(" ")[1])
-            ok, uid = bot.del_schedule(uid)
+            ok, uid = bot.schedule.delete(uid)
             if ok:
                 msg = "<b>移除了任务 " + str(uid) + "</b>"
             else:
@@ -147,7 +147,7 @@ def Schedule(bot, message):
         if len(text.split(" ")) == 2:
             msg = ""
             uid = str(text.split(" ")[1])
-            ok, uid = bot.find_schedule(uid)
+            ok, uid = bot.schedule.find(uid)
             if ok:
                 msg = "<b>任务存在于队列中</b>"
             else:
@@ -166,7 +166,7 @@ def Schedule(bot, message):
 
     elif text[:len(prefix + "clear")] == prefix + "clear":
         msg = ""
-        ok, msgg = bot.clear_schedule()
+        ok, msgg = bot.schedule.clear()
         if ok:
             msg = "<b>已清空队列</b>"
         else:
@@ -181,7 +181,7 @@ def Schedule(bot, message):
 
     elif text[:len(prefix + "status")] == prefix + "status":
         msg = ""
-        ok, result = bot.stat_schedule()
+        ok, result = bot.schedule.status()
         if ok:
             msg = "<code>使用: " + str(result["used"]) + "\n" + \
                 "空闲: " + str(result["free"]) + "\n" + \

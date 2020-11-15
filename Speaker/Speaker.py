@@ -15,7 +15,7 @@ def Speaker(bot, message):
     prefix = "/speaker"
 
     if prefix in text and str(user_id) != bot.config["root"]:
-        status = bot.sendMessage(chat_id, text="无权限", parse_mode="HTML",
+        status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
             reply_to_message_id=message_id)
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])
         return
