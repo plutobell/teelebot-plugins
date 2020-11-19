@@ -29,3 +29,5 @@
 22. Speaker - Speaker插件，群发消息至Bot存在的群组，目前仅支持文本类消息
 23. CallAdmins - CallAdmins插件，一键呼叫群组管理员
 24. AutoReply - AutoReply插件，根据关键字回复特定内容
+25. MusicDownload - MusicDownload插件，根据音乐ID下载网易云、QQ、百度的音乐，接口 [韩小韩API](https://api.vvhan.com/) 
+
