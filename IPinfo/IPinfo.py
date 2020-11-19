@@ -58,16 +58,19 @@ def IPinfo(bot, message):
 
 def ip_info(ip):
     url = "http://ip-api.com/json/"+ str(ip) + "?lang=zh-CN"
-    with requests.post(url=url) as req:
-        result = req.json()
-        if not req.status_code == requests.codes.ok:
-            return False
-        elif result.get("status") == "success":
-            del result["status"]
-            del result["query"]
-            del result["org"]
-            del result["as"]
-            return result
-        else:
-            return False
+    try:
+        with requests.post(url=url) as req:
+            result = req.json()
+            if not req.status_code == requests.codes.ok:
+                return False
+            elif result.get("status") == "success":
+                del result["status"]
+                del result["query"]
+                del result["org"]
+                del result["as"]
+                return result
+            else:
+                return False
+    except:
+        return False
 

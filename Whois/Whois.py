@@ -60,12 +60,14 @@ def Whois(bot, message):
 
 def whois_info(domain):
     url = "https://v1.alapi.cn/api/whois?domain="+ str(domain)
-    with requests.post(url=url) as req:
-        result = req.json()
-        if not req.status_code == requests.codes.ok:
-            return False
-        elif result.get("msg") == "success":
-            return result["data"]
-        else:
-            return False
-
+    try:
+        with requests.post(url=url) as req:
+            result = req.json()
+            if not req.status_code == requests.codes.ok:
+                return False
+            elif result.get("msg") == "success":
+                return result["data"]
+            else:
+                return False
+    except:
+        return False

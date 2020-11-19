@@ -37,6 +37,7 @@ def Bing(bot, message):
                     status = bot.sendChatAction(chat_id, "typing")
                     status = bot.sendMessage(chat_id=chat_id, text="获取失败，请重试!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(15, chat_id, status["message_id"])
+                    return
 
             status = bot.sendChatAction(chat_id, "typing")
             status = bot.sendPhoto(chat_id=chat_id, photo=img_url, caption=copyright_+"\n\n"+date, parse_mode="HTML", reply_to_message_id=message["message_id"])
@@ -154,13 +155,16 @@ def Bing(bot, message):
 
 def bing_img():
     url = "https://cn.bing.com/HPImageArchive.aspx?ensearch=0&mkt=zh-cn&format=js&idx=0&n=1"
-    with requests.post(url=url, verify=False) as req:
-        if not req.status_code == requests.codes.ok:
-            return False
-        elif req.json().get("images"):
-            return req.json().get("images")[0]
-        else:
-            return False
+    try:
+        with requests.post(url=url, verify=False) as req:
+            if not req.status_code == requests.codes.ok:
+                return False
+            elif req.json().get("images"):
+                return req.json().get("images")[0]
+            else:
+                return False
+    except:
+        return False
 
 def validate(date_text):
     try:

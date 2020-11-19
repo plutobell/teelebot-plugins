@@ -23,7 +23,7 @@
 16. Sticker - Sticker插件，获取贴纸图片
 17. TodayInHistory - TodayInHistory插件，调用 [Kate.API](https://api.66mz8.com/) 查看历史上的今天
 18. Dwz - Dwz插件，调用 [ALAPI](https://www.alapi.net/) 生成短网址
-19. Acg - Acg插件，调用 [ALAPI](https://www.alapi.net/) 随机获取一张ACG图
+19. Acg - Acg插件，调用 [ALAPI](https://www.alapi.net/) 和 [樱花API](http://www.dmoe.cc/) 随机获取一张ACG图
 20. Whois - Whois插件，调用 [ALAPI](https://www.alapi.net/) 查询域名whois信息
 21. Schedule - Schedule插件，周期性执行特定任务，目前仅支持文本类消息
 22. Speaker - Speaker插件，群发消息至Bot存在的群组，目前仅支持文本类消息
