@@ -44,7 +44,10 @@ def Menu(bot, message):
 
     if "reply_markup" in message.keys():
         click_user_id = message["click_user"]["id"]
-        from_user_id = message["reply_to_message"]["from"]["id"]
+        if "reply_to_message" in message.keys():
+            from_user_id = message["reply_to_message"]["from"]["id"]
+        else:
+            from_user_id = bot.bot_id
         callback_query_data = message["callback_query_data"]
 
         if callback_query_data[:len(page_callback_command)] == page_callback_command:
