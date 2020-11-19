@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-15
-last_modify: 2020-11-15
+last_modify: 2020-11-18
 '''
 import time
 
@@ -18,21 +18,31 @@ def CallAdmins(bot, message):
 
     prefix = "/110"
 
+    root_id = bot.root_id
 
     if text.split(" ")[0][:len(prefix)] == prefix:
         if chat_type != "private":
+            if len(text.split(" ")) != 2:
+                status = bot.sendMessage(chat_id=chat_id,
+                    text="🤖 指令格式错误，请检查. (<b>e.g. " + str(prefix) + " reason</b>)",
+                    parse_mode="HTML", reply_to_message_id=message_id)
+                bot.message_deletor(15, status["chat"]["id"], status["message_id"])
+                return
+
+            reason = text.split(" ")[1]
+
             status = bot.sendMessage(chat_id=chat_id, text="🤖 正在为您呼叫管理员.", parse_mode="HTML",
                 reply_to_message_id=message_id)
 
             admins_raw = administrators(bot=bot, chat_id=chat_id)
-            if str(bot.config["root"]) not in admins_raw:
-                admins_raw.append(str(bot.config["root"])) #root permission
+            if str(root_id) not in admins_raw:
+                admins_raw.append(str(root_id)) #root permission
             admins = []
             for i, admin in enumerate(admins_raw):
                 if str(admin) != str(user_id):
                     admins.append(admin)
 
-            chat_username = message["chat"]["username"]
+            chat_username = message["chat"].get("username", chat_id)
             chat_title = message["chat"]["title"]
             for i, admin in enumerate(admins):
 
@@ -46,10 +56,10 @@ def CallAdmins(bot, message):
                 reply_markup = {
                     "inline_keyboard": inlineKeyboard
                 }
-                msg = "🤖 尊敬的管理，您好, " + \
+                msg = "🤖 管理，您好，" + \
                 "<b>" + str(chat_title) + "</b> " + \
                 "有小伙伴在呼叫您." + \
-                ""
+                "\n\n<b>原因:</b> <code>" + str(reason) + "</code>"
                 stat = bot.sendMessage(chat_id=admin, text=msg,
                 parse_mode="HTML", reply_markup=reply_markup)
 

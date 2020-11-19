@@ -3,8 +3,8 @@ import requests, lxml, hashlib
 from bs4 import BeautifulSoup
 
 def Firefoxmoniter(bot, message):
-
-    with open(bot.path_converter(bot.plugin_dir + "Firefoxmoniter/__init__.py"), encoding="utf-8") as f:
+    plugin_dir = bot.plugin_dir
+    with open(bot.path_converter(plugin_dir + "Firefoxmoniter/__init__.py"), encoding="utf-8") as f:
         h = f.readline()[1:]
     if len(message["text"]) < len(h):
         status = bot.sendChatAction(message["chat"]["id"], "typing")
@@ -21,8 +21,8 @@ def Firefoxmoniter(bot, message):
         status = bot.sendMessage(message["chat"]["id"], "查询失败！\n请检查邮件格式!", parse_mode="HTML", reply_to_message_id=message["message_id"])
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])
         return False
-
-    if str(message["from"]["id"]) == bot.config["root"]:
+    root_id = bot.root_id
+    if str(message["from"]["id"]) == root_id:
         status = bot.sendChatAction(message["chat"]["id"], "typing")
         status = bot.sendMessage(message["chat"]["id"], "主人，正在查询邮件地址[" + str(email) + "]，请稍等...", parse_mode="HTML", reply_to_message_id=message["message_id"])
         txt_message_id = status["message_id"]

@@ -9,10 +9,12 @@ import requests
 requests.adapters.DEFAULT_RETRIES = 5
 
 def Top(bot, message):
-    if str(message["from"]["id"]) == bot.config["root"]:
+    root_id = bot.root_id
+    plugin_dir = bot.plugin_dir
+    if str(message["from"]["id"]) == root_id:
         url = ""
         data = {"Key" : ""}
-        with open(bot.path_converter(bot.plugin_dir + "Top/key.ini"), "r") as f:
+        with open(bot.path_converter(plugin_dir + "Top/key.ini"), "r") as f:
             sets = f.readlines()
             url = sets[0].strip()
             data["Key"] = sets[1].strip()

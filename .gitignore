@@ -3,5 +3,6 @@ config.cfg
 __pycache__/
 *.ini
 *.db
+*.txt
 info.txt
 cert/

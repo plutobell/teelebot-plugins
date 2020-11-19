@@ -27,22 +27,24 @@ restrict_permissions = {
 }
 
 def Guard(bot, message):
+    bot_id = bot.bot_id
+    root_id = bot.root_id
+    plugin_dir = bot.plugin_dir
     repl = "<*>"
     DFA = DFAFilter()
-    DFA.parse(bot.path_converter(bot.plugin_dir + "Guard/keywords"))
+    DFA.parse(bot.path_converter(plugin_dir + "Guard/keywords"))
     message_id = message["message_id"]
     chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
 
-    db = SqliteDB(bot)
     gap = 60
-    bot_id = bot.key.split(':')[0]
+    db = SqliteDB(bot, plugin_dir)
 
-    if not os.path.exists(bot.path_converter(bot.plugin_dir + "Guard/config.ini")):
+    if not os.path.exists(bot.path_converter(plugin_dir + "Guard/config.ini")):
         print("Guard: configuration file not found.")
         return
 
-    with open(bot.path_converter(bot.plugin_dir + "Guard/config.ini")) as f:
+    with open(bot.path_converter(plugin_dir + "Guard/config.ini")) as f:
         config_data = f.read().strip().split(",")
         data_group_id = config_data[0]
         log_group_id = config_data[1]
@@ -221,7 +223,7 @@ def Guard(bot, message):
                 db.insert(chat_id=chat_id, user_id=user_id,
                           message_id=status["message_id"], authcode=captcha_text)
                 timer = Timer(
-                    gap + 1, timer_func, args=[bot, gap, chat_id, user_id, first_name, last_name, message_id, log_group_id])
+                    gap + 1, timer_func, args=[bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, message_id, log_group_id])
                 timer.start()
 
     elif "left_chat_member" in message.keys():
@@ -338,8 +340,8 @@ def Guard(bot, message):
 
         if message["chat"]["type"] != "private":
             admins = administrators(bot=bot, chat_id=chat_id)
-            if str(bot.config["root"]) not in admins:
-                admins.append(str(bot.config["root"]))  # root permission
+            if str(root_id) not in admins:
+                admins.append(str(root_id))  # root permission
 
         # 判断是否为私人对话
         if message["chat"]["type"] == "private" and text[1:len(prefix)+1] == prefix:
@@ -361,10 +363,10 @@ def Guard(bot, message):
                 if len(text.split(' ')) == 2:
                     keyword = (text.split(' ')[1]).strip()
                     # if str(user_id) in admins and len(keyword) <= 7:
-                    if str(user_id) == str(bot.config["root"]) and len(keyword) <= 7:
+                    if str(user_id) == str(root_id) and len(keyword) <= 7:
                         result = DFA.filter(keyword, repl)
                         if repl not in result:
-                            with open(bot.path_converter(bot.plugin_dir + "Guard/keywords"), "a", encoding="utf-8") as k:
+                            with open(bot.path_converter(plugin_dir + "Guard/keywords"), "a", encoding="utf-8") as k:
                                 k.write("\n" + keyword)
                             status = bot.sendChatAction(chat_id, "typing")
                             status = bot.sendMessage(
@@ -394,8 +396,8 @@ def Guard(bot, message):
                     bot.message_deletor(gap, chat_id, status["message_id"])
 
 
-def timer_func(bot, gap, chat_id, user_id, first_name, last_name, message_id, log_group_id):
-    db = SqliteDB(bot)
+def timer_func(bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, message_id, log_group_id):
+    db = SqliteDB(bot, plugin_dir)
     result = db.select(chat_id=chat_id, user_id=user_id)
     if result != False and result[2] == str(user_id) != "private":
         if int(time.time()) > result[5] + gap:
@@ -560,12 +562,12 @@ def handle_logging(bot, content, log_group_id, user_id, chat_id, message_id, rea
 
 
 class SqliteDB(object):
-    def __init__(self, bot):
+    def __init__(self, bot, plugin_dir):
         '''
         Open the connection
         '''
         self.conn = sqlite3.connect(
-            bot.path_converter(bot.plugin_dir + "Guard/captcha.db"), check_same_thread=False)  # 只读模式加上uri=True
+            bot.path_converter(plugin_dir + "Guard/captcha.db"), check_same_thread=False)  # 只读模式加上uri=True
         self.cursor = self.conn.cursor()
         self.cursor.execute(
             "CREATE TABLE IF NOT EXISTS captcha_list (id INTEGER PRIMARY KEY autoincrement, chat_id TEXT, user_id TEXT, message_id TEXT, authcode TEXT, timestamp INTEGER)")

@@ -13,7 +13,7 @@
 6. PluginCTL - 插件分群开关控制
 7. Hello - Hello World插件例子
 8. Firefoxmoniter - 调用 [Firefox Moniter](https://monitor.firefox.com/) , 搜索自2007年起的公开数据外泄事件当中是否包含你的电子邮件
-9. Bing - 调用第三方Bing壁纸接口 [Bing](https://asilu.com) 获取每日必应壁纸
+9. Bing -  获取每日必应壁纸
 10. Top - 调用top命令查看服务器状态
 11. Translate - 调用 [有道翻译](http://fanyi.youdao.com/) API 对文字进行翻译
 12. Guard - 广告过滤， 使用 DFA 对消息进行过滤；入群验证码人机检测
@@ -28,3 +28,4 @@
 21. Schedule - Schedule插件，周期性执行特定任务，目前仅支持文本类消息
 22. Speaker - Speaker插件，群发消息至Bot存在的群组，目前仅支持文本类消息
 23. CallAdmins - CallAdmins插件，一键呼叫群组管理员
+24. AutoReply - AutoReply插件，根据关键字回复特定内容

@@ -11,10 +11,11 @@ def Speaker(bot, message):
     user_id = message["from"]["id"]
     message_id = message["message_id"]
     text = message["text"]
+    root_id = bot.root_id
 
     prefix = "/speaker"
 
-    if prefix in text and str(user_id) != bot.config["root"]:
+    if prefix in text and str(user_id) != root_id:
         status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
             reply_to_message_id=message_id)
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])
@@ -24,7 +25,7 @@ def Speaker(bot, message):
         if  len(text.split(" ")) == 2:
             send_msg = text.split(" ")[1]
             send_msg = send_msg + " \n\n<code>此消息为群发消息</code>"
-            chats = bot.response_chats()
+            chats = bot.response_chats
             chats_count = len(chats)
 
 

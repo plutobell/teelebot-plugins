@@ -1,13 +1,14 @@
 # -*- coding:utf-8 -*-
 
 def ID(bot, message):
-    bot_id = bot.key.split(':')[0]
+    bot_id = bot.bot_id
+    root_id = bot.root_id
 
     admins = []
     if message["chat"]["type"] != "private":
         admins = administrators(bot=bot, chat_id=message["chat"]["id"])
-        if str(bot.config["root"]) not in admins:
-            admins.append(str(bot.config["root"])) #root permission
+        if str(root_id) not in admins:
+            admins.append(str(root_id)) #root permission
 
     if message["text"] == "/idchat":
         if message["chat"]["type"] != "private" and str(message["from"]["id"]) not in admins:
@@ -24,9 +25,9 @@ def ID(bot, message):
                 parse_mode="text", reply_to_message_id=message["message_id"])
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])
 
-    elif message["text"] == "/id" and "reply_to_message" not in message.keys():
+    elif message["text"][:len("/id")] == "/id" and "reply_to_message" not in message.keys():
         status = bot.sendChatAction(message["chat"]["id"], "typing")
-        if str(message["from"]["id"]) == bot.config["root"]:
+        if str(message["from"]["id"]) == root_id:
             status = bot.sendChatAction(message["chat"]["id"], "typing")
             status = bot.sendMessage(message["chat"]["id"], "主人\n" + "您的用户ID为：<b><code>" + str(message["from"]["id"]) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
         else:
@@ -34,7 +35,7 @@ def ID(bot, message):
             first_name = str(message["from"]["first_name"])
             status = bot.sendMessage(message["chat"]["id"], first_name + "\n您的用户ID为：<b><code>" + str(message["from"]["id"]) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
         bot.message_deletor(30, status["chat"]["id"], status["message_id"])
-    elif message["text"] == "/id" and "reply_to_message" in message.keys() and message["chat"]["type"] != "private":
+    elif message["text"][:len("/id")] == "/id" and "reply_to_message" in message.keys() and message["chat"]["type"] != "private":
 
         if str(message["from"]["id"]) in admins:
             reply_to_message = message["reply_to_message"]
@@ -43,7 +44,7 @@ def ID(bot, message):
             target_chat_id = reply_to_message["chat"]["id"]
 
             if str(bot_id) != str(target_user_id):
-                if str(message["from"]["id"]) == bot.config["root"]:
+                if str(message["from"]["id"]) == root_id:
                     status = bot.sendChatAction(message["chat"]["id"], "typing")
                     status = bot.sendMessage(message["chat"]["id"], "主人\n您查询的用户的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
                 else:
@@ -52,7 +53,7 @@ def ID(bot, message):
                     status = bot.sendMessage(message["chat"]["id"], first_name + "\n您查询的用户的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
             else:
-                if str(message["from"]["id"]) == bot.config["root"]:
+                if str(message["from"]["id"]) == root_id:
                     status = bot.sendChatAction(message["chat"]["id"], "typing")
                     status = bot.sendMessage(message["chat"]["id"], "主人，我的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
                 else:
@@ -63,14 +64,14 @@ def ID(bot, message):
             status = bot.sendChatAction(message["chat"]["id"], "typing")
             status = bot.sendMessage(chat_id=message["chat"]["id"], text="抱歉，您无权查询!", parse_mode="text", reply_to_message_id=message["message_id"])
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
-    elif message["text"] == "/id" and "reply_to_message" in message.keys() and message["chat"]["type"] == "private":
+    elif message["text"][:len("/id")] == "/id" and "reply_to_message" in message.keys() and message["chat"]["type"] == "private":
         reply_to_message = message["reply_to_message"]
         target_message_id = reply_to_message["message_id"]
         target_user_id = reply_to_message["from"]["id"]
         target_chat_id = reply_to_message["chat"]["id"]
 
         if str(bot_id) == str(target_user_id):
-            if str(message["from"]["id"]) == bot.config["root"]:
+            if str(message["from"]["id"]) == root_id:
                 status = bot.sendChatAction(message["chat"]["id"], "typing")
                 status = bot.sendMessage(message["chat"]["id"], "主人，我的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
             else:
@@ -78,7 +79,7 @@ def ID(bot, message):
                 status = bot.sendMessage(chat_id=message["chat"]["id"], text="抱歉，您无权查询!", parse_mode="text", reply_to_message_id=message["message_id"])
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
         else:
-            if str(message["from"]["id"]) == bot.config["root"]:
+            if str(message["from"]["id"]) == root_id:
                 status = bot.sendChatAction(message["chat"]["id"], "typing")
                 status = bot.sendMessage(message["chat"]["id"], "主人\n您查询的用户的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
             elif message["chat"]["id"] == target_user_id:
