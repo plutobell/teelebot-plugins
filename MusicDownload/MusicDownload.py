@@ -37,28 +37,15 @@ def MusicDownload(bot, message):
                 result = get_music(app, m_id)
                 if result and result["song_id"] != None:
                     if result["mp3url"] != "":
-                        try:
-                            with requests.get(url=result["mp3url"], verify=False) as req:
-                                audio = req.content
-                        except:
-                            status = bot.sendMessage(chat_id,
-                                text="下载歌曲出错.",
-                                parse_mode="HTML", reply_to_message_id=message_id)
-                            bot.message_deletor(15, status["chat"]["id"], status["message_id"])
-                            return
-
                         caption = "<b>歌名: " + str(result["name"]) + "</b>\n" +\
-                            "<b>歌手: #" + str(result["author"]) + "</b>"
-                        status = bot.sendPhoto(chat_id=chat_id, photo=result["cover"],
-                            caption=caption, parse_mode="HTML", reply_to_message_id=message_id)
-                        status = bot.sendAudio(chat_id=chat_id, audio=audio, parse_mode="HTML",
-                            title=str(result["name"]) + " - " + str(result["author"]),
-                            reply_to_message_id=status["message_id"])
+                            "<b>歌手: #" + str(result["author"]) + "</b>\n" +\
+                            "<b>资源: <a href='" + str(result["mp3url"]) + "'>点击下载</a></b>"
                     else:
-                        status = bot.sendMessage(chat_id,
-                            text="获取歌曲 <b>《" + str(result["name"]) + " - " + result["author"] + "》</b> 下载链接失败.",
-                            parse_mode="HTML", reply_to_message_id=message_id)
-                        bot.message_deletor(15, status["chat"]["id"], status["message_id"])
+                        caption = "<b>歌名: " + str(result["name"]) + "</b>\n" +\
+                            "<b>歌手: #" + str(result["author"]) + "</b>\n" +\
+                            "<b>资源: 无法下载</b>"
+                    status = bot.sendPhoto(chat_id=chat_id, photo=result["cover"],
+                        caption=caption, parse_mode="HTML", reply_to_message_id=message_id)
                 else:
                     status = bot.sendMessage(chat_id,
                         text="获取歌曲信息失败.",
