@@ -26,7 +26,10 @@ def Acg(bot, message):
 def acg_img():
     urls = [
         "http://www.dmoe.cc/random.php",
-        "https://v1.alapi.cn/api/acg"
+        "https://v1.alapi.cn/api/acg",
+        "https://acg.yanwz.cn/wallpaper/api.php",
+        "https://acg.yanwz.cn/api.php",
+        "https://api.vvhan.com/api/acgimg"
     ]
     url = choice(urls)
     try:
@@ -41,7 +44,13 @@ def acg_img():
         return False
 
 def one_said():
-    url = "http://api.guaqb.cn/v1/onesaid/"
+    urls = [
+        "https://api.vvhan.com/api/love",
+        "https://api.vvhan.com/api/sao",
+        "http://api.guaqb.cn/v1/onesaid/",
+        "https://api.vvhan.com/api/ian"
+    ]
+    url = choice(urls)
     try:
         with requests.post(url, verify=False) as req:
             if not req.status_code == requests.codes.ok:
