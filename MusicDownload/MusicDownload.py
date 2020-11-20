@@ -71,7 +71,7 @@ def MusicDownload(bot, message):
 def get_music(app, m_id):
     urls = {
         "wy": "https://api.vvhan.com/api/music?id={}&type=song&media=netease",
-        "qq": "https://api.vvhan.com/api/music?id={}type=song&media=tencent",
+        "qq": "https://api.vvhan.com/api/music?id={}&type=song&media=tencent",
         "bd": "https://api.vvhan.com/api/music?id={}&type=song&media=baidu"
     }
     url = urls[app]
