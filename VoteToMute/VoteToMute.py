@@ -29,9 +29,22 @@ def VoteToMute(bot, message):
     if message_type == "text":
         text = message["text"]
 
-    if message["chat"]["type"] == "private" and text[:len(prefix)+1] == prefix: #判断是否为私人对话
+    if chat_type != "private":
+        results = bot.getChatAdministrators(chat_id=chat_id) #判断Bot是否具备管理员权限
+        admin_status = False
+        for admin_user in results:
+            if str(admin_user["user"]["id"]) == str(bot.bot_id):
+                admin_status = True
+        if admin_status != True:
+            status = bot.sendChatAction(chat_id, "typing")
+            msg = "权限不足，请授予适当权限以使用 VoteToMute 插件。"
+            status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML")
+            bot.message_deletor(15, chat_id, status["message_id"])
+            return False
+
+    if chat_type == "private" and text[:len(prefix)+1] == prefix: #判断是否为私人对话
         status = bot.sendChatAction(chat_id, "typing")
-        status = bot.sendMessage(chat_id, "抱歉，该指令不支持私人会话!", parse_mode="HTML", reply_to_message_id=message_id)
+        status = bot.sendMessage(chat_id, "抱歉，该指令不支持私人会话.", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
     elif "reply_to_message" in message.keys():
         reply_to_message = message["reply_to_message"]
@@ -63,10 +76,10 @@ def VoteToMute(bot, message):
             return
 
         options = [
-            "违规消息: 将根据投票结果禁言被举报者，时间1小时。",
-            "驳回举报: 若举报被驳回，举报者将被禁言1小时。"
+            "违规消息: 被举报者将被禁言，时间1小时",
+            "驳回举报: 举报发起者将被禁言，时间1小时"
         ]
-        question = "此消息已被举报，请在3分钟内投票表决."
+        question = "此消息已被举报，请在3分钟内投票表决"
         status = bot.sendChatAction(chat_id, "typing")
         status = bot.sendPoll(chat_id=chat_id,
             is_anonymous=False, question=question, options=options,
@@ -77,17 +90,17 @@ def VoteToMute(bot, message):
 
             bot.timer(1 * 3 * 60, handler_func, args=(bot, chat_id,
                 message_id,target_message_id, poll_message_id,
-                poll_id, user_id, target_user_id))
+                poll_id, user_id, target_user_id, admins))
     else:
         status = bot.sendChatAction(chat_id, "typing")
-        status = bot.sendMessage(chat_id=chat_id, text="未指定要举报的对象!",
+        status = bot.sendMessage(chat_id=chat_id, text="未指定要举报的对象.",
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
 
 
 
 def handler_func(bot, chat_id, message_id,
-    target_message_id, poll_message_id, poll_id, user_id, target_user_id):
+    target_message_id, poll_message_id, poll_id, user_id, target_user_id, admins):
     status = bot.stopPoll(chat_id=chat_id, message_id=poll_message_id)
     if status:
         total_voter_count = status["total_voter_count"]
@@ -118,11 +131,14 @@ def handler_func(bot, chat_id, message_id,
                 bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message_id)
 
             elif question1_voter_count < question2_voter_count:
-                status = bot.restrictChatMember(chat_id=chat_id,
-                    user_id=user_id,permissions=permissions,
-                    until_date=1 * 60 * 60)
+                if str(user_id) not in admins:
+                    status = bot.restrictChatMember(chat_id=chat_id,
+                        user_id=user_id,permissions=permissions,
+                        until_date=1 * 60 * 60)
+                    msg = "投票结束\n<b>举报发起者</b> <b><a href='tg://user?id=" + str(user_id) + "'>" + str(user_id) + "</a></b> 已被禁言\n持续时间：<b>1小时</b>"
+                else:
+                    msg = "投票结束\n<b>举报被驳回</b>\n但无权处置管理员"
                 bot.deleteMessage(chat_id=chat_id, message_id=poll_message_id)
-                msg = "投票结束\n<b>举报者</b> <b><a href='tg://user?id=" + str(user_id) + "'>" + str(user_id) + "</a></b> 已被禁言\n持续时间：<b>1小时</b>"
                 status = bot.sendChatAction(chat_id, "typing")
                 bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message_id)
 
@@ -134,7 +150,7 @@ def handler_func(bot, chat_id, message_id,
 
         else:
             bot.deleteMessage(chat_id=chat_id, message_id=poll_message_id)
-            msg = "投票结束\n由于投票人数不足 <b>3</b> 人,<b>此次投票无效</b>\n请重新投票"
+            msg = "投票结束\n由于投票人数不足 <b>3</b> 人，<b>此次投票无效</b>\n请重新投票"
             status = bot.sendChatAction(chat_id, "typing")
             bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message_id)
 
