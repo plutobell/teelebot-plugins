@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-6-4
-last_modify: 2020-11-18
+last_modify: 2020-12-14
 '''
 
 def Admin(bot, message):
@@ -336,7 +336,7 @@ def Admin(bot, message):
                     bot.message_deletor(gap, chat_id, status["message_id"])
                     bot.message_deletor(gap, chat_id, message_id)
                     return
-                if len(text.split(" ")) != 2:
+                if len(text.split(" ")) < 2:
                     status = bot.sendChatAction(chat_id, "typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 指令格式错误，请检查. \n(<b>e.g. /admintitle title</b>)",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
@@ -372,7 +372,7 @@ def Admin(bot, message):
                     bot_info.pop("user")
                     bot_info.pop("status")
                     bot_permissions = bot_info
-                    title = text.split(" ")[1]
+                    title = text.split(" ", 1)[1]
                     if len(title) > 16:
                         status = bot.sendChatAction(chat_id, "typing")
                         status = bot.sendMessage(chat_id=chat_id, text="🤖 输入的昵称过长.",

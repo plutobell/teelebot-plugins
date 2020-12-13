@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-15
-last_modify: 2020-11-18
+last_modify: 2020-12-14
 '''
 import time
 
@@ -22,14 +22,14 @@ def CallAdmins(bot, message):
 
     if text.split(" ")[0][:len(prefix)] == prefix:
         if chat_type != "private":
-            if len(text.split(" ")) != 2:
+            if len(text.split(" ")) < 2:
                 status = bot.sendMessage(chat_id=chat_id,
                     text="🤖 指令格式错误，请检查. (<b>e.g. " + str(prefix) + " reason</b>)",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, status["chat"]["id"], status["message_id"])
                 return
 
-            reason = text.split(" ")[1]
+            reason = text.split(" ", 1)[1]
 
             status = bot.sendMessage(chat_id=chat_id, text="🤖 正在为您呼叫管理员.", parse_mode="HTML",
                 reply_to_message_id=message_id)

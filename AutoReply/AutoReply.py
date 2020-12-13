@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-15
-last_modify: 2020-11-16
+last_modify: 2020-12-14
 '''
 import os
 import re
@@ -46,8 +46,7 @@ def AutoReply(bot, message):
     with open(data_dir, "r", encoding="utf-8") as lines:
         for line in lines:
             if line != "\n":
-                result[line.split(":")[0].strip()] = line.split(":")[1].strip()
-
+                result[line.split(":")[0]] = line.split(":")[1]
 
     if text[:len(prefix)] == prefix and count == 0:
         if prefix in text and str(user_id) != root_id:
@@ -72,8 +71,8 @@ def AutoReply(bot, message):
             bot.message_deletor(15, status["chat"]["id"], status["message_id"])
             return
 
-        if len(text.split(" ")) == 2:
-            keyword_and_reply = text.split(" ")[1]
+        if len(text.split(" ")) >= 2:
+            keyword_and_reply = text.split(" ", 1)[1]
             if len(keyword_and_reply.split(":")) == 2:
                 keyword = keyword_and_reply.split(":")[0].strip()
                 reply = keyword_and_reply.split(":")[1].strip()
@@ -175,7 +174,9 @@ def AutoReply(bot, message):
         if len(text_re) != 0:
             for keyword, reply in result_washed.items():
                 keyword_re = re.findall('[a-zA-Z0-9]+',keyword)
-                if keyword not in text_re and len(keyword_re) != 0:
+                if (keyword not in text_re
+                    and len(keyword_re) != 0
+                    and text_re != keyword_re):
                     result.pop(keyword)
 
         if len(list(result.values())) != 0:

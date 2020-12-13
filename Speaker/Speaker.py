@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-12
-last_modify: 2020-11-13
+last_modify: 2020-12-14
 '''
 import time
 
@@ -22,8 +22,8 @@ def Speaker(bot, message):
         return
 
     if text.split(" ")[0][:len(prefix)] == prefix:
-        if  len(text.split(" ")) == 2:
-            send_msg = text.split(" ")[1]
+        if  len(text.split(" ")) >= 2:
+            send_msg = text.split(" ", 1)[1]
             send_msg = send_msg + " \n\n<code>此消息为群发消息</code>"
             chats = bot.response_chats
             chats_count = len(chats)
