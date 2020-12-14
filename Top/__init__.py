@@ -1,2 +1,2 @@
 #/top
-#Top 查看服务器状态
+#Top 通过 Pi Dashboard Go 后端接口查看服务器状态

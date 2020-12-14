@@ -14,7 +14,7 @@
 7. Hello - Hello World插件例子
 8. Firefoxmoniter - 调用 [Firefox Moniter](https://monitor.firefox.com/) , 搜索自2007年起的公开数据外泄事件当中是否包含你的电子邮件
 9. Bing -  获取每日必应壁纸
-10. Top - 调用top命令查看服务器状态
+10. Top - 通过 [Pi Dashboard Go](https://github.com/plutobell/pi-dashboard-go) 后端接口查看服务器状态
 11. Translate - 调用 [有道翻译](http://fanyi.youdao.com/) API 对文字进行翻译
 12. Guard - 广告过滤， 使用 DFA 对消息进行过滤；入群验证码人机检测
 13. Admin - 群管插件，管理员可通过指令对群进行管理(踢人、禁言等)

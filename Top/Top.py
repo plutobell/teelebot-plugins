@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
 '''
-creation time: 2020-3-21
-last_modify: 2020-11-13
+@creation time: 2020-3-21
+@last_modify: 2020-12-14
+@The backend is powered by Pi Dashboard Go
+    https://github.com/plutobell/pi-dashboard-go
 '''
 import requests
 
@@ -13,56 +15,80 @@ def Top(bot, message):
     plugin_dir = bot.plugin_dir
     if str(message["from"]["id"]) == root_id:
         url = ""
-        data = {"Key" : ""}
-        with open(bot.path_converter(plugin_dir + "Top/key.ini"), "r") as f:
+        username = ""
+        password = ""
+        with open(bot.path_converter(plugin_dir + "Top/config.ini"), "r") as f:
             sets = f.readlines()
-            url = sets[0].strip()
-            data["Key"] = sets[1].strip()
+            if len(sets) != 3 and "/\n" in sets:
+                for i, set in enumerate(sets):
+                    if set == "/\n":
+                        sets.pop(i)
+
+            url = sets[0].strip("\n")
+            username = sets[1].strip("\n")
+            password = sets[2].strip("\n")
 
         status = bot.sendChatAction(message["chat"]["id"], "typing")
         status = bot.sendMessage(message["chat"]["id"], text="主人，正在获取服务器信息，请稍等...", parse_mode="HTML", reply_to_message_id=message["message_id"])
         txt_message_id = status["message_id"]
         try:
-            with requests.post(url=url, data=data) as req:
-                if req.json().get("status") == False:
+            with requests.get(url=url + "?ajax=true", auth=(username, password)) as req:
+                if req.json().get("version", False) is False:
                     req.close()
                     status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id, text="抱歉主人，获取服务器信息失败", parse_mode="HTML")
                     bot.message_deletor(15, message["chat"]["id"], txt_message_id)
-                elif req.json().get("status") == True:
-                    contents = req.json().get("contents")
-                    Top = contents.get("Top")
-                    Cpu = contents.get("Cpu")
-                    Memory = contents.get("Memory")
-                    Swap = contents.get("Swap")
+                else:
+                    contents = req.json()
+                    version = contents.get("version")
 
-                    Hostname = contents.get("Hostname")
-                    top_time = Top["top_time"]
-                    top_time_head = top_time[0]
-                    top_time_tail = top_time[1]
-                    top_up = Top["top_up"]
-                    top_load_average = Top["top_load_average"]
-                    top_user = Top["top_user"]
-                    cpu_id = Cpu["cpu_id"]
-                    memory_total = Memory["memory_total"]
-                    avail_memory = Swap["avail_memory"]
-                    Cpu_temperature = contents.get("Cpu_temperature")
-                    Hard_disk = contents.get("Hard_disk")
-                    hd_used = Hard_disk[0]
-                    hd_avail = Hard_disk[1]
+                    Hostname = contents.get("hostname")
+                    IP = contents.get("ip")
+                    Device_model = contents.get("model")
+                    System = contents.get("system")
+                    top_time_head = contents.get("now_time_ymd")
+                    top_time_tail = contents.get("now_time_hms")
+                    top_up = contents.get("uptime")
+                    top_load_average = [
+                        contents.get("load_average_1m"),
+                        contents.get("load_average_5m"),
+                        contents.get("load_average_15m"),
+                    ]
+                    top_user = contents.get("login_user_count")
+                    cpu_id = contents.get("cpu_status_idle")
+                    memory_total = contents.get("memory_total")
+                    memory_percent = contents.get("memory_real_percent")
+                    avail_memory = contents.get("memory_available")
+                    Cpu_temperature = contents.get("cpu_temperature")
+                    # hd_name = contents.get("disk_name")
+                    hd_used = contents.get("disk_used")
+                    hd_avail = contents.get("disk_total")
+                    hd_percent = contents.get("disk_used_percent")
+                    net_in_data = contents.get("net_status_in_data_format")
+                    net_out_data = contents.get("net_status_out_data_format")
+                    # net_dev_name = contents.get("net_dev_name")
+                    process_running = contents.get("load_average_process_running")
+                    process_total = contents.get("load_average_process_total")
 
-                    msg = "<b>服务器：" + str(Hostname) + "</b>\n" + \
-                        "查询时间：<i>" + str(top_time_head) + " " + str(top_time_tail) + "</i>\n\n" + \
-                        "登入用户：<b>" + str(top_user) + "</b> 个\n" + \
+                    msg = "<b>服务器：" + str(Hostname) + "</b>\n\n" + \
+                        "<code>查询时间：<i>" + str(top_time_head) + " " + str(top_time_tail) + "</i>\n" + \
+                        "后端版本：<b>Pi Dashboard Go v" + str(version).strip() + "</b>\n\n" + \
+                        "设备型号：<b>" + str(Device_model).strip() + "</b>\n" + \
+                        "系统版本：<b>" + str(System).strip() + "</b>\n" + \
+                        "本地地址：<b>" + str(IP).strip() + "</b>\n" + \
+                        "登入用户：<b>" + str(top_user) + "</b> user(s)\n" + \
                         "运行时间：<b>" + str(top_up) + "</b>\n" + \
                         "平均负载：<b>" + str(top_load_average[0]) + " " + str(top_load_average[1]) + " " + str(top_load_average[2]) + "</b>\n" + \
-                        "CPU温度：<b>" + str(Cpu_temperature) + " ℃</b>\n" + \
-                        "CPU用量：<b>" + str(round(100.0-float(cpu_id), 2)) + "</b> 已用，<b>" + str(round(float(cpu_id), 2)) + "</b> 空闲\n" + \
-                        "内存用量：<b>" + str(round((float(memory_total)-float(avail_memory))/1024, 2)) + "G</b> 已用，<b>" + str(round(float(avail_memory)/1024,2)) + "G</b> 空闲\n" + \
-                        "硬盘用量：<b>" + str(hd_used) + "</b> 已用，<b>" + str(hd_avail) + "</b> 空闲"
+                        "核心温度：<b>" + str(Cpu_temperature) + "℃</b>\n" + \
+                        "核心用量：<b>" + str(round(100.0-float(cpu_id), 2)) + "%</b>\n" + \
+                        "进程统计：<b>" + str(process_running) + "(running) " + str(process_total) + "(total)</b>\n" + \
+                        "网络监控：<b>" + str(net_in_data) + "(in)</b> <b>" + str(net_out_data) + "(out)</b>\n" + \
+                        "内存用量：<b>" + str(memory_percent) + "% " + str(round((float(memory_total)-float(avail_memory))/1024, 2)) + "GB</b>/<b>" + str(round(float(memory_total)/1024,2)) + "GB</b>\n" + \
+                        "硬盘用量：<b>" + str(hd_percent) + "% " + str(hd_used) + "GB</b>/<b>" + str(hd_avail) + "GB</b></code>"
 
                     status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(60, message["chat"]["id"], txt_message_id)
-        except Exception:
+        except Exception as e:
+            print("Top plugin error:", e)
             status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id, text="抱歉，查询失败!", parse_mode="HTML")
             bot.message_deletor(15, message["chat"]["id"], status["message_id"])
     else:
