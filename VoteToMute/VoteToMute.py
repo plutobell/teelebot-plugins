@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-27
-last_modify: 2020-11-27
+last_modify: 2021-03-02
 '''
 
 def VoteToMute(bot, message):
@@ -74,6 +74,17 @@ def VoteToMute(bot, message):
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])
             return
+
+        statu = bot.forwardMessage(chat_id=chat_id, from_chat_id=chat_id, message_id=message_id)
+        vote_message_id = statu["message_id"]
+        statu = bot.forwardMessage(chat_id=chat_id, from_chat_id=chat_id, message_id=target_message_id)
+        forward_message_id = statu["message_id"]
+
+        bot.deleteMessage(chat_id=chat_id, message_id=target_message_id)
+        bot.deleteMessage(chat_id=chat_id, message_id=message_id)
+
+        message_id = vote_message_id
+        target_message_id = forward_message_id
 
         options = [
             "违规消息: 被举报者将被禁言，时间1小时",
