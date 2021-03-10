@@ -207,16 +207,19 @@ def Admin(bot, message):
                         bot_permissions.get("can_restrict_members", False) and \
                         bot_permissions.get("can_delete_messages", False) and \
                         bot_permissions.get("can_pin_messages", False) and \
-                        bot_permissions.get("can_invite_users", False):
+                        bot_permissions.get("can_invite_users", False) and \
+                        bot_permissions.get("can_manage_voice_chats", False):
                         if str(target_user_id) == root_id:
                             ok = bot.promoteChatMember(
                                 chat_id = chat_id,
                                 user_id = root_id,
                                 is_anonymous = False,
+                                can_manage_chat = bot_permissions.get("can_manage_chat", False),
                                 can_change_info = bot_permissions.get("can_change_info", False),
                                 can_post_messages = bot_permissions.get("can_post_messages", False),
                                 can_edit_messages = bot_permissions.get("can_edit_messages", False),
                                 can_delete_messages = bot_permissions.get("can_delete_messages", False),
+                                can_manage_voice_chats = bot_permissions.get("can_manage_voice_chats", False),
                                 can_invite_users = bot_permissions.get("can_invite_users", False),
                                 can_restrict_members = bot_permissions.get("can_restrict_members", False),
                                 can_pin_messages = bot_permissions.get("can_pin_messages", False),
@@ -231,6 +234,7 @@ def Admin(bot, message):
                                 can_post_messages = False,
                                 can_edit_messages = False,
                                 can_delete_messages = True,
+                                can_manage_voice_chats = True,
                                 can_invite_users = False,
                                 can_restrict_members = True,
                                 can_pin_messages = True,
@@ -303,10 +307,12 @@ def Admin(bot, message):
                     chat_id = chat_id,
                     user_id = target_user_id,
                     is_anonymous = False,
+                    can_manage_chat = False,
                     can_change_info = False,
                     can_post_messages = False,
                     can_edit_messages = False,
                     can_delete_messages = False,
+                    can_manage_voice_chats = False,
                     can_invite_users = False,
                     can_restrict_members = False,
                     can_pin_messages = False,
@@ -386,10 +392,12 @@ def Admin(bot, message):
                                 chat_id = chat_id,
                                 user_id = root_id,
                                 is_anonymous = False,
+                                can_manage_chat = bot_permissions.get("can_manage_chat", False),
                                 can_change_info = bot_permissions.get("can_change_info", False),
                                 can_post_messages = bot_permissions.get("can_post_messages", False),
                                 can_edit_messages = bot_permissions.get("can_edit_messages", False),
                                 can_delete_messages = bot_permissions.get("can_delete_messages", False),
+                                can_manage_voice_chats = bot_permissions.get("can_manage_voice_chats", False),
                                 can_invite_users = bot_permissions.get("can_invite_users", False),
                                 can_restrict_members = bot_permissions.get("can_restrict_members", False),
                                 can_pin_messages = bot_permissions.get("can_pin_messages", False),
@@ -404,6 +412,7 @@ def Admin(bot, message):
                                     can_post_messages = False,
                                     can_edit_messages = False,
                                     can_delete_messages = False,
+                                    can_manage_voice_chats = True,
                                     can_invite_users = True,
                                     can_restrict_members = False,
                                     can_pin_messages = False,
