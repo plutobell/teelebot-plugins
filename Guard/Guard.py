@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
-creation time: 2020-5-28
-last_modify: 2020-11-13
+creation time: 2020-05-28
+last_modify: 2021-04-23
 '''
 from collections import defaultdict
 import re
@@ -49,6 +49,7 @@ def Guard(bot, message):
         data_group_id = config_data[0]
         log_group_id = config_data[1]
 
+    user_status = "member"
     result = db.select(chat_id=chat_id, user_id=user_id)
     if "reply_markup" in message.keys() and\
         message["message_type"] == "callback_query_data" and\
@@ -67,13 +68,17 @@ def Guard(bot, message):
         else:
             last_name = ""
 
-        if result != False and message["callback_query_data"] == "/guardupdatingcaptcha" and result[2] == str(user_id) and result[1] == str(chat_id):
+        if result != False and "/guardupdatingcaptcha" in message["callback_query_data"] and result[2] == str(user_id) and result[1] == str(chat_id):
+            if message["callback_query_data"] == "/guardupdatingcaptcha-restricted":
+                user_status = "restricted"
+
             msg = "<b><a href='tg://user?id=" + str(user_id) + "'>" + first_name + " " + last_name + \
                 "</a></b> 验证码已手动刷新，请于 <b>" + \
                 str((gap + result[5])-int(time.time())) + \
                 "</b> 秒内从下方选出与图片一致的验证码。"
             bytes_image, captcha_text = captcha_img()
-            reply_markup = reply_markup_dict(captcha_text=captcha_text)
+            reply_markup = reply_markup_dict(captcha_text=captcha_text,
+                user_status=user_status)
             status = bot.sendPhoto(chat_id=str(
                 data_group_id), photo=bytes_image, parse_mode="HTML")
             db.update(
@@ -94,14 +99,20 @@ def Guard(bot, message):
             else:
                 status = bot.answerCallbackQuery(
                     message["callback_query_id"], text="刷新失败", show_alert=bool("true"))
-        elif result != False and message["callback_query_data"] == "/guardcaptchatrue" and result[2] == str(user_id) and result[1] == str(chat_id):
+        elif result != False and "/guardcaptchatrue" in message["callback_query_data"] and result[2] == str(user_id) and result[1] == str(chat_id):
+            if message["callback_query_data"] == "/guardcaptchatrue-restricted":
+                user_status = "restricted"
+
             status = bot.answerCallbackQuery(
                 message["callback_query_id"], text="正确", show_alert=bool("true"))
             status = bot.getChat(chat_id=chat_id)
             chat_title = status["title"]
+
             permissions = status.get("permissions")
-            status = bot.restrictChatMember(
-                chat_id=chat_id, user_id=result[2], permissions=permissions)
+            if user_status != "restricted":
+                status = bot.restrictChatMember(
+                    chat_id=chat_id, user_id=result[2], permissions=permissions)
+
             status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
             db.delete(chat_id=chat_id, user_id=user_id)
             rr = db.user_insert(chat_id=chat_id, user_id=user_id)
@@ -121,6 +132,9 @@ def Guard(bot, message):
                 reason="人机检测", handle="准许入境")
 
         elif result != False and "/guardcaptchafalse" in message["callback_query_data"] and result[2] == str(user_id) and result[1] == str(chat_id):
+            if message["callback_query_data"].split("-")[1] == "restricted":
+                user_status = "restricted"
+
             status = bot.answerCallbackQuery(
                 message["callback_query_id"], text="不正确", show_alert=bool("true"))
             msg = "<b><a href='tg://user?id=" + str(user_id) + "'>" + first_name + " " + last_name + \
@@ -128,7 +142,8 @@ def Guard(bot, message):
                 str((gap + result[5])-int(time.time())) + \
                 "</b> 秒内从下方选出与图片一致的验证码。"
             bytes_image, captcha_text = captcha_img()
-            reply_markup = reply_markup_dict(captcha_text=captcha_text)
+            reply_markup = reply_markup_dict(captcha_text=captcha_text,
+                user_status=user_status)
             status = bot.sendPhoto(chat_id=str(
                 data_group_id), photo=bytes_image, parse_mode="HTML")
             db.update(
@@ -150,13 +165,35 @@ def Guard(bot, message):
                 status = bot.answerCallbackQuery(
                     message["callback_query_id"], text="刷新失败", show_alert=bool("true"))
         # 防止接收来自其他插件的CallbackQuery
-        elif message["callback_query_data"] in "/guardupdatingcaptcha" or "/guardcaptcha" in message["callback_query_data"]:
+        elif "/guardupdatingcaptcha" in message["callback_query_data"] or "/guardcaptcha" in message["callback_query_data"]:
             status = bot.answerCallbackQuery(
                 message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
 
     elif "new_chat_members" in message.keys():
-        status = bot.restrictChatMember(
-            chat_id=chat_id, user_id=user_id, permissions=restrict_permissions, until_date=gap+5)
+        user_permissions = bot.getChatMember(chat_id=chat_id, user_id=user_id)
+        user_status = user_permissions["status"]
+        if user_status in ["restricted", "left", "kicked"]:
+            user_status = "restricted"
+            bot.deleteMessage(chat_id=chat_id, message_id=message_id)
+            msg = "<b><a href='tg://user?id=" + \
+                str(user_id) + "'>" + str(user_id) + \
+                "</a></b>，怎么，想试试退群重进能不能逃过处罚？<b>想得美哈哈哈哈哈~~</b>"
+            bot.sendChatAction(chat_id, "typing")
+            status = bot.sendMessage(
+                chat_id=chat_id, text=msg, parse_mode="HTML")
+            bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+
+            log_status, reply_markup = handle_logging(bot,
+                content="该用户企图通过退群重进逃过处罚", log_group_id=log_group_id,
+                user_id=user_id, chat_id=chat_id,
+                message_id=message_id,
+                reason="人机检测", handle="准许入境")
+
+            return False
+
+        if user_status != "restricted":
+            status = bot.restrictChatMember(
+                chat_id=chat_id, user_id=user_id, permissions=restrict_permissions, until_date=gap+5)
 
         results = bot.getChatAdministrators(chat_id=chat_id)  # 判断Bot是否具管理员权限
         admin_status = False
@@ -217,7 +254,8 @@ def Guard(bot, message):
                     "</a></b> 您好，本群已启用人机检测，请于 <b>" + \
                     str(gap) + "</b> 秒内从下方选出与图片一致的验证码。"
                 bytes_image, captcha_text = captcha_img()
-                reply_markup = reply_markup_dict(captcha_text=captcha_text)
+                reply_markup = reply_markup_dict(captcha_text=captcha_text,
+                    user_status=user_status)
                 status = bot.sendPhoto(chat_id=chat_id, photo=bytes_image,
                                        caption=msg, parse_mode="HTML", reply_markup=reply_markup)
                 db.insert(chat_id=chat_id, user_id=user_id,
@@ -462,7 +500,7 @@ def captcha_img(width=160, height=60, font_sizes=(50, 55, 60), fonts=None):
     return bytes_image, captcha_text
 
 
-def reply_markup_dict(captcha_text):
+def reply_markup_dict(captcha_text, user_status):
     answer = randint(0, 3)
     options = []
     while True:
@@ -479,9 +517,21 @@ def reply_markup_dict(captcha_text):
     callback_data = []
     for i in range(4):  # 生成callback_data列表
         if answer == i:
-            callback_data.append("/guardcaptchatrue")
+            if user_status == "restricted":
+                callback_data.append("/guardcaptchatrue-restricted")
+            else:
+                callback_data.append("/guardcaptchatrue")
         else:
-            callback_data.append("/guardcaptchafalse" + str(i))
+            if user_status == "restricted":
+                callback_data.append("/guardcaptchafalse" + str(i) + "-restricted")
+            else:
+                callback_data.append("/guardcaptchafalse" + str(i))
+
+        if user_status == "restricted":
+            update_captcha = "/guardupdatingcaptcha-restricted"
+        else:
+            update_captcha = "/guardupdatingcaptcha"
+
 
     inlineKeyboard = [
         [
@@ -493,7 +543,7 @@ def reply_markup_dict(captcha_text):
             {"text": options[3], "callback_data":callback_data[3]},
         ],
         [
-            {"text": "看不清，换一张", "callback_data": "/guardupdatingcaptcha"},
+            {"text": "看不清，换一张", "callback_data": update_captcha},
         ]
     ]
     reply_markup = {
