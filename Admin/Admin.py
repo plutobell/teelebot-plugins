@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
-creation time: 2020-6-4
-last_modify: 2020-12-14
+creation time: 2020-06-04
+last_modify: 2021-04-23
 '''
 
 def Admin(bot, message):
@@ -152,7 +152,7 @@ def Admin(bot, message):
                     status = bot.sendMessage(chat_id=chat_id, text="抱歉，无权处置该用户!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
             elif text[1:len(prefix + command["/adminunmute"])+1] == prefix + command["/adminunmute"]:
-                if str(target_user_id) not in admins:
+                if str(target_user_id) not in admins or str(target_user_id) == str(root_id):
                     status = bot.getChat(chat_id=chat_id)
                     permissions = status.get("permissions")
                     status = bot.restrictChatMember(chat_id=chat_id, user_id=target_user_id,permissions=permissions)
