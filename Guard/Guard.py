@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2021-04-23
+last_modify: 2021-05-16
 '''
 from collections import defaultdict
 import re
@@ -36,6 +36,7 @@ def Guard(bot, message):
     message_id = message["message_id"]
     chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
+    message_type = message["message_type"]
 
     gap = 60
     db = SqliteDB(bot, plugin_dir)
@@ -45,9 +46,7 @@ def Guard(bot, message):
         return
 
     with open(bot.path_converter(plugin_dir + "Guard/config.ini")) as f:
-        config_data = f.read().strip().split(",")
-        data_group_id = config_data[0]
-        log_group_id = config_data[1]
+        log_group_id = f.readline().strip()
 
     user_status = "member"
     result = db.select(chat_id=chat_id, user_id=user_id)
@@ -79,20 +78,11 @@ def Guard(bot, message):
             bytes_image, captcha_text = captcha_img()
             reply_markup = reply_markup_dict(captcha_text=captcha_text,
                 user_status=user_status)
-            status = bot.sendPhoto(chat_id=str(
-                data_group_id), photo=bytes_image, parse_mode="HTML")
             db.update(
                 message_id=result[3], authcode=captcha_text, chat_id=chat_id, user_id=user_id)
-            media = {
-                'media': {
-                    'type': 'photo',
-                    'media': status["photo"][0]["file_id"],
-                    'caption': msg,
-                    'parse_mode': 'HTML'
-                }
-            }
             status = bot.editMessageMedia(
-                chat_id=chat_id, message_id=result[3], media=media, reply_markup=reply_markup)
+                chat_id=chat_id, message_id=result[3], type_="photo", media=bytes_image,
+                caption=msg, parse_mode="HTML", reply_markup=reply_markup)
             if status != False:
                 status = bot.answerCallbackQuery(
                     message["callback_query_id"], text="刷新成功", show_alert=bool("true"))
@@ -132,7 +122,7 @@ def Guard(bot, message):
                 reason="人机检测", handle="准许入境")
 
         elif result != False and "/guardcaptchafalse" in message["callback_query_data"] and result[2] == str(user_id) and result[1] == str(chat_id):
-            if message["callback_query_data"].split("-")[1] == "restricted":
+            if "restricted" in message["callback_query_data"]:
                 user_status = "restricted"
 
             status = bot.answerCallbackQuery(
@@ -144,20 +134,11 @@ def Guard(bot, message):
             bytes_image, captcha_text = captcha_img()
             reply_markup = reply_markup_dict(captcha_text=captcha_text,
                 user_status=user_status)
-            status = bot.sendPhoto(chat_id=str(
-                data_group_id), photo=bytes_image, parse_mode="HTML")
             db.update(
                 message_id=result[3], authcode=captcha_text, chat_id=chat_id, user_id=user_id)
-            media = {
-                'media': {
-                    'type': 'photo',
-                    'media': status["photo"][0]["file_id"],
-                    'caption': msg,
-                    'parse_mode': 'HTML'
-                }
-            }
             status = bot.editMessageMedia(
-                chat_id=chat_id, message_id=result[3], media=media, reply_markup=reply_markup)
+                chat_id=chat_id, message_id=result[3], type_="photo", media=bytes_image,
+                caption=msg, parse_mode="HTML", reply_markup=reply_markup)
             if status != False:
                 status = bot.answerCallbackQuery(
                     message["callback_query_id"], text="刷新成功", show_alert=bool("true"))
@@ -169,32 +150,90 @@ def Guard(bot, message):
             status = bot.answerCallbackQuery(
                 message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
 
-    elif "new_chat_members" in message.keys():
-        user_permissions = bot.getChatMember(chat_id=chat_id, user_id=user_id)
-        user_status = user_permissions["status"]
-        if user_status in ["restricted", "left", "kicked"]:
-            user_status = "restricted"
-            bot.deleteMessage(chat_id=chat_id, message_id=message_id)
-            msg = "<b><a href='tg://user?id=" + \
-                str(user_id) + "'>" + str(user_id) + \
-                "</a></b>，怎么，想试试退群重进能不能逃过处罚？<b>想得美哈哈哈哈哈~~</b>"
-            bot.sendChatAction(chat_id, "typing")
+    # 兼容 Bot API version < 5.3
+    elif "new_chat_members" in message.keys() or \
+        "left_chat_member" in message.keys():
+        bot.deleteMessage(chat_id=chat_id, message_id=message_id)
+
+    # 入群
+    elif message_type == "chat_member_data" and \
+        message["old_chat_member"]["status"] in ["left", "kicked"] and \
+        message["new_chat_member"]["status"] in ["creator", "administrator", "member", "restricted"]:
+
+        new_chat_member = message["new_chat_member"]
+        user_id = new_chat_member["user"]["id"]
+
+        results = bot.getChatAdministrators(chat_id=chat_id)  # 判断Bot是否具管理员权限
+        admin_status = False
+        for admin_user in results:
+            if str(admin_user["user"]["id"]) == str(bot_id):
+                admin_status = True
+        if admin_status != True:
+            status = bot.sendChatAction(chat_id, "typing")
+            msg = "权限不足，请授予删除消息及封禁用户权限以使用 Guard 插件。"
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+            return False
 
+        if new_chat_member["status"] != "restricted":
+          status = bot.restrictChatMember(
+            chat_id=chat_id, user_id=user_id, permissions=restrict_permissions, until_date=gap+5)
+            
+        if "first_name" in new_chat_member["user"].keys():  # Optional (first_name or last_name)
+            first_name = new_chat_member["user"]["first_name"].strip()
+        else:
+            first_name = ""
+        if "last_name" in new_chat_member["user"].keys():
+            last_name = new_chat_member["user"]["last_name"].strip()
+        else:
+            last_name = ""
+        name = str(first_name + last_name).strip()
+        #print("New Member：", user_id, first_name)
+        result = DFA.filter(name, repl)
+        if (repl in result and len(name) > 9) or (len(name) > 25):
+            status = bot.kickChatMember(
+                chat_id=chat_id, user_id=user_id, until_date=35)
+            status = bot.deleteMessage(
+                chat_id=chat_id, message_id=message_id)
             log_status, reply_markup = handle_logging(bot,
-                content="该用户企图通过退群重进逃过处罚", log_group_id=log_group_id,
+                content=name, log_group_id=log_group_id,
                 user_id=user_id, chat_id=chat_id,
                 message_id=message_id,
-                reason="人机检测", handle="准许入境")
+                reason="名字违规", handle="驱逐出境")
+            #status = bot.unbanChatMember(chat_id=chat_id, user_id=user_id)
+            msg = "<b><a href='tg://user?id=" + \
+                str(user_id) + "'>" + str(user_id) + \
+                "</a></b> 的名字<b> 违规</b>，已驱逐出境。"
+            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendMessage(
+                chat_id=chat_id, text=msg, parse_mode="HTML",
+                reply_markup=reply_markup)
 
-            return False
+            # bot.message_deletor(
+            #     30, status["chat"]["id"], status["message_id"])
+        else:
+            # status = bot.deleteMessage(
+            #     chat_id=chat_id, message_id=message_id)
+            msg = "<b><a href='tg://user?id=" + \
+                str(user_id) + "'>" + first_name + " " + last_name + \
+                "</a></b> 您好，本群已启用人机检测，请于 <b>" + \
+                str(gap) + "</b> 秒内从下方选出与图片一致的验证码。"
+            bytes_image, captcha_text = captcha_img()
+            reply_markup = reply_markup_dict(captcha_text=captcha_text,
+                user_status=user_status)
+            status = bot.sendPhoto(chat_id=chat_id, photo=bytes_image,
+                                    caption=msg, parse_mode="HTML", reply_markup=reply_markup)
+            db.insert(chat_id=chat_id, user_id=user_id,
+                        message_id=status["message_id"], authcode=captcha_text)
+            timer = Timer(
+                gap + 1, timer_func, args=[bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, message_id, log_group_id])
+            timer.start()
 
-        if user_status != "restricted":
-            status = bot.restrictChatMember(
-                chat_id=chat_id, user_id=user_id, permissions=restrict_permissions, until_date=gap+5)
-
+    # 离群
+    elif message_type == "chat_member_data" and \
+        message["old_chat_member"]["status"] in ["creator", "administrator", "member", "restricted"] and \
+        message["new_chat_member"]["status"] in ["left", "kicked"]:
         results = bot.getChatAdministrators(chat_id=chat_id)  # 判断Bot是否具管理员权限
         admin_status = False
         for admin_user in results:
@@ -208,96 +247,28 @@ def Guard(bot, message):
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
             return False
 
-        new_chat_members = message["new_chat_members"]
-        for new_chat_member in new_chat_members:
-            if str(bot_id) == str(new_chat_member["id"]):
-                continue
-
-            user_id = str(new_chat_member["id"])
-            if "first_name" in new_chat_member.keys():  # Optional (first_name or last_name)
-                first_name = new_chat_member["first_name"].strip()
-            else:
-                first_name = ""
-            if "last_name" in new_chat_member.keys():
-                last_name = new_chat_member["last_name"].strip()
-            else:
-                last_name = ""
-            name = str(first_name + last_name).strip()
-            #print("New Member：", user_id, first_name)
-            result = DFA.filter(name, repl)
-            if (repl in result and len(name) > 9) or (len(name) > 25):
-                status = bot.kickChatMember(
-                    chat_id=chat_id, user_id=user_id, until_date=35)
-                status = bot.deleteMessage(
-                    chat_id=chat_id, message_id=message_id)
-                log_status, reply_markup = handle_logging(bot,
-                    content=name, log_group_id=log_group_id,
-                    user_id=user_id, chat_id=chat_id,
-                    message_id=message_id,
-                    reason="名字违规", handle="驱逐出境")
-                #status = bot.unbanChatMember(chat_id=chat_id, user_id=user_id)
-                msg = "<b><a href='tg://user?id=" + \
-                    str(user_id) + "'>" + str(user_id) + \
-                    "</a></b> 的名字<b> 违规</b>，已驱逐出境。"
-                status = bot.sendChatAction(chat_id, "typing")
-                status = bot.sendMessage(
-                    chat_id=chat_id, text=msg, parse_mode="HTML",
-                    reply_markup=reply_markup)
-
-                # bot.message_deletor(
-                #     30, status["chat"]["id"], status["message_id"])
-            else:
-                status = bot.deleteMessage(
-                    chat_id=chat_id, message_id=message_id)
-                msg = "<b><a href='tg://user?id=" + \
-                    str(user_id) + "'>" + first_name + " " + last_name + \
-                    "</a></b> 您好，本群已启用人机检测，请于 <b>" + \
-                    str(gap) + "</b> 秒内从下方选出与图片一致的验证码。"
-                bytes_image, captcha_text = captcha_img()
-                reply_markup = reply_markup_dict(captcha_text=captcha_text,
-                    user_status=user_status)
-                status = bot.sendPhoto(chat_id=chat_id, photo=bytes_image,
-                                       caption=msg, parse_mode="HTML", reply_markup=reply_markup)
-                db.insert(chat_id=chat_id, user_id=user_id,
-                          message_id=status["message_id"], authcode=captcha_text)
-                timer = Timer(
-                    gap + 1, timer_func, args=[bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, message_id, log_group_id])
-                timer.start()
-
-    elif "left_chat_member" in message.keys():
-        results = bot.getChatAdministrators(chat_id=chat_id)  # 判断Bot是否具管理员权限
-        admin_status = False
-        for admin_user in results:
-            if str(admin_user["user"]["id"]) == str(bot_id):
-                admin_status = True
-        if admin_status != True:
-            status = bot.sendChatAction(chat_id, "typing")
-            msg = "权限不足，请授予删除消息及封禁用户权限以使用 Guard 插件。"
-            status = bot.sendMessage(
-                chat_id=chat_id, text=msg, parse_mode="HTML")
-            bot.message_deletor(30, status["chat"]["id"], status["message_id"])
-            return False
-
+        new_chat_member = message["new_chat_member"]
         req = db.user_select(
-            chat_id=message["chat"]["id"], user_id=message["left_chat_member"]["id"])
+            chat_id=message["chat"]["id"], user_id=new_chat_member["user"]["id"])
         if req != False:
             db.user_delete(
-                chat_id=message["chat"]["id"], user_id=message["left_chat_member"]["id"])
+                chat_id=message["chat"]["id"], user_id=new_chat_member["user"]["id"])
 
         result = db.select(
-            chat_id=message["chat"]["id"], user_id=message["left_chat_member"]["id"])
+            chat_id=message["chat"]["id"], user_id=new_chat_member["user"]["id"])
         if result != False and result[2] == str(user_id) and result[1] == str(chat_id) and message["chat"]["type"] != "private":
             status = bot.deleteMessage(
                 chat_id=message["chat"]["id"], message_id=result[3])
             db.delete(chat_id=message["chat"]["id"],
-                    user_id=message["left_chat_member"]["id"])
-        user_id = message["left_chat_member"]["id"]
-        if "first_name" in message["left_chat_member"]:
-            first_name = message["left_chat_member"]["first_name"].strip()
+                    user_id=new_chat_member["user"]["id"])
+
+        user_id = new_chat_member["user"]["id"]
+        if "first_name" in new_chat_member["user"].keys():  # Optional (first_name or last_name)
+            first_name = new_chat_member["user"]["first_name"].strip()
         else:
             first_name = ""
-        if "last_name" in message["left_chat_member"]:
-            last_name = message["left_chat_member"]["last_name"].strip()
+        if "last_name" in new_chat_member["user"].keys():
+            last_name = new_chat_member["user"]["last_name"].strip()
         else:
             last_name = ""
         name = str(first_name + last_name).strip()
@@ -306,10 +277,10 @@ def Guard(bot, message):
         if (repl in result and len(name) > 9) or (len(name) > 25):
             status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
         else:
-            status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
+            # status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
             msg = "<b><a href='tg://user?id=" + \
-                str(user_id) + "'>" + first_name + \
-                " " + last_name + "</a></b> 离开了我们。"
+                str(user_id) + "'>" + first_name + " " + last_name + \
+                "</a></b>" + " 离开了我们。"
             status = bot.sendChatAction(chat_id, "typing")
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
