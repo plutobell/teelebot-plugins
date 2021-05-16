@@ -32,4 +32,5 @@
 25. MusicDownload - MusicDownload插件，根据音乐ID下载网易云、QQ、百度的音乐，接口 [韩小韩API](https://api.vvhan.com/) 
 26. VoteToMute - VoteToMute插件，投票禁言
 27. MuteMe - MuteMe插件，随机获取禁言礼包
+28. MessageFloodedCheck - MessageFloodedCheck插件，消息刷屏检测
 
