@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2021-05-16
+last_modify: 2021-05-27
 '''
 from collections import defaultdict
 import re
@@ -54,6 +54,10 @@ def Guard(bot, message):
         message["message_type"] == "callback_query_data" and\
         message["chat"]["type"] != "private":
 
+        admins = administrators(bot=bot, chat_id=chat_id)
+        if str(root_id) not in admins:
+            admins.append(str(root_id))
+
         user = message["click_user"]
         user_id = user["id"]  # 未处理：多用户同时点击的情况
         result = db.select(chat_id=chat_id, user_id=user_id)
@@ -77,7 +81,7 @@ def Guard(bot, message):
                 "</b> 秒内从下方选出与图片一致的验证码。"
             bytes_image, captcha_text = captcha_img()
             reply_markup = reply_markup_dict(captcha_text=captcha_text,
-                user_status=user_status)
+                user_status=user_status, user_id=user_id)
             db.update(
                 message_id=result[3], authcode=captcha_text, chat_id=chat_id, user_id=user_id)
             status = bot.editMessageMedia(
@@ -133,7 +137,7 @@ def Guard(bot, message):
                 "</b> 秒内从下方选出与图片一致的验证码。"
             bytes_image, captcha_text = captcha_img()
             reply_markup = reply_markup_dict(captcha_text=captcha_text,
-                user_status=user_status)
+                user_status=user_status, user_id=user_id)
             db.update(
                 message_id=result[3], authcode=captcha_text, chat_id=chat_id, user_id=user_id)
             status = bot.editMessageMedia(
@@ -145,10 +149,90 @@ def Guard(bot, message):
             else:
                 status = bot.answerCallbackQuery(
                     message["callback_query_id"], text="刷新失败", show_alert=bool("true"))
+
+        elif "/guardmanual" in message["callback_query_data"] and str(user_id) in admins:
+            origin_user_id = message["callback_query_data"].split("-")[1]
+            result = db.select(chat_id=chat_id, user_id=origin_user_id)
+
+            if result == False: # 消息过期
+                status = bot.answerCallbackQuery(
+                    message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
+                return
+
+            origin_user_info = bot.getChatMember(chat_id=chat_id, user_id=origin_user_id)["user"]
+            if "first_name" in origin_user_info.keys():  # Optional (first_name or last_name)
+                origin_first_name = origin_user_info["first_name"].strip()
+            else:
+                origin_first_name = ""
+            if "last_name" in origin_user_info.keys():
+                origin_last_name = origin_user_info["last_name"].strip()
+            else:
+                origin_last_name = ""
+
+            if "/guardmanualpass" in message["callback_query_data"]:
+                status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
+
+                status = bot.answerCallbackQuery(
+                    message["callback_query_id"], text="放行成功", show_alert=bool("true"))
+                status = bot.getChat(chat_id=chat_id)
+                chat_title = status["title"]
+
+                permissions = status.get("permissions")
+                if user_status != "restricted":
+                    status = bot.restrictChatMember(
+                        chat_id=chat_id, user_id=result[2], permissions=permissions)
+
+                db.delete(chat_id=chat_id, user_id=origin_user_id)
+                rr = db.user_insert(chat_id=chat_id, user_id=origin_user_id)
+                admin_msg = "<b><a href='tg://user?id=" + \
+                    str(user_id) + "'>" + first_name + " " + last_name + "</a></b>"
+                msg = "<b><a href='tg://user?id=" + \
+                    str(origin_user_id) + "'>" + origin_first_name + " " + origin_last_name + \
+                    "</a></b>, 您已被管理员 " + admin_msg + " 放行。\n欢迎加入 <b>" + str(chat_title) + "</b>。"
+                status = bot.sendChatAction(chat_id, "typing")
+                status = bot.sendMessage(
+                    chat_id=chat_id, text=msg, parse_mode="HTML")
+
+                bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+
+                log_status, reply_markup = handle_logging(bot,
+                    content="由管理员 " + admin_msg + " 放行", log_group_id=log_group_id,
+                    user_id=origin_user_id, chat_id=chat_id,
+                    message_id=message_id,
+                    reason="人机检测", handle="准许入境")
+            elif "/guardmanualkick" in message["callback_query_data"]:
+                status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
+
+                status = bot.answerCallbackQuery(
+                    message["callback_query_id"], text="驱逐成功", show_alert=bool("true"))
+
+                db.delete(chat_id=chat_id, user_id=origin_user_id)
+                status = bot.kickChatMember(
+                    chat_id=chat_id, user_id=origin_user_id, until_date=35)
+                #status = bot.unbanChatMember(chat_id=chat_id, user_id=user_id)
+                admin_msg = "<b><a href='tg://user?id=" + \
+                    str(user_id) + "'>" + first_name + " " + last_name + "</a></b>"
+                msg = "<b><a href='tg://user?id=" + \
+                    str(origin_user_id) + "'>" + origin_first_name + " " + \
+                    origin_last_name + "</a></b> 已被管理员 " + admin_msg + " 驱逐, 没能通过人机检测。"
+                status = bot.sendMessage(
+                    chat_id=chat_id, text=msg, parse_mode="HTML")
+
+                bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+
+                log_status, reply_markup = handle_logging(bot,
+                    content="由管理员 " + admin_msg + " 驱逐", log_group_id=log_group_id,
+                    user_id=origin_user_id, chat_id=chat_id,
+                    message_id=message_id,
+                    reason="人机检测", handle="拒绝入境")
+
         # 防止接收来自其他插件的CallbackQuery
         elif "/guardupdatingcaptcha" in message["callback_query_data"] or "/guardcaptcha" in message["callback_query_data"]:
             status = bot.answerCallbackQuery(
                 message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
+        elif "/guardmanual" in message["callback_query_data"]:
+            status = bot.answerCallbackQuery(
+                message["callback_query_id"], text="想啥呢？只有管理员可以操作！", show_alert=bool("true"))
 
     # 兼容 Bot API version < 5.3
     elif "new_chat_members" in message.keys() or \
@@ -177,9 +261,9 @@ def Guard(bot, message):
             return False
 
         if new_chat_member["status"] != "restricted":
-          status = bot.restrictChatMember(
-            chat_id=chat_id, user_id=user_id, permissions=restrict_permissions, until_date=gap+5)
-            
+            status = bot.restrictChatMember(
+                chat_id=chat_id, user_id=user_id, permissions=restrict_permissions, until_date=gap+5)
+
         if "first_name" in new_chat_member["user"].keys():  # Optional (first_name or last_name)
             first_name = new_chat_member["user"]["first_name"].strip()
         else:
@@ -221,7 +305,7 @@ def Guard(bot, message):
                 str(gap) + "</b> 秒内从下方选出与图片一致的验证码。"
             bytes_image, captcha_text = captcha_img()
             reply_markup = reply_markup_dict(captcha_text=captcha_text,
-                user_status=user_status)
+                user_status=user_status, user_id=user_id)
             status = bot.sendPhoto(chat_id=chat_id, photo=bytes_image,
                                     caption=msg, parse_mode="HTML", reply_markup=reply_markup)
             db.insert(chat_id=chat_id, user_id=user_id,
@@ -471,7 +555,7 @@ def captcha_img(width=160, height=60, font_sizes=(50, 55, 60), fonts=None):
     return bytes_image, captcha_text
 
 
-def reply_markup_dict(captcha_text, user_status):
+def reply_markup_dict(captcha_text, user_status, user_id):
     answer = randint(0, 3)
     options = []
     while True:
@@ -515,6 +599,10 @@ def reply_markup_dict(captcha_text, user_status):
         ],
         [
             {"text": "看不清，换一张", "callback_data": update_captcha},
+        ],
+        [
+            {"text": "手动放行", "callback_data":"/guardmanualpass-" + str(user_id)},
+            {"text": "手动驱逐", "callback_data":"/guardmanualkick-" + str(user_id)},
         ]
     ]
     reply_markup = {
