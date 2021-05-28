@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2021-05-27
+last_modify: 2021-05-28
 '''
 from collections import defaultdict
 import re
@@ -601,8 +601,8 @@ def reply_markup_dict(captcha_text, user_status, user_id):
             {"text": "看不清，换一张", "callback_data": update_captcha},
         ],
         [
-            {"text": "手动放行", "callback_data":"/guardmanualpass-" + str(user_id)},
-            {"text": "手动驱逐", "callback_data":"/guardmanualkick-" + str(user_id)},
+            {"text": "放行", "callback_data":"/guardmanualpass-" + str(user_id)},
+            {"text": "驱逐", "callback_data":"/guardmanualkick-" + str(user_id)},
         ]
     ]
     reply_markup = {
