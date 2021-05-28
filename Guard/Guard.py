@@ -371,8 +371,12 @@ def Guard(bot, message):
 
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
-    elif "text" in message.keys():
-        text = message["text"]
+    elif "text" in message.keys() or "caption" in message.keys():
+        text = ""
+        if "text" in message.keys():
+            text += message["text"]
+        if "caption" in message.keys():
+            text += message["caption"]
         prefix = "guard"
         gap = 15
 
