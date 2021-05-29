@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 '''
 @creation date: 2021-04-26
-@last modify: 2021-04-26
+@last modify: 2021-05-29
 '''
 import difflib
 import time
+from langconv import Converter
 
 def MessageFloodedCheck(bot, message):
 
@@ -37,51 +38,69 @@ def MessageFloodedCheck(bot, message):
             bot.message_deletor(30, chat_id, status["message_id"])
             return False
 
+    if str(user_id) == bot_id:
+        return
+    elif message_type not in ["text", "sticker"]:
+        if "caption" not in message.keys():
+            return
 
     ok, buf = bot.buffer.read()
     buf.setdefault(str(chat_id), {}).setdefault(str(user_id), {})
     if ok:
-        previous_message = buf[str(chat_id)][str(user_id)].setdefault("previous_message", "")
-        repeat_times = buf[str(chat_id)][str(user_id)].setdefault("repeat_times", 0)
+        chat_record_messages = buf[str(chat_id)] # 清除群组范围内的无效数据
+        for user_id, value in dict(chat_record_messages).items():
+            timestamp_ = value.setdefault("timestamp", int(time.time()))
+            if (int(time.time()) - timestamp_) > 60:
+                buf[str(chat_id)].pop(str(user_id))
+
+        record_messages = buf[str(chat_id)][str(user_id)].setdefault("record_messages", {})
         timestamp = buf[str(chat_id)][str(user_id)].setdefault("timestamp", int(time.time()))
-        repeat_message_ids = buf[str(chat_id)][str(user_id)].setdefault("repeat_message_ids", [])
-        # print(previous_message, repeat_times, timestamp, repeat_message_ids)
 
-        now_message = ""
+        message_text = ""
         if message_type == "text":
-            now_message = message["text"]
+            message_text = message["text"]
+        elif "caption" in message.keys():
+            message_text += message["caption"]
         elif message_type == "sticker":
-            now_message = message["sticker"]["file_unique_id"]
+            message_text = message["sticker"]["file_unique_id"]
+        message_text = message_text.strip()
+        message_text = message_text.replace(" ", "")
+        message_text = Traditional2Simplified(sentence=message_text)
 
-        if now_message != "":
-            similarity = string_similar(previous_message, now_message)
-            # print(str(similarity * 100) + "%")
-            if similarity > 0.75:
-                repeat_times += 1
-                repeat_message_ids.append(str(message_id))
+        if message_text != "":
+            record_messages[str(message_id)] = message_text
+        record_messages_no_repeat = set(record_messages.values())
 
-            previous_message = now_message
+        no_repeat_msg_repeat_ids = {}
+        for no_repeat_msg in record_messages_no_repeat:
+            repeat_times = 0
+            no_repeat_msg_dict = {}
+            no_repeat_msg_dict["repeat_ids"] = []
+            for msg_id in list(record_messages.keys()):
+                msg = record_messages[msg_id]
+                similarity = string_similar(no_repeat_msg, msg)
+                # print(str(similarity * 100) + "%")
+                if similarity > 0.65:
+                    repeat_times += 1
+                    no_repeat_msg_dict["repeat_ids"].append(msg_id)
+            no_repeat_msg_dict["repeat_times"] = repeat_times
+            no_repeat_msg_repeat_ids[no_repeat_msg] = no_repeat_msg_dict
 
         if (int(time.time()) - timestamp) <= 60: # 超时判断
-            if repeat_times == 3:
-                bot.sendChatAction(chat_id, "typing")
-                user_info = "<b><a href='tg://user?id=" + str(user_id) + "'>" + str(user_id) + "</a></b>"
-                if str(user_id) in admins:
-                    msg = "管理员 " + user_info + ", 您似乎在重复发送相似消息\n<b>请以身作则😃</b>"
-                else:
-                    msg = user_info + ", 检测到您似乎在重复发送相似消息\n<b>继续发送将被禁言，请谨言慎行</b>"
-                status = bot.sendMessage(
-                    chat_id=chat_id, text=msg, parse_mode="HTML")
-                bot.message_deletor(15, status["chat"]["id"], status["message_id"])
+            period = int(time.time()) - timestamp
+            msg_count = len(record_messages.keys())
+            if period == 0 or msg_count == 0:
+                send_rate = 0
+            else:
+                send_rate = period / msg_count
 
-            if repeat_times >= 5:
+            if  send_rate < 1.5 and msg_count >= 5: # 频率判断 n秒一条
                 mute_time = 10 # 禁言时间，单位为分钟
-                bot.sendChatAction(chat_id, "typing")
                 user_info = "<b><a href='tg://user?id=" + str(user_id) + "'>" + str(user_id) + "</a></b>"
                 if str(user_id) in admins:
-                    msg = "🐶管理 " + user_info + ", 还在刷！?\n作为管理员，<b>您配吗?😕</b>\n<b>请以身作则</b>"
+                    msg = "🐶管理 " + user_info + ", 请注意您的发言频率！\n作为管理员，<b>您配吗?😕</b>\n<b>请以身作则</b>"
                 else:
-                    msg = user_info + ", 由于您重复发送相似消息\n<b>你已被禁言 " + str(mute_time) + " 分钟</b>"
+                    msg = user_info + ", 由于您的发言频率过高\n<b>你已被禁言 " + str(mute_time) + " 分钟</b>"
                     permissions = {
                         'can_send_messages':False,
                         'can_send_media_messages':False,
@@ -95,34 +114,100 @@ def MessageFloodedCheck(bot, message):
                     status = bot.restrictChatMember(
                         chat_id=chat_id, user_id=user_id,
                         permissions=permissions, until_date=mute_time * 60)
+                bot.sendChatAction(chat_id, "typing")
                 status = bot.sendMessage(
                     chat_id=chat_id, text=msg, parse_mode="HTML")
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
-                for msg_id in repeat_message_ids: # 删除重复消息
-                    bot.deleteMessage(chat_id, msg_id)
+                for msg_id in list(record_messages.keys()): # 删除重复消息
+                    status = bot.deleteMessage(chat_id, msg_id)
                     time.sleep(0.5)
 
                 timestamp = int(time.time())
-                repeat_times = 0
-                repeat_message_ids = []
+                record_messages = {}
+
+                buf[str(chat_id)][str(user_id)]["record_messages"] = record_messages
+                buf[str(chat_id)][str(user_id)]["timestamp"] = timestamp
+                ok, _ = bot.buffer.write(buf)
+                return
+
+            for msg_dict in list(no_repeat_msg_repeat_ids.values()):
+                repeat_times = msg_dict["repeat_times"]
+                repeat_ids = msg_dict["repeat_ids"]
+                if repeat_times == 3:
+                    user_info = "<b><a href='tg://user?id=" + str(user_id) + "'>" + str(user_id) + "</a></b>"
+                    if str(user_id) in admins:
+                        msg = "管理员 " + user_info + ", 您似乎在重复发送相似消息\n<b>请以身作则😃</b>"
+                    else:
+                        msg = user_info + ", 检测到您似乎在重复发送相似消息\n<b>继续发送将被禁言，请谨言慎行</b>"
+                    bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendMessage(
+                        chat_id=chat_id, text=msg, parse_mode="HTML")
+                    bot.message_deletor(15, status["chat"]["id"], status["message_id"])
+
+                if repeat_times >= 5:
+                    mute_time = 10 # 禁言时间，单位为分钟
+                    user_info = "<b><a href='tg://user?id=" + str(user_id) + "'>" + str(user_id) + "</a></b>"
+                    if str(user_id) in admins:
+                        msg = "🐶管理 " + user_info + ", 还在刷！?\n作为管理员，<b>您配吗?😕</b>\n<b>请以身作则</b>"
+                    else:
+                        msg = user_info + ", 由于您重复发送相似消息\n<b>你已被禁言 " + str(mute_time) + " 分钟</b>"
+                        permissions = {
+                            'can_send_messages':False,
+                            'can_send_media_messages':False,
+                            'can_send_polls':False,
+                            'can_send_other_messages':False,
+                            'can_add_web_page_previews':False,
+                            'can_change_info':False,
+                            'can_invite_users':False,
+                            'can_pin_messages':False
+                        }
+                        status = bot.restrictChatMember(
+                            chat_id=chat_id, user_id=user_id,
+                            permissions=permissions, until_date=mute_time * 60)
+                    bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendMessage(
+                        chat_id=chat_id, text=msg, parse_mode="HTML")
+                    bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+
+                    for msg_id in repeat_ids: # 删除重复消息
+                        status = bot.deleteMessage(chat_id, msg_id)
+                        if msg_id in record_messages.keys():
+                            record_messages.pop(msg_id)
+                        time.sleep(0.5)
+
+                    timestamp = int(time.time())
         else:
             timestamp = int(time.time())
-            repeat_times = 0
-            repeat_message_ids = []
+            record_messages = {}
 
-        buf[str(chat_id)][str(user_id)]["previous_message"] = previous_message
-        buf[str(chat_id)][str(user_id)]["repeat_times"] = repeat_times
+        buf[str(chat_id)][str(user_id)]["record_messages"] = record_messages
         buf[str(chat_id)][str(user_id)]["timestamp"] = timestamp
-        buf[str(chat_id)][str(user_id)]["repeat_message_ids"] = repeat_message_ids
         ok, _ = bot.buffer.write(buf)
-
 
 
 def string_similar(str1, str2):
     similarity = difflib.SequenceMatcher(None, str1, str2).quick_ratio()
 
     return round(similarity, 2)
+
+def Traditional2Simplified(sentence):
+    '''
+    将sentence中的繁体字转为简体字
+    :param sentence: 待转换的句子
+    :return: 将句子中繁体字转换为简体字之后的句子
+    '''
+    sentence = Converter('zh-hans').convert(sentence)
+    return sentence
+
+def Simplified2Traditional(sentence):
+    '''
+    将sentence中的简体字转为繁体字
+    :param sentence: 待转换的句子
+    :return: 将句子中简体字转换为繁体字之后的句子
+    '''
+    sentence = Converter('zh-hant').convert(sentence)
+    return sentence
 
 def administrators(bot, chat_id):
     admins = []
