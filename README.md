@@ -33,4 +33,5 @@
 26. VoteToMute - VoteToMute插件，投票禁言
 27. MuteMe - MuteMe插件，随机获取禁言礼包
 28. MessageFloodedCheck - MessageFloodedCheck插件，消息刷屏检测
+29. SteamFreePromotion - SteamFreePromotion插件，从 [Steam社区](https://steamcommunity.com/groups/freegamesinfoo) 获取Steam免费促销信息
 
