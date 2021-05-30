@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2021-05-28
+last_modify: 2021-05-30
 '''
 from collections import defaultdict
 import re
@@ -274,7 +274,8 @@ def Guard(bot, message):
             last_name = ""
         name = str(first_name + last_name).strip()
         #print("New Member：", user_id, first_name)
-        result = DFA.filter(name, repl)
+        name_demoji = filter_emoji(name)
+        result = DFA.filter(name_demoji, repl)
         if (repl in result and len(name) > 9) or (len(name) > 25):
             status = bot.kickChatMember(
                 chat_id=chat_id, user_id=user_id, until_date=35)
@@ -357,7 +358,8 @@ def Guard(bot, message):
             last_name = ""
         name = str(first_name + last_name).strip()
 
-        result = DFA.filter(first_name, repl)
+        name_demoji = filter_emoji(name)
+        result = DFA.filter(name_demoji, repl)
         if (repl in result and len(name) > 9) or (len(name) > 25):
             status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
         else:
@@ -396,8 +398,8 @@ def Guard(bot, message):
                     req[3] += 1
                     db.user_update(chat_id=chat_id, user_id=user_id,
                                 message_times=req[3], spam_times=req[4])
-
-                    result = DFA.filter(text.strip(), repl)
+                    text_demoji = filter_emoji(text.strip())
+                    result = DFA.filter(text_demoji, repl)
                     if (repl in result and len(text) > 9) or (len(text) > 200):
                         req[4] += 2
                         db.user_update(chat_id=chat_id, user_id=user_id,
@@ -459,9 +461,10 @@ def Guard(bot, message):
             if text[1:len(prefix + command["/guardadd"])+1] == prefix + command["/guardadd"]:
                 if len(text.split(' ')) == 2:
                     keyword = (text.split(' ')[1]).strip()
+                    keyword_demoji = filter_emoji(keyword)
                     # if str(user_id) in admins and len(keyword) <= 7:
                     if str(user_id) == str(root_id) and len(keyword) <= 7:
-                        result = DFA.filter(keyword, repl)
+                        result = DFA.filter(keyword_demoji, repl)
                         if repl not in result:
                             with open(bot.path_converter(plugin_dir + "Guard/keywords"), "a", encoding="utf-8") as k:
                                 k.write("\n" + keyword)
@@ -537,6 +540,13 @@ def shuffle_str(s):
 
     return ''.join(str_list)
 
+def filter_emoji(desstr, restr=''):
+    try:
+        co = re.compile(u'[\U00010000-\U0010ffff]')
+    except re.error:
+        co = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')
+
+    return co.sub(restr, desstr)
 
 def captcha_img(width=160, height=60, font_sizes=(50, 55, 60), fonts=None):
 
