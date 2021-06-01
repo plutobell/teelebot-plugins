@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 @creation date: 2021-04-26
-@last modify: 2021-05-29
+@last modify: 2021-06-01
 '''
 import difflib
 import time
@@ -35,7 +35,8 @@ def MessageFloodedCheck(bot, message):
             bot.sendChatAction(chat_id, "typing")
             msg = "权限不足，请授予全部权限以使用 MessageFloodedCheck 插件。"
             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML")
-            bot.message_deletor(30, chat_id, status["message_id"])
+            if status != False:
+                bot.message_deletor(30, chat_id, status["message_id"])
             return False
 
     if str(user_id) == bot_id:
@@ -53,6 +54,7 @@ def MessageFloodedCheck(bot, message):
             if (int(time.time()) - timestamp_) > 60:
                 buf[str(chat_id)].pop(str(user_id))
 
+        buf[str(chat_id)].setdefault(str(user_id), {})
         record_messages = buf[str(chat_id)][str(user_id)].setdefault("record_messages", {})
         timestamp = buf[str(chat_id)][str(user_id)].setdefault("timestamp", int(time.time()))
 
@@ -117,9 +119,10 @@ def MessageFloodedCheck(bot, message):
                 bot.sendChatAction(chat_id, "typing")
                 status = bot.sendMessage(
                     chat_id=chat_id, text=msg, parse_mode="HTML")
-                bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+                if status != False:
+                    bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
-                for msg_id in list(record_messages.keys()): # 删除重复消息
+                for msg_id in reversed(list(record_messages.keys())): # 删除重复消息
                     status = bot.deleteMessage(chat_id, msg_id)
                     time.sleep(0.5)
 
@@ -143,7 +146,8 @@ def MessageFloodedCheck(bot, message):
                     bot.sendChatAction(chat_id, "typing")
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
-                    bot.message_deletor(15, status["chat"]["id"], status["message_id"])
+                    if status != False:
+                        bot.message_deletor(15, status["chat"]["id"], status["message_id"])
 
                 if repeat_times >= 5:
                     mute_time = 10 # 禁言时间，单位为分钟
@@ -168,9 +172,10 @@ def MessageFloodedCheck(bot, message):
                     bot.sendChatAction(chat_id, "typing")
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
-                    bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+                    if status != False:
+                        bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
-                    for msg_id in repeat_ids: # 删除重复消息
+                    for msg_id in reversed(list(repeat_ids)): # 删除重复消息
                         status = bot.deleteMessage(chat_id, msg_id)
                         if msg_id in record_messages.keys():
                             record_messages.pop(msg_id)
