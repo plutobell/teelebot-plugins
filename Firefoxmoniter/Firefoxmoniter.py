@@ -44,9 +44,10 @@ def Firefoxmoniter(bot, message):
             bot.message_deletor(15, message["chat"]["id"], status["message_id"])
             return False
         page.encoding = "utf-8"
-        session = page.cookies["session"]
+        connect_sid = page.cookies["connect.sid"]
         soup = BeautifulSoup(page.text, "lxml")
         csrf = soup.find_all("input")[0]["value"]
+        soup.decompose()
 
     url = "https://monitor.firefox.com/scan"
     data = {
@@ -56,7 +57,7 @@ def Firefoxmoniter(bot, message):
     }
     headers = {
         'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
-        'cookie': 'session=' + session + "; _ga=GA1.3.1750251620.1566005038; _gid=GA1.3.1329192982.1566005038; _gat=1;",
+        'cookie': 'connect.sid=' + connect_sid + "; _ga=GA1.3.1750251620.1566005038; _gid=GA1.3.1329192982.1566005038; _gat=1;",
         'origin': 'https://monitor.firefox.com',
         'referer': 'https://monitor.firefox.com/',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
@@ -68,16 +69,22 @@ def Firefoxmoniter(bot, message):
         soup = BeautifulSoup(page.text, "lxml")
 
     if "扫描结果" in soup.find("title").text:
-        result += "电子邮件地址" + email +"出现在" + str(soup.find("span", class_="bold").text) + "次已知数据外泄事件中。\n\n"
-        for section in soup.find_all("div", class_="flx flx-col"):
+        result += "电子邮件地址 <b>" + email +"</b> 出现在 <b>" + str(soup.find("span", class_="bold").text) + "</b> 次已知数据外泄事件中。\n\n"
+        sections = soup.find_all("div", class_="flx flx-col")
+        if len(sections) > 10:
+            sections = sections[:10]
+        for section in sections:
             source = section.find_all("span")[0].text + "\n"
             date = "事件记录时间:\n" + section.find_all("span")[2].text + "\n"
             data = "泄露的数据:\n" + section.find_all("span")[4].text + "\n"
             result += source + date + data + "\n"
+        result += "<i>(只显示前10条)</i>"
 
-        status = bot.editMessageText(chat_id=message["chat"]["id"],message_id=txt_message_id, text=result, parse_mode="text")
+        soup.decompose()
+        status = bot.editMessageText(chat_id=message["chat"]["id"],message_id=txt_message_id, text=result, parse_mode="HTML")
         bot.message_deletor(60, message["chat"]["id"], status["message_id"])
     else:
+        soup.decompose()
         status = bot.editMessageText(chat_id=message["chat"]["id"], text="查询失败！\n请检测命令格式!", parse_mode="text")
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])
 

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 """
 @Creation: 2021-05-30
-@Last modify: 2021-05-30
+@Last modify: 2021-06-03
 """
 import requests
 import lxml
@@ -83,6 +83,8 @@ def get_steam_free_promotion_info():
             games[game_name]["announcement_date"] = announcement_date
             games[game_name]["text_info"] = text_info
 
+        soup.decompose()
         return games
     except:
+        soup.decompose()
         return False
