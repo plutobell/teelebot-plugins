@@ -47,7 +47,8 @@ def PaperFinder(bot, message):
             start = page * page_size - 1
 
         ok, xml_str = arXiv_api_do(search_query=keyword,
-                start=start, max_results=page_size)
+                start=start, max_results=page_size,
+                sortBy="lastUpdatedDate", sortOrder="descending")
         if ok:
             data = arXiv_xml_parser(xml_str=xml_str)
             if len(data) == 0:
@@ -94,7 +95,8 @@ def PaperFinder(bot, message):
         status = bot.editMessageText(
             chat_id=chat_id, message_id=message_id,
             text=msg, parse_mode="HTML",
-            reply_markup=reply_markup)
+            reply_markup=reply_markup,
+            disable_web_page_preview=True)
 
         if status != False:
             status = bot.answerCallbackQuery(message["callback_query_id"], show_alert=bool("true"))
@@ -122,7 +124,8 @@ def PaperFinder(bot, message):
             start = page * page_size - 1
 
         ok, xml_str = arXiv_api_do(search_query=keyword,
-                start=start, max_results=page_size)
+                start=start, max_results=page_size,
+                sortBy="lastUpdatedDate", sortOrder="descending")
         if ok:
             data = arXiv_xml_parser(xml_str=xml_str)
             paper = None
@@ -142,34 +145,23 @@ def PaperFinder(bot, message):
                 message_id=status["message_id"])
             return
 
-        msg = "<b>Title: </b>" + paper["title"].strip().replace("\n", "").replace("\r", "") + "\n\n" + \
+        msg = "<b>Title: </b>" + paper["title"].strip().replace("\n", "").replace("\r", "").replace(keyword, "<b><i><u>"+keyword+"</u></i></b>") + "\n\n" + \
             "<b>Author: </b>" + paper["author"] + "\n\n" + \
-            "<b>Summary: </b>" + paper["summary"][:500].strip().replace("\n", "").replace("\r", "") + "..." + "\n\n" + \
+            "<b>Summary: </b>" + paper["summary"][:500].strip().replace("\n", "").replace("\r", "").replace(keyword, "<b><i><u>"+keyword+"</u></i></b>") + "..." + "\n\n" + \
             "<b>Published: </b>" + paper["published"] + "\n" + \
-            "<b>Updated: </b>" + paper["updated"] + "\n\n" + \
-            "<code>Thank you to arXiv for use of its open access interoperability.</code>"
+            "<b>Updated: </b>" + paper["updated"] + "\n\n"
+
+        links_row = '<b><a href="'+ paper["link"] +'">Link</a></b>'
+        if "doi" in paper.keys():
+            links_row += '<b> | ' + '<a href="'+ paper["doi"] +'">DOI</a></b>'
+        if "pdf" in paper.keys():
+            links_row += '<b> | ' + '<a href="'+ paper["pdf"] +'">PDF</a></b>'
+        msg += links_row
+        msg += "\n\n<code>Thank you to arXiv for use of its open access interoperability.</code>"
+
         inlineKeyboard = [
-            [{"text": "arXiv Links", "url": paper["link"]}]
-        ]
-        if "doi" in paper.keys() and "pdf" in paper.keys():
-            inlineKeyboard.append(
-                [
-                    {"text": "doi", "url": paper["doi"]},
-                    {"text": "pdf", "url": paper["pdf"]}
-                ]
-            )
-        elif "doi" in paper.keys() or "pdf" in paper.keys():
-            switch = "doi"
-            if "pdf" in paper.keys():
-                switch = "pdf"
-            inlineKeyboard.append(
-                [
-                    {"text": switch, "url": paper[switch]}
-                ]
-            )
-        inlineKeyboard.append(
             [{"text": "Back to list", "callback_data": prefix + "page-" + str(keyword) + "-" + str(page)}]
-        )
+        ]
         reply_markup = {
             "inline_keyboard": inlineKeyboard
         }
@@ -177,7 +169,8 @@ def PaperFinder(bot, message):
         status = bot.editMessageText(
             chat_id=chat_id, message_id=message_id,
             text=msg, parse_mode="HTML",
-            reply_markup=reply_markup)
+            reply_markup=reply_markup,
+            disable_web_page_preview=True)
 
         if status != False:
             status = bot.answerCallbackQuery(message["callback_query_id"], show_alert=bool("true"))
@@ -186,11 +179,12 @@ def PaperFinder(bot, message):
 
     elif prefix in text.split(" ", 1)[0]:
         if len(text.split(" ", 1)) == 2:
-            keyword = text.split(" ", 1)[1].strip().replace(" ", "")
+            keyword = text.split(" ", 1)[1]
             page = 1
 
             ok, xml_str = arXiv_api_do(search_query=keyword,
-                start=page-1, max_results=page_size)
+                start=page-1, max_results=page_size,
+                sortBy="lastUpdatedDate", sortOrder="descending")
             if ok:
                 data = arXiv_xml_parser(xml_str=xml_str)
             else:
@@ -236,7 +230,7 @@ def PaperFinder(bot, message):
                 status = bot.sendMessage(chat_id=chat_id,
                     text=msg, parse_mode="HTML",
                     reply_to_message_id=message_id,
-                    reply_markup=reply_markup)
+                    reply_markup=reply_markup, disable_web_page_preview=True)
                 bot.message_deletor(180, chat_id=status["chat"]["id"],
                     message_id=status["message_id"])
             else:
@@ -257,13 +251,16 @@ def PaperFinder(bot, message):
 
 
 def arXiv_api_do(search_query,
-    id_list=None, start=None, max_results=None):
+    id_list=None, start=None, max_results=None,
+    sortBy=None, sortOrder=None):
     """Requests arXiv API
 
     :param search_query: keyword for search
     :param id_list: id_list
     :param start: start id
     :param max_results: max_results
+    :param sortBy: can be "relevance", "lastUpdatedDate", "submittedDate"
+    :param sortOrder: can be either "ascending" or "descending"
     :return: xml text string
     :rtype: str
     """
@@ -278,6 +275,10 @@ def arXiv_api_do(search_query,
         data["start"] = start
     if max_results is not None:
         data["max_results"] = max_results
+    if sortBy is not None and sortBy in ["relevance", "lastUpdatedDate", "submittedDate"]:
+        data["sortBy"] = sortBy
+    if sortOrder is not None and sortOrder in ["ascending", "descending"]:
+        data["sortOrder"] = sortOrder
 
     try:
         req = requests.post(url=basic_url, data=data)
