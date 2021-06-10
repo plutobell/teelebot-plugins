@@ -1,8 +1,9 @@
 # -*- coding:utf-8 -*-
 """
 @Creation: 2021-05-30
-@Last modify: 2021-06-03
+@Last modify: 2021-06-10
 """
+import re
 import requests
 import lxml
 from bs4 import BeautifulSoup
@@ -70,8 +71,12 @@ def get_steam_free_promotion_info():
             announcement_byline = announcement.find("div", class_="announcement_byline")
 
             text_info = bodytext.text.strip("\n").strip("\r").strip()
-            game_links = text_info.split("Game:")[1].split(" ")[0]
-            text_info = text_info.split("Game:")[0]
+            pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+            urls = re.findall(pattern, text_info)
+            for url in urls:
+                if "store.steampowered.com/app" in url:
+                    game_links = "/".join(url.strip().split("/")[:6])
+            text_info = text_info.replace(url.strip(), "")
             announcement_date = announcement_byline.text.split("-")[0].strip("\n").strip("\r").strip()
             game_name = a_links.text
             announcement_detail = a_links["href"]
