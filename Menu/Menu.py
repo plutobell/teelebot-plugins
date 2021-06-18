@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2019-8-15
-last_modify: 2020-11-16
+last_modify: 2021-06-18
 '''
 import os
 
@@ -12,7 +12,16 @@ def Menu(bot, message):
 
     prefix = "start"
 
-    plugin_bridge = bot.plugin_bridge
+    plugin_bridge = {}
+    plugin_bridge_raw = bot.plugin_bridge
+    for plugin in plugin_bridge_raw.keys():
+        if plugin_bridge_raw[plugin] == "":
+            plugin_bridge_raw[plugin] = plugin + "_command"
+    for command in sorted(plugin_bridge_raw.values()): # sort by command
+        for plugin in plugin_bridge_raw.keys():
+            if plugin_bridge_raw[plugin] == command:
+                plugin_bridge[plugin] = command
+
     plugin_dir = bot.plugin_dir
     plugin_list = list(plugin_bridge.keys())
 
