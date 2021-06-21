@@ -10,15 +10,35 @@ def ID(bot, message):
         if str(root_id) not in admins:
             admins.append(str(root_id)) #root permission
 
-    if message["text"] == "/idchat":
+    if message["text"][:len("/idchat")] == "/idchat":
         if message["chat"]["type"] != "private" and str(message["from"]["id"]) not in admins:
             status = bot.sendChatAction(message["chat"]["id"], "typing")
             status = bot.sendMessage(chat_id=message["chat"]["id"], text="抱歉，您无权查询!", parse_mode="text", reply_to_message_id=message["message_id"])
-        elif message["chat"]["type"] != "private":
-            status = bot.sendChatAction(message["chat"]["id"], "typing")
-            status = bot.sendMessage(message["chat"]["id"],
-            "当前群组的ID为：<b><code>" + str(message["chat"]["id"]) + "</code></b>",
-                parse_mode="HTML", reply_to_message_id=message["message_id"])
+        elif message["chat"]["type"] != "private" or len(message["text"].split(" ", 1)) > 1:
+            if len(message["text"].split(" ", 1)) == 1:
+                status = bot.sendChatAction(message["chat"]["id"], "typing")
+                status = bot.sendMessage(message["chat"]["id"],
+                "当前群组的ID为：<b><code>" + str(message["chat"]["id"]) + "</code></b>",
+                    parse_mode="HTML", reply_to_message_id=message["message_id"])
+            elif len(message["text"].split(" ", 1)) == 2:
+                chat_username = message["text"].split(" ", 1)[1]
+                if " " in chat_username or chat_username[0] != "@":
+                    status = bot.sendChatAction(message["chat"]["id"], "typing")
+                    status = bot.sendMessage(message["chat"]["id"], "群组用户名格式错误，请检查!",
+                        parse_mode="text", reply_to_message_id=message["message_id"])
+                else:
+                    status = bot.getChat(chat_id=chat_username)
+                    if status != False:
+                        id = status["id"]
+                        status = bot.sendChatAction(message["chat"]["id"], "typing")
+                        msg = "群组 <b>" + str(chat_username) + " </b>的ID为: <code>" + str(id) + "</code>"
+                        status = bot.sendMessage(message["chat"]["id"], msg,
+                            parse_mode="HTML", reply_to_message_id=message["message_id"])
+                    else:
+                        status = bot.sendChatAction(message["chat"]["id"], "typing")
+                        msg = "获取群组 <b>" + str(chat_username) + " </b>的ID失败，请重试！"
+                        status = bot.sendMessage(message["chat"]["id"], msg,
+                            parse_mode="HTML", reply_to_message_id=message["message_id"])
         else:
             status = bot.sendChatAction(message["chat"]["id"], "typing")
             status = bot.sendMessage(message["chat"]["id"], "抱歉，该指令不支持私人会话!",
