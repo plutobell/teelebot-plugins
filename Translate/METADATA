@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: Translate
+Version: 1.0.0
+Summary: 有道翻译插件
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: youdao, Translate, 翻译
+Requires-teelebot: >=1.17.0
+Requires-dist: requests
+Source: https://github.com/plutobell/teelebot-plugins

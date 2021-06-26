@@ -1,3 +1,2 @@
 # CallAdmins #
-
-一键呼叫群组管理员
+CallAdmins插件，一键呼叫群组管理员

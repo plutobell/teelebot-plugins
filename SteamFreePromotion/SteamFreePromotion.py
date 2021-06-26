@@ -1,11 +1,10 @@
 # -*- coding:utf-8 -*-
 """
 @Creation: 2021-05-30
-@Last modify: 2021-06-10
+@Last modify: 2021-06-25
 """
 import re
 import requests
-import lxml
 from bs4 import BeautifulSoup
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -15,11 +14,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 def SteamFreePromotion(bot, message):
 
     chat_id = message["chat"]["id"]
-    user_id = message["from"]["id"]
     message_id = message["message_id"]
-
-    message_type = message["message_type"]
-    chat_type = message["chat"]["type"]
 
     prefix = ""
     with open(bot.path_converter(bot.plugin_dir + "SteamFreePromotion/__init__.py"), "r", encoding="utf-8") as init:
@@ -61,7 +56,7 @@ def get_steam_free_promotion_info():
 
     try:
         req = requests.get(url=url, headers=headers, verify=False)
-        soup = BeautifulSoup(req.text, "lxml")
+        soup = BeautifulSoup(req.text, "html.parser")
         announcements = soup.find_all("div", class_="announcement")
 
         games = {}
@@ -73,14 +68,24 @@ def get_steam_free_promotion_info():
             text_info = bodytext.text.strip("\n").strip("\r").strip()
             pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
             urls = re.findall(pattern, text_info)
+
+            game_links = None
             for url in urls:
                 if "store.steampowered.com/app" in url:
                     game_links = "/".join(url.strip().split("/")[:6])
+            if game_links is None:
+                continue
+
             text_info = text_info.replace(url.strip(), "")
             announcement_date = announcement_byline.text.split("-")[0].strip("\n").strip("\r").strip()
             game_name = a_links.text
             announcement_detail = a_links["href"]
             # print(announcement_date, game_name, announcement_detail, text_info, game_links)
+
+            if len(announcement_detail) > 200:
+                announcement_detail = announcement_detail[:200]
+            if len(text_info) > 200:
+                text_info = text_info[:200]
 
             games[game_name] = {}
             games[game_name]["game_links"] = game_links

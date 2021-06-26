@@ -6,3 +6,5 @@ __pycache__/
 *.txt
 info.txt
 cert/
+.cache/
+*.list

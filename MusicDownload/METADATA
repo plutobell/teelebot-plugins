@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: MusicDownload
+Version: 1.0.0
+Summary: 音乐下载插件
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: MusicDownload, 音乐下载
+Requires-teelebot: >=1.17.0
+Requires-dist: requests
+Source: https://github.com/plutobell/teelebot-plugins

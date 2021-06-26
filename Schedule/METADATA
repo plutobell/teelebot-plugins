@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: Schedule
+Version: 1.0.0
+Summary: 周期性执行特定任务，目前只支持文本类消息
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: Schedule, 周期性任务
+Requires-teelebot: >=1.17.0
+Requires-dist: 
+Source: https://github.com/plutobell/teelebot-plugins

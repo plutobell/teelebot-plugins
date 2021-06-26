@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: Menu
+Version: 1.0.0
+Summary: 自动生成的插件菜单
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: Menu, 插件列表, 插件菜单
+Requires-teelebot: >=1.17.0
+Requires-dist: 
+Source: https://github.com/plutobell/teelebot-plugins

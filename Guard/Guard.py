@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2021-05-30
+last_modify: 2021-06-26
 '''
 from collections import defaultdict
 import re
@@ -41,11 +41,65 @@ def Guard(bot, message):
     gap = 60
     db = SqliteDB(bot, plugin_dir)
 
+    if message["chat"]["type"] != "private" and message_type == "text": # 初始化
+        text = message["text"]
+        if text[:len("/guardinit")] == "/guardinit":
+            if str(user_id) != str(root_id):
+                msg = "抱歉，您无权操作。"
+                bot.sendChatAction(chat_id, "typing")
+                status = bot.sendMessage(
+                    chat_id=chat_id, text=msg, parse_mode="HTML")
+                bot.message_deletor(15, chat_id, status["message_id"])
+                return
+
+            text_list = text.strip(" ").split(" ", 1)
+            if len(text_list) == 2:
+                logging_channel = text_list[1].replace(" ", "")
+                if logging_channel[0] != "@":
+                    msg = "频道用户名格式错误，请带上'@'符号。"
+                    bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendMessage(
+                        chat_id=chat_id, text=msg, parse_mode="HTML")
+                    bot.message_deletor(15, chat_id, status["message_id"])
+                    return
+                try:
+                    status = bot.getChat(chat_id=logging_channel)
+                    if status != False:
+                        id = status["id"]
+                        with open(bot.path_converter(plugin_dir + "Guard/config.ini"), "w", encoding="utf-8") as f:
+                            f.write(str(id))
+
+                    msg = "Guard插件日志存放频道设置成功。"
+                    bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendMessage(
+                        chat_id=chat_id, text=msg, parse_mode="HTML")
+                    bot.message_deletor(15, chat_id, status["message_id"])
+                    return
+                except:
+                    msg = "Guard插件日志存放频道设置失败，请重试。"
+                    bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendMessage(
+                        chat_id=chat_id, text=msg, parse_mode="HTML")
+                    bot.message_deletor(15, chat_id, status["message_id"])
+                    return
+            else:
+                msg = "指令格式错误。e.g.: /guardinit @ channel_username"
+                bot.sendChatAction(chat_id, "typing")
+                status = bot.sendMessage(
+                    chat_id=chat_id, text=msg, parse_mode="HTML")
+                bot.message_deletor(15, chat_id, status["message_id"])
+                return
+
     if not os.path.exists(bot.path_converter(plugin_dir + "Guard/config.ini")):
         print("Guard: configuration file not found.")
+        msg = "要使用Guard插件请先设置日志存放频道\n请Bot管理员使用以下指令设置:\ne.g.: /guardinit @ channel_username"
+        bot.sendChatAction(chat_id, "typing")
+        status = bot.sendMessage(
+            chat_id=chat_id, text=msg, parse_mode="HTML")
+        bot.message_deletor(15, chat_id, status["message_id"])
         return
 
-    with open(bot.path_converter(plugin_dir + "Guard/config.ini")) as f:
+    with open(bot.path_converter(plugin_dir + "Guard/config.ini"), "r", encoding="utf-8") as f:
         log_group_id = f.readline().strip()
 
     user_status = "member"
@@ -207,7 +261,7 @@ def Guard(bot, message):
                     message["callback_query_id"], text="驱逐成功", show_alert=bool("true"))
 
                 db.delete(chat_id=chat_id, user_id=origin_user_id)
-                status = bot.kickChatMember(
+                status = bot.banChatMember(
                     chat_id=chat_id, user_id=origin_user_id, until_date=35)
                 #status = bot.unbanChatMember(chat_id=chat_id, user_id=user_id)
                 admin_msg = "<b><a href='tg://user?id=" + \
@@ -277,7 +331,7 @@ def Guard(bot, message):
         name_demoji = filter_emoji(name)
         result = DFA.filter(name_demoji, repl)
         if (repl in result and len(name) > 9) or (len(name) > 25):
-            status = bot.kickChatMember(
+            status = bot.banChatMember(
                 chat_id=chat_id, user_id=user_id, until_date=35)
             status = bot.deleteMessage(
                 chat_id=chat_id, message_id=message_id)
@@ -413,7 +467,7 @@ def Guard(bot, message):
                         db.user_update(chat_id=chat_id, user_id=user_id,
                                     message_times=req[3], spam_times=req[4])
                     if (req[3] == 1 and req[4] == 1) or req[4] >= 2:
-                        bot.kickChatMember(
+                        bot.banChatMember(
                             chat_id=req[1], user_id=req[2], until_date=35)
                         bot.deleteMessage(
                             chat_id=req[1], message_id=message_id)
@@ -450,8 +504,9 @@ def Guard(bot, message):
             bot.message_deletor(gap, chat_id, status["message_id"])
         elif text[1:len(prefix)+1] == prefix and count == 0:  # 菜单
             status = bot.sendChatAction(chat_id, "typing")
-            msg = "<b>Guard 插件功能</b>\n\n" +\
-                "<b>/guardadd</b> - 新增过滤关键词，一次只能添加一个。格式：命令后接关键词，以空格作为分隔符\n" +\
+            msg = "<b>Guard 插件功能</b>\n\n" + \
+                "<b>/guardadd</b> - 新增过滤关键词，一次只能添加一个。格式：命令后接关键词，以空格作为分隔符\n" + \
+                "<b>/guardinit</b> - 设置日志存放频道，格式：/guardinit @ channel_username\n" +\
                 "\n"
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message["message_id"])
@@ -503,7 +558,7 @@ def timer_func(bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, me
         if int(time.time()) > result[5] + gap:
             status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
             db.delete(chat_id=chat_id, user_id=user_id)
-            status = bot.kickChatMember(
+            status = bot.banChatMember(
                 chat_id=chat_id, user_id=user_id, until_date=35)
             #status = bot.unbanChatMember(chat_id=chat_id, user_id=user_id)
             msg = "<b><a href='tg://user?id=" + \

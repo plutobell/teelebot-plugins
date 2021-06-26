@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: SteamFreePromotion
+Version: 1.0.0
+Summary: Steam免费促销信息获取插件
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: Steam, Free Promotion, 免费促销
+Requires-teelebot: >=1.17.0
+Requires-dist: requests, bs4
+Source: https://github.com/plutobell/teelebot-plugins

@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-import requests, lxml, hashlib
+import requests, hashlib
 from bs4 import BeautifulSoup
 
 def Firefoxmoniter(bot, message):
@@ -50,7 +50,7 @@ def Firefoxmoniter(bot, message):
             return False
         page.encoding = "utf-8"
         connect_sid = page.cookies["connect.sid"]
-        soup = BeautifulSoup(page.text, "lxml")
+        soup = BeautifulSoup(page.text, "html.parser")
         csrf = soup.find_all("input")[0]["value"]
         soup.decompose()
 
@@ -71,7 +71,7 @@ def Firefoxmoniter(bot, message):
         page.encoding = "utf-8"
 
         result = ""
-        soup = BeautifulSoup(page.text, "lxml")
+        soup = BeautifulSoup(page.text, "html.parser")
 
     if "扫描结果" in soup.find("title").text:
         result += "电子邮件地址 <b>" + email +"</b> 出现在 <b>" + str(soup.find("span", class_="bold").text) + "</b> 次已知数据外泄事件中。\n\n"

@@ -1,2 +1,2 @@
 # VoteToMute #
-投票禁言
+VoteToMute插件，投票禁言

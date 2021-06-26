@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: Top
+Version: 1.0.0
+Summary: 通过Pi Dashboard Go后端接口查看服务器状态
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: Top, pi-dashboard-go, 服务器信息
+Requires-teelebot: >=1.17.0
+Requires-dist: requests
+Source: https://github.com/plutobell/teelebot-plugins

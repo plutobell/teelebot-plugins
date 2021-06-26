@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: About
+Version: 1.0.0
+Summary: 关于Bot
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: About
+Requires-teelebot: >=1.17.0
+Requires-dist: 
+Source: https://github.com/plutobell/teelebot-plugins

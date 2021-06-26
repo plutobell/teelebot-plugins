@@ -81,7 +81,7 @@ def Admin(bot, message):
         if str(user_id) in admins and str(chat_id) == str(target_chat_id):
             if text[1:len(prefix + command["/adminkick"])+1] == prefix + command["/adminkick"]:
                 if str(target_user_id) not in admins:
-                    status = bot.kickChatMember(chat_id=chat_id, user_id=target_user_id, until_date=60)
+                    status = bot.banChatMember(chat_id=chat_id, user_id=target_user_id, until_date=60)
                     status_ = bot.unbanChatMember(chat_id=chat_id, user_id=target_user_id)
                     if status != False:
                         status = bot.sendChatAction(chat_id, "typing")

@@ -1,2 +1,2 @@
 # PaperFinder #
-论文检索器, 在arXiv中检索论文
+PaperFinder插件，论文检索器，在 [arXiv](https://arxiv.org/) 中检索论文

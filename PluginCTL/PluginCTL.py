@@ -1,11 +1,10 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-6-15
-last_modify: 2020-11-28
+last_modify: 2021-06-25
 '''
 import os
 from threading import Lock
-
 
 lock = Lock()
 
@@ -222,7 +221,7 @@ def PluginCTL(bot, message):
                 bot.message_deletor(15, chat_id, status["message_id"])
 
         elif text[1:len(prefix + command["/pluginctloff"])+1] == prefix + command["/pluginctloff"]:
-            default_plugin = ["Menu", "About", "PluginCTL", "Uptime", "Schedule"]
+            default_plugin = ["Menu", "About", "PluginManagementTools", "PluginCTL", "Uptime", "Schedule"]
             plugin_list = list(plugin_bridge.keys())
             if len(text.split(' ')) == 2:
                 plug_set = text.split(' ')[1]

@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 '''
 @creation time: 2020-3-21
-@last_modify: 2020-12-15
+@last_modify: 2021-06-26
 @The backend is powered by Pi Dashboard Go
     https://github.com/plutobell/pi-dashboard-go
 '''
+import os
 import requests
 
 #设置重连次数
@@ -13,11 +14,74 @@ requests.adapters.DEFAULT_RETRIES = 5
 def Top(bot, message):
     root_id = bot.root_id
     plugin_dir = bot.plugin_dir
-    if str(message["from"]["id"]) == root_id:
+
+    message_id = message["message_id"]
+    chat_id = message["chat"]["id"]
+    user_id = message["from"]["id"]
+    message_type = message["message_type"]
+
+    if str(user_id) == str(root_id):
         url = ""
         username = ""
         password = ""
-        with open(bot.path_converter(plugin_dir + "Top/config.ini"), "r") as f:
+
+        if message_type == "text":
+            text = message["text"]
+            if text[:len("/topinit")] == "/topinit": # 初始化
+                text_list = text.strip(" ").strip("\n").split(" ", 3)
+                if len(text_list) == 4:
+                    url = text_list[1]
+                    username = text_list[2]
+                    password = text_list[3].replace(" ", "")
+
+                    if ("http://" not in url and "https://" not in url) \
+                        or len(url.split(":")) != 3:
+                        msg = "url格式错误，请带上协议头和端口号"
+                        bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendMessage(
+                            chat_id=chat_id, text=msg, parse_mode="HTML")
+                        bot.message_deletor(15, chat_id, status["message_id"])
+                        return
+
+                    try:
+                        with open(bot.path_converter(plugin_dir + "Top/config.ini"), "w", encoding="utf-8") as f:
+                            write_list = []
+                            write_list.append(url + "\n")
+                            write_list.append(username + "\n")
+                            write_list.append(password + "\n")
+                            f.writelines(write_list)
+
+                        msg = "Top插件后端登录信息设置成功。"
+                        bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendMessage(
+                            chat_id=chat_id, text=msg, parse_mode="HTML")
+                        bot.message_deletor(15, chat_id, status["message_id"])
+                        return
+                    except:
+                        msg = "Top插件后端登录信息设置失败，请重试。"
+                        bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendMessage(
+                            chat_id=chat_id, text=msg, parse_mode="HTML")
+                        bot.message_deletor(15, chat_id, status["message_id"])
+                        return
+                else:
+                    msg = "指令格式错误。e.g.: /topinit url username password"
+                    bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendMessage(
+                        chat_id=chat_id, text=msg, parse_mode="HTML")
+                    bot.message_deletor(15, chat_id, status["message_id"])
+                    return
+
+        if not os.path.exists(bot.path_converter(plugin_dir + "Top/config.ini")):
+            print("Guard: configuration file not found.")
+            msg = "要使用Top插件请先设置后端登录信息\n请Bot管理员使用以下指令设置:\ne.g.: /topinit url username password"
+            bot.sendChatAction(chat_id, "typing")
+            status = bot.sendMessage(
+                chat_id=chat_id, text=msg, parse_mode="HTML")
+            bot.message_deletor(15, chat_id, status["message_id"])
+            return
+
+        with open(bot.path_converter(plugin_dir + "Top/config.ini"), "r", encoding="utf-8") as f:
             sets = f.readlines()
             if len(sets) != 3 and "/\n" in sets:
                 for i, set in enumerate(sets):
@@ -29,7 +93,7 @@ def Top(bot, message):
             password = sets[2].strip("\n")
 
         status = bot.sendChatAction(message["chat"]["id"], "typing")
-        status = bot.sendMessage(message["chat"]["id"], text="正在获取服务器信息，请稍等...", parse_mode="HTML", reply_to_message_id=message["message_id"])
+        status = bot.sendMessage(message["chat"]["id"], text="正在获取服务器信息，请稍等...", parse_mode="HTML", reply_to_message_id=message_id)
         txt_message_id = status["message_id"]
         try:
             with requests.get(url=url + "?ajax=true", auth=(username, password)) as req:
@@ -91,7 +155,8 @@ def Top(bot, message):
             print("Top plugin error:", e)
             status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id, text="抱歉，获取失败!", parse_mode="HTML")
             bot.message_deletor(15, message["chat"]["id"], status["message_id"])
+
     else:
         status = bot.sendChatAction(message["chat"]["id"], "typing")
-        status = bot.sendMessage(message["chat"]["id"], text="抱歉，您无权操作!", parse_mode="HTML", reply_to_message_id=message["message_id"])
+        status = bot.sendMessage(message["chat"]["id"], text="抱歉，您无权操作!", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])
