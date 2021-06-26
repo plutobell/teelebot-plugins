@@ -2,7 +2,7 @@
 """
 @description: Plugin Management Tools
 @creation date: 2021-06-23
-@last modify: 2021-06-25
+@last modify: 2021-06-27
 @author: Pluto (github.com/plutobell)
 """
 import os
@@ -426,7 +426,7 @@ def PluginManagementTools(bot, message):
                 msg += 'Done\n'
                 bot.editMessageText(chat_id=chat_id,
                     message_id=update_msg_id, text="<code>"+msg+"</code>", parse_mode="HTML")
-
+                bot.message_deletor(30, chat_id, update_msg_id)
         elif command == "clean":
             msg = "正在清除本地缓存 ..."
             bot.sendChatAction(chat_id, "typing")
@@ -519,27 +519,21 @@ def PluginManagementTools(bot, message):
                         msg += "Skip[Requires teelebot >=" + requires_teelebot + "]\n"
                     else:
                         try:
-                            copy = Copy()
-                            copy.copyTree(
-                                sources_cache_path + os.sep + label + os.sep + plugin_name,
-                                plugin_dir + plugin_name
-                            )
-                            msg += "Success\n"
 
                             if ok:
                                 uninstalled_dependencies = []
-                                dependencies = metadata["Requires-dist"].strip(" ").replace(" ", "").split(",")
-                                i = 0
-                                total = len(dependencies)
-                                for dependency in dependencies:
-                                    if dependency in ["", " ", None]:
-                                        if total > 0:
-                                            total -= 1
-                                        continue
-                                    else:
-                                        i += 1
+                                dependencies_raw = metadata["Requires-dist"].strip(" ").replace(" ", "").split(",")
+                                dependencies = []
+                                for dependency in dependencies_raw:
+                                    if dependency not in ["", " ", None]:
+                                        dependencies.append(dependency)
+                                dependency_total = len(dependencies)
 
-                                    msg += "[" + str(i) + "/" + str(total) + "]为 " + label + "/" + plugin_name + " 安装依赖 " + dependency + " ..."
+                                if dependency_total > 0:
+                                    msg += "\n"
+
+                                for i, dependency in enumerate(dependencies):
+                                    msg += "[" + str(i+1) + "/" + str(dependency_total) + "]为 " + label + "/" + plugin_name + " 安装依赖 " + dependency + " ..."
                                     bot.editMessageText(chat_id=chat_id,
                                         message_id=update_msg_id,
                                         text="<code>"+msg+"</code>", parse_mode="HTML")
@@ -552,11 +546,22 @@ def PluginManagementTools(bot, message):
                                         msg += "Success\n"
 
                                 if len(uninstalled_dependencies) != 0:
-                                    msg += "** 插件 " + label + "/" + plugin_name + " 依赖缺失 **\n"
+                                    msg += "** 插件 " + label + "/" + plugin_name + " 依赖缺失，安装失败 **\n"
+                                else:
+                                    try:
+                                        copy = Copy()
+                                        copy.copyTree(
+                                            sources_cache_path + os.sep + label + os.sep + plugin_name,
+                                            plugin_dir + plugin_name
+                                        )
+                                        if dependency_total == 0:
+                                            msg += "Success\n"
+                                    except:
+                                        msg += "** 插件 " + label + "/" + plugin_name + " 安装失败 **\n"
                             else:
                                 msg += "Failure[Dependency Information]\n"
                         except:
-                            msg += "Failure[Plugin Installation]\n"
+                            msg += "Failure[Dependency Installation]\n"
 
                     bot.editMessageText(chat_id=chat_id,
                         message_id=update_msg_id, text="<code>"+msg+"</code>", parse_mode="HTML")
@@ -924,7 +929,7 @@ def get_metadata(plugin_dir, plugin_name, bot_version):
             metadata.writelines([
                 "Metadata-version: 1.0\n",
                 "Plugin-name: " + plugin_name + "\n",
-                "Version: 1.0.0\n",
+                "Version: 0.1.0\n",
                 "Summary: \n",
                 "Home-page: \n",
                 "Author: \n",
@@ -1125,14 +1130,20 @@ class PipExecutor:
         self.__origin = origin
 
     def __executor(self, arguments):
-        command = [sys.executable, "-m", "pip"]
+        FNULL = open(os.devnull, 'w')
+        command = [sys.executable, "-m", "pip3", "-v"]
+        try: # 检测pip版本
+            subprocess.check_call(command, timeout=120, stdout=FNULL, stderr=subprocess.STDOUT)
+            command = [sys.executable, "-m", "pip3"]
+        except subprocess.CalledProcessError as error:
+            command = [sys.executable, "-m", "pip"]
+
         command.extend(arguments)
         if self.__origin is not None:
             origin_list = ["-i", self.__origin]
             command.extend(origin_list)
 
         if command[3] in ["install", "uninstall"]:
-            FNULL = open(os.devnull, 'w')
             try:
                 subprocess.check_call(command, timeout=120, stdout=FNULL, stderr=subprocess.STDOUT)
                 return True, ""
