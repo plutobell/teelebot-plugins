@@ -42,4 +42,4 @@
 29. MessageFloodedCheck - MessageFloodedCheck插件，消息刷屏检测
 30. SteamFreePromotion - SteamFreePromotion插件，从 [Steam社区](https://steamcommunity.com/groups/freegamesinfoo) 获取Steam免费促销信息
 31. PaperFinder - PaperFinder插件，论文检索器，在 [arXiv](https://arxiv.org) 中检索论文
-
+32. DataCenter - DataCenter插件，获取账号所在数据中心
