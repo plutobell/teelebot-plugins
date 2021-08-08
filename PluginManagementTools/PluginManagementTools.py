@@ -2,7 +2,7 @@
 """
 @description: Plugin Management Tools
 @creation date: 2021-06-23
-@last modify: 2021-06-27
+@last modification: 2021-08-08
 @author: Pluto (github.com/plutobell)
 """
 import os
@@ -678,7 +678,7 @@ def PluginManagementTools(bot, message):
 
         elif command == "list":
             msg = "已安装 "+ str(len(plugin_bridge.keys())) +" 个插件:\n"
-            for i, plugin in enumerate(plugin_bridge.keys()):
+            for i, plugin in enumerate(sorted(plugin_bridge.keys())):
                 ok, metadata = get_metadata(plugin_dir, plugin, version)
                 if ok:
                     label = ""
