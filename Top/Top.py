@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 @creation time: 2020-3-21
-@last_modify: 2021-08-10
+@last_modify: 2021-08-12
 @The backend is powered by Pi Dashboard Go
     https://github.com/plutobell/pi-dashboard-go
 '''
@@ -74,7 +74,9 @@ def Top(bot, message):
 
         if not os.path.exists(bot.path_converter(plugin_dir + "Top/config.ini")):
             print("Guard: configuration file not found.")
-            msg = "要使用Top插件请先设置后端登录信息\n请Bot管理员使用以下指令设置:\ne.g.: /topinit url username password"
+            msg = "要使用Top插件请先设置后端登录信息\n" + \
+                "请Bot管理员使用以下指令设置:\n" + \
+                "e.g.: /topinit url username password"
             bot.sendChatAction(chat_id, "typing")
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
@@ -101,14 +103,14 @@ def Top(bot, message):
                     "username": username,
                     "password": password
                 }
-                with s.post(url=url + "/login", data=data) as req:
+                with s.post(url=url + "/api/login", json=data) as req:
                     if "<title>Login</title>" in req.text:
                         status = bot.editMessageText(chat_id=message["chat"]["id"],message_id=txt_message_id,
                             text="抱歉，登录失败!", parse_mode="HTML")
                         bot.message_deletor(15, message["chat"]["id"], txt_message_id)
                         return
 
-                with s.get(url=url + "?ajax=true") as req:
+                with s.post(url=url + "/api/device") as req:
                     if req.json().get("version", False) is False:
                         req.close()
                         status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id,
