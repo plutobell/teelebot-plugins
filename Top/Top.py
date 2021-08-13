@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 @creation time: 2020-3-21
-@last_modify: 2021-08-12
+@last_modify: 2021-08-13
 @The backend is powered by Pi Dashboard Go
     https://github.com/plutobell/pi-dashboard-go
 '''
@@ -103,14 +103,21 @@ def Top(bot, message):
                     "username": username,
                     "password": password
                 }
-                with s.post(url=url + "/api/login", json=data) as req:
-                    if "<title>Login</title>" in req.text:
+                with s.get(url=url + "/api/login", json=data) as req:
+                    if req.cookies.get("cf_sid", False) == False:
                         status = bot.editMessageText(chat_id=message["chat"]["id"],message_id=txt_message_id,
-                            text="抱歉，登录失败!", parse_mode="HTML")
+                            text="抱歉，认证失败!", parse_mode="HTML")
                         bot.message_deletor(15, message["chat"]["id"], txt_message_id)
                         return
+                    headers = {"X-XSRF-TOKEN": req.cookies.get("cf_sid")}
+                    with s.post(url=url + "/api/login", headers=headers, json=data) as req:
+                        if "<title>Login</title>" in req.text:
+                            status = bot.editMessageText(chat_id=message["chat"]["id"],message_id=txt_message_id,
+                                text="抱歉，登录失败!", parse_mode="HTML")
+                            bot.message_deletor(15, message["chat"]["id"], txt_message_id)
+                            return
 
-                with s.post(url=url + "/api/device") as req:
+                with s.post(url=url + "/api/device", headers=headers) as req:
                     if req.json().get("version", False) is False:
                         req.close()
                         status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id,
