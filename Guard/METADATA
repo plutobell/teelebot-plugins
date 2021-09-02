@@ -1,6 +1,6 @@
 Metadata-version: 1.0
 Plugin-name: Guard
-Version: 1.0.0
+Version: 1.0.1
 Summary: 广告过滤，使用DFA对消息进行过滤；入群验证码人机检测
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
