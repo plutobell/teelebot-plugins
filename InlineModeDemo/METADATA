@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: InlineModeDemo
+Version: 1.0.0
+Summary: InlineMode插件例子
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: InlineModeDemo, Inline
+Requires-teelebot: >=1.17.2
+Requires-dist: 
+Source: https://github.com/plutobell/teelebot-plugins
