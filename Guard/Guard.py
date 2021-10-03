@@ -143,16 +143,16 @@ def Guard(bot, message):
                 caption=msg, parse_mode="HTML", reply_markup=reply_markup)
             if status != False:
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="刷新成功", show_alert=bool("true"))
+                    message["callback_query_id"], text="刷新成功")
             else:
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="刷新失败", show_alert=bool("true"))
+                    message["callback_query_id"], text="刷新失败")
         elif result != False and "/guardcaptchatrue" in message["callback_query_data"] and result[2] == str(user_id) and result[1] == str(chat_id):
             if message["callback_query_data"] == "/guardcaptchatrue-restricted":
                 user_status = "restricted"
 
             status = bot.answerCallbackQuery(
-                message["callback_query_id"], text="正确", show_alert=bool("true"))
+                message["callback_query_id"], text="正确")
             status = bot.getChat(chat_id=chat_id)
             chat_title = status["title"]
 
@@ -184,7 +184,7 @@ def Guard(bot, message):
                 user_status = "restricted"
 
             status = bot.answerCallbackQuery(
-                message["callback_query_id"], text="不正确", show_alert=bool("true"))
+                message["callback_query_id"], text="不正确")
             msg = "<b><a href='tg://user?id=" + str(user_id) + "'>" + first_name + " " + last_name + \
                 "</a></b> 验证码不正确，已刷新，请于 <b>" + \
                 str((gap + result[5])-int(time.time())) + \
@@ -199,10 +199,10 @@ def Guard(bot, message):
                 caption=msg, parse_mode="HTML", reply_markup=reply_markup)
             if status != False:
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="刷新成功", show_alert=bool("true"))
+                    message["callback_query_id"], text="刷新成功")
             else:
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="刷新失败", show_alert=bool("true"))
+                    message["callback_query_id"], text="刷新失败")
 
         elif "/guardmanual" in message["callback_query_data"] and str(user_id) in admins:
             origin_user_id = message["callback_query_data"].split("-")[1]
@@ -210,7 +210,7 @@ def Guard(bot, message):
 
             if result == False: # 消息过期
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
+                    message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
                 return
 
             origin_user_info = bot.getChatMember(chat_id=chat_id, user_id=origin_user_id)["user"]
@@ -227,7 +227,7 @@ def Guard(bot, message):
                 status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
 
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="放行成功", show_alert=bool("true"))
+                    message["callback_query_id"], text="放行成功")
                 status = bot.getChat(chat_id=chat_id)
                 chat_title = status["title"]
 
@@ -258,7 +258,7 @@ def Guard(bot, message):
                 status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
 
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="驱逐成功", show_alert=bool("true"))
+                    message["callback_query_id"], text="驱逐成功")
 
                 db.delete(chat_id=chat_id, user_id=origin_user_id)
                 status = bot.banChatMember(
@@ -283,10 +283,10 @@ def Guard(bot, message):
         # 防止接收来自其他插件的CallbackQuery
         elif "/guardupdatingcaptcha" in message["callback_query_data"] or "/guardcaptcha" in message["callback_query_data"]:
             status = bot.answerCallbackQuery(
-                message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
+                message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
         elif "/guardmanual" in message["callback_query_data"]:
             status = bot.answerCallbackQuery(
-                message["callback_query_id"], text="想啥呢？只有管理员可以操作！", show_alert=bool("true"))
+                message["callback_query_id"], text="想啥呢？只有管理员可以操作！", show_alert=True)
 
     # 兼容 Bot API version < 5.3
     elif "new_chat_members" in message.keys() or \

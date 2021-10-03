@@ -104,7 +104,7 @@ def Menu(bot, message):
                 status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=menu_str, parse_mode="HTML", reply_markup=reply_markup)
                 status = bot.answerCallbackQuery(message["callback_query_id"])
             else:
-                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
+                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
     else:
         page = 1
         if page_total == 1:

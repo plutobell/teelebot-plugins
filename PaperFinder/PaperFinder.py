@@ -38,7 +38,7 @@ def PaperFinder(bot, message):
             page = int(callback_query_data.split("-")[2])
             keyword = str(callback_query_data.split("-")[1])
         else:
-            status = bot.answerCallbackQuery(message["callback_query_id"], text="What is your business?", show_alert=bool("true"))
+            status = bot.answerCallbackQuery(message["callback_query_id"], text="What is your business?", show_alert=True)
             return
 
         if page == 1:
@@ -53,7 +53,7 @@ def PaperFinder(bot, message):
             data = arXiv_xml_parser(xml_str=xml_str)
             if len(data) == 0:
                 bot.answerCallbackQuery(message["callback_query_id"],
-                    text="It's already the last page.", show_alert=bool("true"))
+                    text="It's already the last page.")
                 return
         else:
             bot.sendChatAction(chat_id, "typing")
@@ -99,9 +99,9 @@ def PaperFinder(bot, message):
             disable_web_page_preview=True)
 
         if status != False:
-            status = bot.answerCallbackQuery(message["callback_query_id"], show_alert=bool("true"))
+            status = bot.answerCallbackQuery(message["callback_query_id"])
         else:
-            bot.answerCallbackQuery(message["callback_query_id"], text="It's already the last page.", show_alert=bool("true"))
+            bot.answerCallbackQuery(message["callback_query_id"], text="It's already the last page.", show_alert=True)
 
     elif "reply_markup" in message.keys() and prefix + "paper" in message["callback_query_data"]:
         click_user_id = message["click_user"]["id"]
@@ -115,7 +115,7 @@ def PaperFinder(bot, message):
             keyword = str(callback_query_data.split("-")[1])
             paper_id = int(callback_query_data.split("-")[3])
         else:
-            status = bot.answerCallbackQuery(message["callback_query_id"], text="What is your business?", show_alert=bool("true"))
+            status = bot.answerCallbackQuery(message["callback_query_id"], text="What is your business?", show_alert=True)
             return
 
         if page == 1:
@@ -134,7 +134,7 @@ def PaperFinder(bot, message):
                     paper = datum
             if len(data) == 0 or paper == None:
                 bot.answerCallbackQuery(message["callback_query_id"],
-                    text="Failed to get the paper.", show_alert=bool("true"))
+                    text="Failed to get the paper.", show_alert=True)
                 return
         else:
             bot.sendChatAction(chat_id, "typing")
@@ -173,9 +173,9 @@ def PaperFinder(bot, message):
             disable_web_page_preview=True)
 
         if status != False:
-            status = bot.answerCallbackQuery(message["callback_query_id"], show_alert=bool("true"))
+            status = bot.answerCallbackQuery(message["callback_query_id"])
         else:
-            bot.answerCallbackQuery(message["callback_query_id"], text="Failed to get the paper.", show_alert=bool("true"))
+            bot.answerCallbackQuery(message["callback_query_id"], text="Failed to get the paper.", show_alert=True)
 
     elif prefix in text.split(" ", 1)[0]:
         if len(text.split(" ", 1)) == 2:

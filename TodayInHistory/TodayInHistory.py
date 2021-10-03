@@ -32,7 +32,7 @@ def TodayInHistory(bot, message):
                     status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=msg, parse_mode="HTML", reply_markup=reply_markup)
                     status = bot.answerCallbackQuery(message["callback_query_id"])
             else:
-                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
+                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
         elif callback_query_data[:len(page_callback_command)] == "/todayinhisthidedata":
             if click_user_id == from_user_id:
                 today_data = today_in_history()
@@ -50,7 +50,7 @@ def TodayInHistory(bot, message):
                     status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=msg, parse_mode="HTML", reply_markup=reply_markup)
                     status = bot.answerCallbackQuery(message["callback_query_id"])
             else:
-                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
+                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
 
     elif text[1:len(prefix)+1] == prefix:
         today_data = today_in_history()

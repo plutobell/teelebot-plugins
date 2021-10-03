@@ -97,7 +97,7 @@ def PluginCTL(bot, message):
                 status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=msg_on + "\n", parse_mode="HTML", reply_markup=reply_markup)
                 status = bot.answerCallbackQuery(message["callback_query_id"])
             else:
-                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
+                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
         elif callback_query_data == pluginctlsho_off_page:
             inlineKeyboard = [
                 [
@@ -125,7 +125,7 @@ def PluginCTL(bot, message):
                 status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=msg_off + "\n", parse_mode="HTML", reply_markup=reply_markup)
                 status = bot.answerCallbackQuery(message["callback_query_id"])
             else:
-                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=bool("true"))
+                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
 
     elif count > 0:
         if str(user_id) not in admins:
