@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2021-06-26
+last_modify: 2021-10-09
 '''
 from collections import defaultdict
 import re
@@ -27,6 +27,10 @@ restrict_permissions = {
 }
 
 def Guard(bot, message):
+
+    if message["chat"]["type"] == "channel":
+        return
+
     bot_id = bot.bot_id
     root_id = bot.root_id
     plugin_dir = bot.plugin_dir
