@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: MessageRecorder
+Version: 0.1.0
+Summary: 消息记录器，同时可生成消息词云
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: message, recorder, record, wordcloud, word, cloud, 词云, 消息记录
+Requires-teelebot: >=1.22.0
+Requires-dist: wordcloud, jieba, pillow
+Source: https://github.com/plutobell/teelebot-plugins

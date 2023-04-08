@@ -44,3 +44,4 @@
 31. SteamFreePromotion - SteamFreePromotion插件，从 [Steam社区](https://steamcommunity.com/groups/freegamesinfoo) 获取Steam免费促销信息
 32. PaperFinder - PaperFinder插件，论文检索器，在 [arXiv](https://arxiv.org) 中检索论文
 33. DataCenter - DataCenter插件，获取账号所在数据中心
+33. MessageRecorder - MessageRecorder插件，消息记录器，同时可生成消息词云
