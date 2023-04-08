@@ -78,6 +78,12 @@ def MessageRecorder(bot, message):
         prefix+"gwc"
     ]
     admin_list = chat_admin_list(bot=bot, chat_id=chat_id)
+    shape_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/shape.png")
+    stopwords_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/stopwords.txt")
+    with open(stopwords_path, "a", encoding="utf-8") as f: pass
+    stop_words = get_stopwords_list(stopwords_path)
+    font_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/font.ttf")
+
     if message_type == "text" and message.get("text", "") in admin_commands:
         
         if str(user_id) not in admin_list:
@@ -149,14 +155,12 @@ def MessageRecorder(bot, message):
                 for r in req:
                     if len(r[3]) > 1 and r[3][0] == "/":
                         continue
+                    if r[3].strip in stop_words:
+                        continue
                     if abs(int(now_timestamp) - int(r[4])) < 604800: # 30d
                         text_list.append(r[3])
                 
                 bot.sendChatAction(chat_id, "typing")
-                shape_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/shape.png")
-                stopwords_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/stopwords.txt")
-                with open(stopwords_path, "a", encoding="utf-8") as f: pass
-                font_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/font.ttf")
                 img_bytes = generate_wordcloud(
                     text_list=text_list,
                     shape_path=shape_path,
@@ -195,14 +199,12 @@ def MessageRecorder(bot, message):
                     for r in req:
                         if len(r[3]) > 1 and r[3][0] == "/":
                             continue
+                        if r[3].strip in stop_words:
+                            continue
                         if abs(int(now_timestamp) - int(r[4])) < 604800: # 30d
                             text_list.append(r[3])
                     
                     bot.sendChatAction(chat_id, "typing")
-                    shape_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/shape.png")
-                    stopwords_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/stopwords.txt")
-                    with open(stopwords_path, "a", encoding="utf-8") as f: pass
-                    font_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/font.ttf")
                     img_bytes = generate_wordcloud(
                         text_list=text_list,
                         shape_path=shape_path,
@@ -394,3 +396,16 @@ def generate_wordcloud(text_list, shape_path, stopwords_path, font_path):
     byte_data = byte_io.getvalue()
     # 返回二进制数据
     return byte_data
+
+
+
+def get_stopwords_list(stopwords_path) -> list:
+    stop_words = []
+    with open(stopwords_path, "r", encoding="utf-8") as s:
+        lines = s.readlines()
+
+        for line in lines:
+            stop_words.append(line.strip())
+    
+    return stop_words
+    
