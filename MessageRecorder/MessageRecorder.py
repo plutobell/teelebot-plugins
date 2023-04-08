@@ -77,7 +77,10 @@ def MessageRecorder(bot, message):
         prefix+"wc",
         prefix+"gwc"
     ]
-    admin_list = chat_admin_list(bot=bot, chat_id=chat_id)
+
+    admin_list = []
+    if chat_type == "private": admin_list.append(str(user_id))
+    else: admin_list = chat_admin_list(bot=bot, chat_id=chat_id)
     shape_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/shape.png")
     stopwords_path = bot.path_converter(bot.plugin_dir + "MessageRecorder/stopwords.txt")
     with open(stopwords_path, "a", encoding="utf-8") as f: pass
@@ -342,8 +345,9 @@ def chat_admin_list(bot, chat_id) -> list:
     admin_list = []
 
     req = bot.getChatAdministrators(chat_id=chat_id)
-    for r in req:
-        admin_list.append(str(r["user"]["id"]))
+    if req != False:
+        for r in req:
+            admin_list.append(str(r["user"]["id"]))
     admin_list.append(str(bot.root_id))
 
     return admin_list
