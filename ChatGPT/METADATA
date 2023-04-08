@@ -1,0 +1,12 @@
+Metadata-version: 1.0
+Plugin-name: ChatGPT
+Version: 1.0.0
+Summary: ChatGPT聊天
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: Chat, Bot, 聊天, ChatGPT
+Requires-teelebot: >=1.21.0
+Requires-dist: requests
+Source: https://github.com/plutobell/teelebot-plugins
