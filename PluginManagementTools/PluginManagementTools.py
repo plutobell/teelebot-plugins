@@ -2,7 +2,7 @@
 """
 @description: Plugin Management Tools
 @creation date: 2021-06-23
-@last modification: 2021-08-08
+@last modification: 2023-04-09
 @author: Pluto (github.com/plutobell)
 """
 import os
@@ -33,6 +33,23 @@ def PluginManagementTools(bot, message):
     prefix = ""
     with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/__init__.py"), "r", encoding="utf-8") as init:
         prefix = init.readline()[1:].strip()
+
+    proxies = {}
+    if not os.path.exists(bot.path_converter(bot.plugin_dir + "PluginManagementTools/proxies.ini")):
+        with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/proxies.ini"), "w", encoding="utf-8") as prox: pass
+    with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/proxies.ini"), "r", encoding="utf-8") as prox:
+        lines = prox.readlines()
+        for line in lines:
+            type = ""
+            proxy = ""
+            line_cut = line.split(" ")
+            if len(line_cut) == 2:
+                type = line_cut[0].strip()
+                proxy = line_cut[1].strip()
+                proxies[type] = proxy
+            else:
+                break
+    # print(proxies)
 
     if str(user_id) != str(root_id):
         msg = "无权限。"
@@ -73,7 +90,7 @@ def PluginManagementTools(bot, message):
         with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/.cache/updated-time"), "w", encoding="utf-8") as updated_time:
             write_list = []
             for label in sources_dict.keys():
-                write_list.append(label + " " + "2021-06-23T25:61:61Z\n")
+                write_list.append(label + " " + "2007-10-01T25:61:61Z\n")
             updated_time.writelines(write_list)
     with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/.cache/updated-time"), "r", encoding="utf-8") as updated_time:
         lines = updated_time.readlines()
@@ -84,8 +101,8 @@ def PluginManagementTools(bot, message):
         write_list = []
         for label in sources_dict.keys():
             if label not in updated_old_dict.keys():
-                updated_old_dict[label] = "2021-06-23T25:61:61Z"
-                write_list.append(label + " " + "2021-06-23T25:61:61Z\n")
+                updated_old_dict[label] = "2007-10-01T25:61:61Z"
+                write_list.append(label + " " + "2007-10-01T25:61:61Z\n")
             else:
                 write_list.append(label + " " + updated_old_dict[label] + "\n")
         updated_time.writelines(write_list)
@@ -133,7 +150,7 @@ def PluginManagementTools(bot, message):
             return
 
         pip = PipExecutor()
-        github = GithubAPI()
+        github = GithubAPI(proxies=proxies)
 
         if command == "add-source" and command_argument != None:
             arg_list = command_argument.split(" ")
@@ -277,8 +294,9 @@ def PluginManagementTools(bot, message):
                 repo_name = username_and_reponame[1]
                 ok, result = github.repo_detail_info(username=username,
                     repo_name=repo_name)
+                # print(ok, result)
                 if ok:
-                    updated_new = str(result["updated_at"])
+                    updated_new = str(result["pushed_at"])
                     default_branch = result["default_branch"]
                     sources_info_dict[label] = {
                         "updated_new": updated_new,
@@ -291,6 +309,7 @@ def PluginManagementTools(bot, message):
                     bot.editMessageText(chat_id=chat_id,
                         message_id=update_msg_id, text="<code>"+msg+"</code>", parse_mode="HTML")
 
+            # print(sources_info_dict)
             changed_sources_list = []
             for label, info in sources_info_dict.items():
                 updated_new = info["updated_new"]
@@ -1016,12 +1035,13 @@ class Copy:
                     self.forceMergeFlatDir(s, d)
 
 class GithubAPI:
-    def __init__(self):
+    def __init__(self, proxies=None):
         self.__basic_url = "https://api.github.com/"
+        self.__proxies = proxies
 
     def __request_and_return(self, url):
         try:
-            req = requests.get(url=url, verify=False)
+            req = requests.get(url=url, verify=False, proxies=self.__proxies)
             if "message" in req.json().keys() \
                 and req.json().get("message") == "Not Found":
                 return False, "Not Found"
