@@ -2,7 +2,7 @@
 # Program: ChatGPT
 # Description: ChatGPT Chat Plugin
 # Creation: 2023-03-11
-# Last modification: 2023-04-08
+# Last modification: 2023-04-10
 
 import openai
 import logging
@@ -68,45 +68,43 @@ def ChatGPT(bot, message):
                 ok, user_messages = bot.buffer.read()
                 # print(user_messages)
                 if not ok: user_messages = {}
-                ai = ChatAI(conf_path=conf_path, user_messages=user_messages, session_cap=12)
+                ai = ChatAI(conf_path=conf_path, user_messages=user_messages)
                 msg = ai.chat(message=text, uid=chat_id)
                 msg = msg.replace("`", "", -1)
                 bot.buffer.write(buffer=ai.user_messages)
                 bot.sendChatAction(chat_id, "typing")
-                bot.sendMessage(chat_id=chat_id,text=msg,
-                    parse_mode="Markdown", reply_to_message_id=message_id)
+                bot.sendMessage(chat_id=chat_id,text=msg, reply_to_message_id=message_id)
             except Exception as e:
                 print(e)
                 bot.sendChatAction(chat_id, "typing")
-                bot.sendMessage(chat_id=chat_id, text="接口调用失败。",
-                    parse_mode="Markdown", reply_to_message_id=message_id)
+                bot.sendMessage(chat_id=chat_id, text="接口调用失败。", reply_to_message_id=message_id)
                 
     except Exception as e:
         print(e)
         bot.sendChatAction(chat_id, "typing")
-        bot.sendMessage(chat_id=chat_id, text="出错了。",
-            parse_mode="Markdown", reply_to_message_id=message_id)
+        bot.sendMessage(chat_id=chat_id, text="出错了。", reply_to_message_id=message_id)
 
 
 class ChatAI:
-    def __init__(self, conf_path, user_messages={}, session_cap=12):
+    def __init__(self, conf_path, user_messages={}):
         with open(conf_path, "r", encoding="utf-8") as conf:
             lines = conf.readlines()
-            if len(lines) >= 4:
+            if len(lines) >= 5:
                 openai.api_key = lines[0].strip()
                 self.__model = lines[1].strip()
-                openai.proxy = lines[2].strip()
-                self.__bot_setting = lines[3].strip()
+                self.__session_cap = int(lines[2].strip())
+                openai.proxy = lines[3].strip()
+                self.__bot_setting = lines[4].strip()
             else:
                 logging.info("Incomplete configuration file.")
                 openai.api_key = ""
                 self.__model = "gpt-3.5-turbo"
+                self.__session_cap = 16
                 openai.proxy = ""
                 self.__bot_setting = ""
 
         self.user_messages = user_messages
         self.__bot_setting_message = {"role": "system", "content": self.__bot_setting}
-        self.session_cap = session_cap
 
     def chat(self, message, uid) -> str:
         if str(uid) not in self.user_messages.keys():    
@@ -115,7 +113,7 @@ class ChatAI:
 
         user_msg = str(message)
 
-        if len(self.user_messages[str(uid)]) > self.session_cap:
+        if len(self.user_messages[str(uid)]) > self.__session_cap:
             self.user_messages[str(uid)].pop(1)
         self.user_messages[str(uid)].append({"role": "user", "content": user_msg})
 
@@ -124,7 +122,7 @@ class ChatAI:
         messages=self.user_messages[str(uid)])
         
         assistant_req = response["choices"][0]["message"]["content"]
-        if len(self.user_messages[str(uid)]) > self.session_cap:
+        if len(self.user_messages[str(uid)]) > self.__session_cap:
             self.user_messages[str(uid)].pop(1)
         self.user_messages[str(uid)].append({"role": "assistant", "content": assistant_req})
 
