@@ -42,7 +42,7 @@ def Dwz(bot, message):
 def dwz(url):
     dwzapi = ["tcn", "dwzcn", "urlcn", "suoim", "mrwso"]
     url = "https://api.uomg.com/api/long2dwz?dwzapi=" + random.choice(dwzapi) + "&url=" + str(url)
-    print(url)
+    # print(url)
     try:
         with requests.post(url=url, verify=False) as req:
             if not req.status_code == requests.codes.ok:
