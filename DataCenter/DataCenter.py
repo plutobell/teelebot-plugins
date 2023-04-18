@@ -1,8 +1,9 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-08-07
-last_modification: 2021-08-07
+last_modification: 2023-04-13
 '''
+import os
 import requests
 from bs4 import BeautifulSoup
 
@@ -35,6 +36,12 @@ def DataCenter(bot, message):
     prefix = ""
     with open(bot.path_converter(bot.plugin_dir + "DataCenter/__init__.py"), "r", encoding="utf-8") as init:
         prefix = init.readline()[1:].strip()
+
+    if not os.path.exists(bot.path_converter(bot.plugin_dir + "DataCenter/config.ini")):
+        with open(bot.path_converter(bot.plugin_dir + "DataCenter/config.ini"), "w", encoding="utf-8") as conf: pass
+    proxy = ""
+    with open(bot.path_converter(bot.plugin_dir + "DataCenter/config.ini"), "r", encoding="utf-8") as conf:
+        proxy = conf.readline().strip()
 
     if "reply_to_message" in message.keys() and \
         chat_type != "private":
@@ -71,7 +78,7 @@ def DataCenter(bot, message):
             return
 
         try:
-            req = requests.get(url="https://t.me/" + username)
+            req = requests.get(url="https://t.me/" + username, proxies={"all": proxy})
         except:
             bot.sendChatAction(chat_id, "typing")
             txt = "获取数据失败，请重试。"
@@ -99,7 +106,7 @@ def DataCenter(bot, message):
         location = "未知"
         if dc in data_centers.keys():
             location = data_centers[dc]
-
+        
         bot.sendChatAction(chat_id, "typing")
         txt = "您查询的账号所在数据中心为 <b>" + dc + \
             "</b>, 地理位置为 <b>" + location + "</b>"
@@ -120,7 +127,7 @@ def DataCenter(bot, message):
             return
 
         try:
-            req = requests.get(url="https://t.me/" + username)
+            req = requests.get(url="https://t.me/" + username, proxies={"all": proxy})
         except:
             bot.sendChatAction(chat_id, "typing")
             txt = "获取数据失败，请重试。"
