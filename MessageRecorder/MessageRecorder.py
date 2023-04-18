@@ -20,7 +20,7 @@ jieba.setLogLevel(jieba.logging.INFO)
 
 def MessageRecorder(bot, message):
 
-    bot_id =bot.bot_id
+    bot_id = bot.bot_id
     chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
     message_id = message["message_id"]

@@ -46,3 +46,4 @@
 33. DataCenter - DataCenter插件，获取账号所在数据中心
 33. MessageRecorder - MessageRecorder插件，消息记录器，同时可生成消息词云
 33. ChatGPT - ChatGPT插件，调用 [OpenAI](https://openai.com/) API 实现的对话程序
+33. CheckGFW - CheckGFW插件，调用 [韩小韩API](https://api.vvhan.com/) 查询域名是否被墙
