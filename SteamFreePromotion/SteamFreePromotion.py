@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 """
 @Creation: 2021-05-30
-@Last modify: 2021-06-25
+@Last modify: 2023-04-19
 """
 import re
 import requests
@@ -12,6 +12,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 def SteamFreePromotion(bot, message):
+    proxies = bot.proxies
 
     chat_id = message["chat"]["id"]
     message_id = message["message_id"]
@@ -28,7 +29,7 @@ def SteamFreePromotion(bot, message):
         reply_to_message_id=message_id)
     tip_message_id = status["message_id"]
 
-    games = get_steam_free_promotion_info()
+    games = get_steam_free_promotion_info(proxies=proxies)
     if games != False:
         msg = "<b>Steam Free Promotion</b>\n\n"
         for game, info in games.items():
@@ -46,7 +47,7 @@ def SteamFreePromotion(bot, message):
         bot.message_deletor(60, chat_id, tip_message_id)
 
 
-def get_steam_free_promotion_info():
+def get_steam_free_promotion_info(proxies):
     url = "https://steamcommunity.com/groups/freegamesinfoo/announcements"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; InfoPath.3; rv:11.0) like Gecko",
@@ -55,7 +56,7 @@ def get_steam_free_promotion_info():
     }
 
     try:
-        req = requests.get(url=url, headers=headers, verify=False)
+        req = requests.get(url=url, headers=headers, verify=False, proxies=proxies)
         soup = BeautifulSoup(req.text, "html.parser")
         announcements = soup.find_all("div", class_="announcement")
 

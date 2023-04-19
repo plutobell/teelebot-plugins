@@ -1,12 +1,12 @@
 Metadata-version: 1.0
 Plugin-name: Sticker
-Version: 1.0.0
+Version: 1.1.0
 Summary: 贴纸获取插件
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Sticker, 贴纸, 表情
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=1.23.1
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-08-07
-last_modification: 2023-04-13
+last_modification: 2023-04-19
 '''
 import os
 import requests
@@ -26,6 +26,7 @@ def DataCenter(bot, message):
 
     root_id = bot.root_id
     bot_id = bot.bot_id
+    proxies = bot.proxies
 
     chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
@@ -36,12 +37,6 @@ def DataCenter(bot, message):
     prefix = ""
     with open(bot.path_converter(bot.plugin_dir + "DataCenter/__init__.py"), "r", encoding="utf-8") as init:
         prefix = init.readline()[1:].strip()
-
-    if not os.path.exists(bot.path_converter(bot.plugin_dir + "DataCenter/config.ini")):
-        with open(bot.path_converter(bot.plugin_dir + "DataCenter/config.ini"), "w", encoding="utf-8") as conf: pass
-    proxy = ""
-    with open(bot.path_converter(bot.plugin_dir + "DataCenter/config.ini"), "r", encoding="utf-8") as conf:
-        proxy = conf.readline().strip()
 
     if "reply_to_message" in message.keys() and \
         chat_type != "private":
@@ -78,7 +73,7 @@ def DataCenter(bot, message):
             return
 
         try:
-            req = requests.get(url="https://t.me/" + username, proxies={"all": proxy})
+            req = requests.get(url="https://t.me/" + username, proxies=proxies)
         except:
             bot.sendChatAction(chat_id, "typing")
             txt = "获取数据失败，请重试。"
@@ -127,7 +122,7 @@ def DataCenter(bot, message):
             return
 
         try:
-            req = requests.get(url="https://t.me/" + username, proxies={"all": proxy})
+            req = requests.get(url="https://t.me/" + username, proxies=proxies)
         except:
             bot.sendChatAction(chat_id, "typing")
             txt = "获取数据失败，请重试。"

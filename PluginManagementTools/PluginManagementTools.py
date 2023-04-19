@@ -2,7 +2,7 @@
 """
 @description: Plugin Management Tools
 @creation date: 2021-06-23
-@last modification: 2023-04-09
+@last modification: 2023-04-19
 @author: Pluto (github.com/plutobell)
 """
 import os
@@ -21,6 +21,7 @@ def PluginManagementTools(bot, message):
     version = bot.version
     plugin_dir = bot.plugin_dir
     plugin_bridge = bot.plugin_bridge
+    proxies = bot.proxies
 
     chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
@@ -33,23 +34,6 @@ def PluginManagementTools(bot, message):
     prefix = ""
     with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/__init__.py"), "r", encoding="utf-8") as init:
         prefix = init.readline()[1:].strip()
-
-    proxies = {}
-    if not os.path.exists(bot.path_converter(bot.plugin_dir + "PluginManagementTools/proxies.ini")):
-        with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/proxies.ini"), "w", encoding="utf-8") as prox: pass
-    with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/proxies.ini"), "r", encoding="utf-8") as prox:
-        lines = prox.readlines()
-        for line in lines:
-            type = ""
-            proxy = ""
-            line_cut = line.split(" ")
-            if len(line_cut) == 2:
-                type = line_cut[0].strip()
-                proxy = line_cut[1].strip()
-                proxies[type] = proxy
-            else:
-                break
-    # print(proxies)
 
     if str(user_id) != str(root_id):
         msg = "无权限。"

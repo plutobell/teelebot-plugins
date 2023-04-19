@@ -2,6 +2,8 @@
 import requests
 
 def Qrcode(bot, message):
+    proxies = bot.proxies
+
     chat_id = message["chat"]["id"]
     message_id = message["message_id"]
     text = message["text"]
@@ -10,7 +12,7 @@ def Qrcode(bot, message):
 
     if text[1:len(prefix)+1] == prefix:
         if len(text.split(' ')) == 2:
-            img = qrcode_img(text.split(' ')[1])
+            img = qrcode_img(data=text.split(' ')[1], proxies=proxies)
             if img != False:
                 status = bot.sendChatAction(chat_id, "typing")
                 status = bot.sendPhoto(chat_id=chat_id, photo=img, caption="您的二维码已生成，消息将在不久后销毁，请尽快保存。", parse_mode="HTML", reply_to_message_id=message_id)
@@ -30,12 +32,12 @@ def Qrcode(bot, message):
 
 
 
-def qrcode_img(data):
+def qrcode_img(data, proxies):
     url_basic = "https://chart.apis.google.com/chart?cht=qr&chs=500x500&chl="
     url = url_basic + str(data)
 
     try:
-        with requests.post(url=url, verify=False) as req:
+        with requests.post(url=url, verify=False, proxies=proxies) as req:
             if not req.status_code == requests.codes.ok:
                 return False
             elif type(req.content) == bytes:

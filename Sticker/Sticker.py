@@ -2,6 +2,8 @@
 import requests
 
 def Sticker(bot, message):
+    proxies = bot.proxies
+
     chat_id = message["chat"]["id"]
     message_id = message["message_id"]
     text = message["text"]
@@ -19,7 +21,7 @@ def Sticker(bot, message):
                     bot.message_deletor(15, chat_id, status["message_id"])
                     return
 
-                req = requests.get(url=file_dl_path)
+                req = requests.get(url=file_dl_path, proxies=proxies)
                 if type(req.content) == bytes:
                     photo = req.content
                 else:
