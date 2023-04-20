@@ -26,10 +26,9 @@ def Acg(bot, message):
 def acg_img():
     urls = [
         "http://www.dmoe.cc/random.php",
-        "https://v1.alapi.cn/api/acg",
-        "https://acg.yanwz.cn/wallpaper/api.php",
-        "https://acg.yanwz.cn/api.php",
-        "https://api.vvhan.com/api/acgimg"
+        "https://api.xiaobaibk.com/api/pic/?pic=acg",
+        "https://api.vvhan.com/api/acgimg",
+        "https://www.loliapi.com/acg/"
     ]
     url = choice(urls)
     try:
