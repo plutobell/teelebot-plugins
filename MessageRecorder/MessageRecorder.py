@@ -2,7 +2,7 @@
 """
 @description: Message Recorder
 @creation date: 2023-04-07
-@last modification: 2023-04-08
+@last modification: 2023-04-21
 @author: Pluto (github.com/plutobell)
 """
 import io
@@ -60,6 +60,10 @@ def MessageRecorder(bot, message):
         table_name = "p" + table_name
     elif chat_type == "supergroup":
         table_name = "g" + table_name
+    elif chat_type == "group":
+        table_name = "g" + table_name
+    elif chat_type == "channel":
+        table_name = "c" + table_name
 
     fileds = [
         "id integer PRIMARY KEY",
@@ -145,6 +149,10 @@ def MessageRecorder(bot, message):
             table_name = "p" + table_name
         elif chat_type == "supergroup":
             table_name = "g" + table_name
+        elif chat_type == "group":
+            table_name = "g" + table_name
+        elif chat_type == "channel":
+            table_name = "c" + table_name
 
         if message.get("text", "") == prefix+"wc" and not break_if:
             condition={
