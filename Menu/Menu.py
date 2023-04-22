@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2019-8-15
-last_modify: 2021-06-18
+last_modify: 2023-04-22
 '''
 import os
 
@@ -42,7 +42,7 @@ def Menu(bot, message):
     page_callback_command = "/" + prefix + "page?page="
 
     if not os.path.exists(bot.path_converter(plugin_dir + "Menu/config.ini")):
-        first_btn = ["交流群组", "https://t.me/teelebot_chat"]
+        first_btn = ["交流群组", "https://t.me/teelebot_official"]
         last_btn = ["项目地址", "https://github.com/plutobell/teelebot"]
     else:
         with open(bot.path_converter(plugin_dir + "Menu/config.ini"), 'r') as g:

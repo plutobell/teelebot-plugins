@@ -12,7 +12,7 @@ def About(bot, message):
     VERSION = bot.version
 
     if not os.path.exists(bot.path_converter(plugin_dir + "About/config.ini")):
-        first_btn = ["交流群组", "https://t.me/teelebot_chat"]
+        first_btn = ["交流群组", "https://t.me/teelebot_official"]
         last_btn = ["项目地址", "https://github.com/plutobell/teelebot"]
     else:
         with open(bot.path_converter(plugin_dir + "About/config.ini"), 'r') as g:
@@ -34,7 +34,8 @@ def About(bot, message):
             "<b>teelebot</b> 是基于 Telegram Bot API 的 Bot 框架，具有插件系统，扩展方便。\n\n"
 
         req = bot.getUserProfilePhotos(user_id=str(bot_id), limit=1)
-        if req.get("photos", "notphotos") != "notphotos":
+        if req.get("photos", "notphotos") != "notphotos" and \
+            req.get("photos", "notphotos") != []:
             bot_icon = req.get("photos")[0][0]["file_id"]
             if type(bot_icon) == str and len(bot_icon) > 50:
                 photo = bot_icon
