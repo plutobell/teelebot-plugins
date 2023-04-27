@@ -32,7 +32,7 @@
 19. TodayInHistory - TodayInHistory插件，调用 [Kate.API](https://api.66mz8.com/) 查看历史上的今天
 20. Dwz - Dwz插件，调用 [UomgAPI](http://api.uomg.com/) 生成短网址
 21. Acg - Acg插件，调用 [XiaobaiAPI](https://api.xiaobaibk.com/) 、[樱花API](http://www.dmoe.cc/) 、[yanwz](https://acg.yanwz.cn/) 、[韩小韩API](https://api.vvhan.com/) 、[LoliApi](https://www.loliapi.com/) 接口随机获取一张配文字ACG图
-22. Whois - Whois插件，调用 [ALAPI](https://www.alapi.net/) 查询域名whois信息
+22. Whois - Whois插件，调用 [夏柔的Api](https://api.aa1.cn/) 查询域名whois信息
 23. Schedule - Schedule插件，周期性执行特定任务，目前仅支持文本类消息
 24. Speaker - Speaker插件，群发消息至Bot存在的群组，目前仅支持文本类消息
 25. CallAdmins - CallAdmins插件，一键呼叫群组管理员
