@@ -2,7 +2,7 @@
 """
 @description: Message Recorder
 @creation date: 2023-04-07
-@last modification: 2023-04-21
+@last modification: 2023-04-30
 @author: Pluto (github.com/plutobell)
 """
 import io
@@ -185,7 +185,7 @@ def MessageRecorder(bot, message):
                     last_name = reply_to_message.get("from", {}).get("last_name", "") 
                 if first_name != "" or last_name != "":
                     user_name = first_name + " " + last_name
-                caption = "This is <b><a href='tg://user?id=" + str(user_id) + "'>"+ str(user_name) + "</a></b>" + \
+                caption = "This is <b><a href='tg://user?id=" + str(user_final_id) + "'>"+ str(user_name) + "</a></b>" + \
                     "'s word cloud for the past <b>30</b> days."
                 status = bot.sendPhoto(chat_id=chat_id, photo=img_bytes,
                     caption=caption, parse_mode="HTML", reply_to_message_id=message_id)
