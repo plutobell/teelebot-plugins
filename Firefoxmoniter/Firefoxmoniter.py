@@ -34,7 +34,7 @@ def Firefoxmoniter(bot, message):
     ok, protocol, ip, port = get_ip()
     if ok != True:
         status = bot.editMessageText(chat_id=message["chat"]["id"],
-            message_id=txt_message_id, text="查询失败！\n获取代理失败，请重试!", parse_mode="text")
+            message_id=txt_message_id, text="查询失败！\n获取代理失败，请重试!")
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])
         return
     proxies = {
@@ -45,7 +45,7 @@ def Firefoxmoniter(bot, message):
     r_session = requests.Session()
     with r_session.get(url, proxies=proxies) as page:
         if not page.status_code == requests.codes.ok:
-            status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id, text="查询失败！\n操作过于频繁，请稍后再试!", parse_mode="text")
+            status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id, text="查询失败！\n操作过于频繁，请稍后再试!")
             bot.message_deletor(15, message["chat"]["id"], status["message_id"])
             return False
         page.encoding = "utf-8"
@@ -90,7 +90,7 @@ def Firefoxmoniter(bot, message):
         bot.message_deletor(60, message["chat"]["id"], status["message_id"])
     else:
         soup.decompose()
-        status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id, text="查询失败！\n请检测命令格式!", parse_mode="text")
+        status = bot.editMessageText(chat_id=message["chat"]["id"], message_id=txt_message_id, text="查询失败！\n请检测命令格式!")
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])
 
 def get_ip():

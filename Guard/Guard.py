@@ -504,8 +504,10 @@ def Guard(bot, message):
         if message["chat"]["type"] == "private" and text[1:len(prefix)+1] == prefix:
             status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(
-                chat_id, "抱歉，该指令不支持私人会话!", parse_mode="text",
-                reply_to_message_id=message_id, allow_sending_without_reply=True)
+                chat_id=chat_id,
+                text="抱歉，该指令不支持私人会话!",
+                reply_to_message_id=message_id,
+                allow_sending_without_reply=True)
             bot.message_deletor(gap, chat_id, status["message_id"])
         elif text[1:len(prefix)+1] == prefix and count == 0:  # 菜单
             status = bot.sendChatAction(chat_id=chat_id, action="typing")
@@ -531,28 +533,36 @@ def Guard(bot, message):
                                 k.write("\n" + keyword)
                             status = bot.sendChatAction(chat_id=chat_id, action="typing")
                             status = bot.sendMessage(
-                                chat_id=chat_id, text="关键词添加成功!", parse_mode="text",
-                                reply_to_message_id=message["message_id"], allow_sending_without_reply=True)
+                                chat_id=chat_id,
+                                text="关键词添加成功!",
+                                reply_to_message_id=message["message_id"],
+                                allow_sending_without_reply=True)
                             bot.message_deletor(
                                 gap, chat_id, status["message_id"])
                         else:
                             status = bot.sendChatAction(chat_id=chat_id, action="typing")
                             status = bot.sendMessage(
-                                chat_id=chat_id, text="关键词已经存在于库中!", parse_mode="text",
-                                reply_to_message_id=message["message_id"], allow_sending_without_reply=True)
+                                chat_id=chat_id,
+                                text="关键词已经存在于库中!",
+                                reply_to_message_id=message["message_id"],
+                                allow_sending_without_reply=True)
                             bot.message_deletor(
                                 gap, chat_id, status["message_id"])
                     elif len(keyword) > 7:
                         status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(
-                            chat_id=chat_id, text="输入的关键词过长!", parse_mode="text",
-                            reply_to_message_id=message["message_id"], allow_sending_without_reply=True)
+                            chat_id=chat_id,
+                            text="输入的关键词过长!",
+                            reply_to_message_id=message["message_id"],
+                            allow_sending_without_reply=True)
                         bot.message_deletor(gap, chat_id, status["message_id"])
                     else:
                         status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(
-                            chat_id=chat_id, text="您无权操作!", parse_mode="text",
-                            reply_to_message_id=message["message_id"], allow_sending_without_reply=True)
+                            chat_id=chat_id,
+                            text="您无权操作!",
+                            reply_to_message_id=message["message_id"],
+                            allow_sending_without_reply=True)
                         bot.message_deletor(gap, chat_id, status["message_id"])
                 else:
                     status = bot.sendChatAction(chat_id=chat_id, action="typing")

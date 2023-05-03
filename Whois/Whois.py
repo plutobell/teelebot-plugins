@@ -31,7 +31,7 @@ def Whois(bot, message):
                     bot.message_deletor(60, chat_id, txt_message_id)
                 else:
                     status = bot.editMessageText(chat_id=chat_id,
-                        message_id=txt_message_id, text="查询失败!", parse_mode="TEXT")
+                        message_id=txt_message_id, text="查询失败!")
                     bot.message_deletor(15, chat_id, txt_message_id)
             else:
                 bot.sendChatAction(chat_id=chat_id, action="typing")
