@@ -17,24 +17,24 @@ def Dwz(bot, message):
                         "\n原网址: " + str(text.split(' ')[1]) +\
                         "\n短网址: " + str(dwz_url) +\
                         "\n\n请保存短网址，本消息不久将被销毁"
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text=msg,
                         parse_mode="HTML", reply_to_message_id=message_id, disable_web_page_preview=True)
                     bot.message_deletor(60, chat_id, status["message_id"])
                 else:
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="生成失败，请重试!", parse_mode="HTML", reply_to_message_id=message_id)
                     bot.message_deletor(15, chat_id, status["message_id"])
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="网址需带上协议头，请重试!", parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
         else:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="指令格式错误，请检查!", parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])
     else:
-        bot.sendChatAction(chat_id, "typing")
+        bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="指令错误，请检查!", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
 

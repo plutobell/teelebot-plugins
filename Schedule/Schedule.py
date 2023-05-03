@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-11
-last_modify: 2020-12-14
+last_modify: 2023-05-02
 '''
 import time
 
@@ -62,7 +62,7 @@ def Schedule(bot, message):
             count += 1
 
     if text.split(" ")[0] != prefix and prefix in text and str(user_id) != root_id:
-        status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
+        status = bot.sendMessage(chat_id=chat_id, text="<b>无权限</b>", parse_mode="HTML",
             reply_to_message_id=message_id)
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])
         return
@@ -78,7 +78,7 @@ def Schedule(bot, message):
             "1m 2m 5m 10m 15m 30m 45m | " + \
             "1h 2h 4h 6h 8h 10h 12h | " + \
             "1d 3d 5d 7d 10d 15d 20d 30d" + "</i>"
-        status = bot.sendMessage(chat_id, text=msg, parse_mode="HTML",
+        status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
             reply_to_message_id=message_id)
         bot.message_deletor(60, status["chat"]["id"], status["message_id"])
 
@@ -92,7 +92,7 @@ def Schedule(bot, message):
                     "1m 2m 5m 10m 15m 30m 45m \n" + \
                     "1h 2h 4h 6h 8h 10h 12h \n" + \
                     "1d 3d 5d 7d 10d 15d 20d 30d" + "</b>"
-                status = bot.sendMessage(chat_id, text=msg, parse_mode="HTML",
+                status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
                     reply_to_message_id=message_id)
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
                 return
@@ -115,11 +115,11 @@ def Schedule(bot, message):
                     msg = "<b>队列已满</b>"
                 else:
                     msg = "<b>遇到错误</b> \n\n <i>" + uid + "</i>"
-            status = bot.sendMessage(chat_id, text=msg, parse_mode="HTML",
+            status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
                 reply_to_message_id=message_id)
             bot.message_deletor(60, status["chat"]["id"], status["message_id"])
         else:
-            status = bot.sendMessage(chat_id,
+            status = bot.sendMessage(chat_id=chat_id,
                 text="<b>指令格式错误 (e.g.: " + prefix + "add gap text)</b>",
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
@@ -136,11 +136,11 @@ def Schedule(bot, message):
                     msg = "<b>队列为空</b>"
                 elif uid == "NotFound":
                     msg = "<b>任务未找到</b>"
-            status = bot.sendMessage(chat_id, text=msg,
+            status = bot.sendMessage(chat_id=chat_id, text=msg,
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
         else:
-            status = bot.sendMessage(chat_id,
+            status = bot.sendMessage(chat_id=chat_id,
                 text="<b>指令格式错误 (e.g.: " + prefix + "del uid)</b>",
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
@@ -157,11 +157,11 @@ def Schedule(bot, message):
                     msg = "<b>队列为空</b>"
                 elif uid == "NotFound":
                     msg = "<b>任务未找到</b>"
-            status = bot.sendMessage(chat_id, text=msg,
+            status = bot.sendMessage(chat_id=chat_id, text=msg,
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
         else:
-            status = bot.sendMessage(chat_id,
+            status = bot.sendMessage(chat_id=chat_id,
                 text="<b>指令格式错误 (e.g.: " + prefix + "del uid)</b>",
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
@@ -177,7 +177,7 @@ def Schedule(bot, message):
             elif msgg != "Cleared":
                 msg = "<b>遇到错误</b> \n\n <i>" + msgg + "</i>"
 
-        status = bot.sendMessage(chat_id, text=msg,
+        status = bot.sendMessage(chat_id=chat_id, text=msg,
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
@@ -190,12 +190,12 @@ def Schedule(bot, message):
                 "容量: " + str(result["size"]) + "</code>\n"
         else:
             msg = "<b>遇到错误</b> \n\n <i>" + result["exception"] + "</i>"
-        status = bot.sendMessage(chat_id, text=msg,
+        status = bot.sendMessage(chat_id=chat_id, text=msg,
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
 
 
 def event(bot, chat_id, msg, parse_mode):
-    status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML")
+    status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode=parse_mode)
 

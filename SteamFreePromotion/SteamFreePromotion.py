@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 """
 @Creation: 2021-05-30
-@Last modify: 2023-04-19
+@Last modify: 2023-05-02
 """
 import re
 import requests
@@ -23,7 +23,7 @@ def SteamFreePromotion(bot, message):
 
     with open(bot.path_converter(bot.plugin_dir + "SteamFreePromotion/steam_logo.png"), "rb") as p:
         photo = p.read()
-    bot.sendChatAction(chat_id, "typing")
+    bot.sendChatAction(chat_id=chat_id, action="typing")
     status = bot.sendPhoto(chat_id=chat_id, photo=photo,  parse_mode="HTML",
         caption="<b>Steam Free Promotion</b>\n\nGetting the latest Steam free promotion information, please wait...",
         reply_to_message_id=message_id)

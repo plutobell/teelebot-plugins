@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-03-03
-last_modify: 2021-03-04
+last_modify: 2023-05-02
 '''
 import random
 
@@ -20,7 +20,7 @@ def MuteMe(bot, message):
             if str(admin_user["user"]["id"]) == str(bot_id):
                 admin_status = True
         if admin_status != True:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "权限不足，请授予全部权限以使用 MuteMe 插件。"
             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML")
             bot.message_deletor(30, chat_id, status["message_id"])
@@ -32,7 +32,7 @@ def MuteMe(bot, message):
     name = first_name + " " + last_name
 
     if chat_type == "private": #判断是否为私人对话
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="抱歉，该指令不支持私人会话!",
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(gap, chat_id, status["message_id"])
@@ -71,7 +71,7 @@ def MuteMe(bot, message):
         bot.message_deletor(30, chat_id, message_id)
         admins = administrators(bot=bot, chat_id=chat_id)
         if str(user_id) in admins:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "<b><a href='tg://user?id=" + str(user_id) + "'>" + \
                 name + "</a></b>，" + "抱歉，管理员没有资格获取禁言礼包.🙄"
             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML")

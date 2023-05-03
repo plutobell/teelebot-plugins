@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-06-06
-last_modify: 2021-06-06
+last_modify: 2023-05-02
 '''
 try:
     import xml.etree.cElementTree as ET
@@ -38,7 +38,7 @@ def PaperFinder(bot, message):
             page = int(callback_query_data.split("-")[2])
             keyword = str(callback_query_data.split("-")[1])
         else:
-            status = bot.answerCallbackQuery(message["callback_query_id"], text="What is your business?", show_alert=True)
+            status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"], text="What is your business?", show_alert=True)
             return
 
         if page == 1:
@@ -52,11 +52,11 @@ def PaperFinder(bot, message):
         if ok:
             data = arXiv_xml_parser(xml_str=xml_str)
             if len(data) == 0:
-                bot.answerCallbackQuery(message["callback_query_id"],
+                bot.answerCallbackQuery(callback_query_id=message["callback_query_id"],
                     text="It's already the last page.")
                 return
         else:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id,
                 text="Failed to get data, please try again.",
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -99,9 +99,9 @@ def PaperFinder(bot, message):
             disable_web_page_preview=True)
 
         if status != False:
-            status = bot.answerCallbackQuery(message["callback_query_id"])
+            status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"])
         else:
-            bot.answerCallbackQuery(message["callback_query_id"], text="It's already the last page.", show_alert=True)
+            bot.answerCallbackQuery(callback_query_id=message["callback_query_id"], text="It's already the last page.", show_alert=True)
 
     elif "reply_markup" in message.keys() and prefix + "paper" in message["callback_query_data"]:
         click_user_id = message["click_user"]["id"]
@@ -115,7 +115,8 @@ def PaperFinder(bot, message):
             keyword = str(callback_query_data.split("-")[1])
             paper_id = int(callback_query_data.split("-")[3])
         else:
-            status = bot.answerCallbackQuery(message["callback_query_id"], text="What is your business?", show_alert=True)
+            status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"],
+                                            text="What is your business?", show_alert=True)
             return
 
         if page == 1:
@@ -133,11 +134,11 @@ def PaperFinder(bot, message):
                 if i == paper_id:
                     paper = datum
             if len(data) == 0 or paper == None:
-                bot.answerCallbackQuery(message["callback_query_id"],
+                bot.answerCallbackQuery(callback_query_id=message["callback_query_id"],
                     text="Failed to get the paper.", show_alert=True)
                 return
         else:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id,
                 text="Failed to get data, please try again.",
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -173,9 +174,9 @@ def PaperFinder(bot, message):
             disable_web_page_preview=True)
 
         if status != False:
-            status = bot.answerCallbackQuery(message["callback_query_id"])
+            status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"])
         else:
-            bot.answerCallbackQuery(message["callback_query_id"], text="Failed to get the paper.", show_alert=True)
+            bot.answerCallbackQuery(callback_query_id=message["callback_query_id"], text="Failed to get the paper.", show_alert=True)
 
     elif prefix in text.split(" ", 1)[0]:
         if len(text.split(" ", 1)) == 2:
@@ -188,7 +189,7 @@ def PaperFinder(bot, message):
             if ok:
                 data = arXiv_xml_parser(xml_str=xml_str)
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id,
                     text="Failed to get data, please try again.",
                     parse_mode="HTML", reply_to_message_id=message_id)
@@ -226,7 +227,7 @@ def PaperFinder(bot, message):
             }
 
             if len(data) != 0:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id,
                     text=msg, parse_mode="HTML",
                     reply_to_message_id=message_id,
@@ -234,7 +235,7 @@ def PaperFinder(bot, message):
                 bot.message_deletor(180, chat_id=status["chat"]["id"],
                     message_id=status["message_id"])
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id,
                     text=msg + "\n\n No result.", parse_mode="HTML",
                     reply_to_message_id=message_id)
@@ -242,7 +243,7 @@ def PaperFinder(bot, message):
                     message_id=status["message_id"])
 
         else:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id,
                 text="Command format is wrong, please check. \n<b>e.g.: " + prefix + " keyword</b>",
                 parse_mode="HTML", reply_to_message_id=message_id)

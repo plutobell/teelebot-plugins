@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-27
-last_modify: 2021-03-06
+last_modify: 2023-05-02
 '''
 
 def VoteToMute(bot, message):
@@ -28,20 +28,20 @@ def VoteToMute(bot, message):
             if str(admin_user["user"]["id"]) == str(bot.bot_id):
                 admin_status = True
         if admin_status != True:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "权限不足，请授予适当权限以使用 VoteToMute 插件。"
             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML")
             bot.message_deletor(15, chat_id, status["message_id"])
             return False
 
     if chat_type == "private" and text[:len(prefix)+1] == prefix: #判断是否为私人对话
-        status = bot.sendChatAction(chat_id, "typing")
-        status = bot.sendMessage(chat_id, "抱歉，该指令不支持私人会话.", parse_mode="HTML", reply_to_message_id=message_id)
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
+        status = bot.sendMessage(chat_id=chat_id, text="抱歉，该指令不支持私人会话.", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
     elif "reply_markup" in message.keys():
         status = bot.editMessageText(chat_id=chat_id, message_id=message_id,
         text=message["text"] + "\n\n<b>已重新发起投票</b>", parse_mode="HTML")
-        status = bot.answerCallbackQuery(message["callback_query_id"])
+        status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"])
         bot.message_deletor(15, chat_id, message_id)
 
         click_user_id = message["click_user"]["id"]
@@ -53,14 +53,14 @@ def VoteToMute(bot, message):
 
         admins = administrators(bot, chat_id)
         if str(target_user_id) == str(bot.bot_id):
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id,
                 text="无权处置本bot.",
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])
             return
         if str(target_user_id) in admins:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id,
                 text="无权处置管理员.",
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -72,7 +72,7 @@ def VoteToMute(bot, message):
             "驳回举报: 举报发起者将被禁言，时间1小时"
         ]
         question = "此消息已被举报，请在3分钟内投票表决"
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendPoll(chat_id=chat_id,
             is_anonymous=False, question=question, options=options,
             reply_to_message_id=target_message_id)
@@ -92,7 +92,7 @@ def VoteToMute(bot, message):
         target_chat_id = reply_to_message["chat"]["id"]
 
         if str(target_chat_id) != str(chat_id):
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id,
                 text="只能对当前群组的用户和消息进行投票.",
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -100,14 +100,14 @@ def VoteToMute(bot, message):
             return
         admins = administrators(bot, chat_id)
         if str(target_user_id) == str(bot.bot_id):
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id,
                 text="无权处置本bot.",
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])
             return
         if str(target_user_id) in admins:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id,
                 text="无权处置管理员.",
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -130,7 +130,7 @@ def VoteToMute(bot, message):
             "驳回举报: 举报发起者将被禁言，时间1小时"
         ]
         question = "此消息已被举报，请在3分钟内投票表决"
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendPoll(chat_id=chat_id,
             is_anonymous=False, question=question, options=options,
             reply_to_message_id=target_message_id)
@@ -142,7 +142,7 @@ def VoteToMute(bot, message):
                 message_id,target_message_id, poll_message_id,
                 poll_id, user_id, target_user_id, admins, mute_time))
     else:
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="未指定要举报的对象.",
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
@@ -177,7 +177,7 @@ def handler_func(bot, prefix, chat_id, message_id,
                 bot.deleteMessage(chat_id=chat_id, message_id=target_message_id)
                 bot.deleteMessage(chat_id=chat_id, message_id=poll_message_id)
                 msg = "投票结束，涉及消息已被删除\n<b>被举报者</b> <b><a href='tg://user?id=" + str(target_user_id) + "'>" + str(target_user_id) + "</a></b> 已被禁言\n持续时间：<b>1小时</b>"
-                status = bot.sendChatAction(chat_id, "typing")
+                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message_id)
 
             elif question1_voter_count < question2_voter_count:
@@ -189,7 +189,7 @@ def handler_func(bot, prefix, chat_id, message_id,
                 else:
                     msg = "投票结束\n<b>举报被驳回</b>\n但无权处置管理员"
                 bot.deleteMessage(chat_id=chat_id, message_id=poll_message_id)
-                status = bot.sendChatAction(chat_id, "typing")
+                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message_id)
 
             elif question1_voter_count == question2_voter_count:
@@ -203,7 +203,7 @@ def handler_func(bot, prefix, chat_id, message_id,
                 }
                 bot.deleteMessage(chat_id=chat_id, message_id=poll_message_id)
                 msg = "投票结束\n由于结果五五开，<b>此次投票无效</b>\n请重新投票"
-                status = bot.sendChatAction(chat_id, "typing")
+                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
                     reply_to_message_id=target_message_id, reply_markup=reply_markup)
 
@@ -218,7 +218,7 @@ def handler_func(bot, prefix, chat_id, message_id,
             }
             bot.deleteMessage(chat_id=chat_id, message_id=poll_message_id)
             msg = "投票结束\n由于投票人数不足 <b>3</b> 人，<b>此次投票无效</b>\n请重新投票"
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
                 reply_to_message_id=target_message_id, reply_markup=reply_markup)
 

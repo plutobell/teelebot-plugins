@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-15
-last_modify: 2020-12-14
+last_modify: 2023-05-02
 '''
 import os
 import re
@@ -50,7 +50,7 @@ def AutoReply(bot, message):
 
     if text[:len(prefix)] == prefix and count == 0:
         if prefix in text and str(user_id) != root_id:
-            status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
+            status = bot.sendMessage(chat_id=chat_id, text="<b>无权限</b>", parse_mode="HTML",
                 reply_to_message_id=message_id, allow_sending_without_reply=True)
             bot.message_deletor(15, status["chat"]["id"], status["message_id"])
             return
@@ -60,13 +60,13 @@ def AutoReply(bot, message):
             "<b>/autordel</b> 删除关键词回复 格式：指令 keyword" + "\n" + \
             "<b>/autorshow</b> 显示关键词回复列表" + "\n" + \
             "<b>/autorclear</b> 清空关键词回复列表" + "\n"
-        status = bot.sendMessage(chat_id, text=msg, parse_mode="HTML",
+        status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
                 reply_to_message_id=message_id, allow_sending_without_reply=True)
         bot.message_deletor(60, status["chat"]["id"], status["message_id"])
 
     elif text.split(" ")[0][:len(prefix + "add")] == prefix + "add":
         if prefix in text and str(user_id) != root_id:
-            status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
+            status = bot.sendMessage(chat_id=chat_id, text="<b>无权限</b>", parse_mode="HTML",
                 reply_to_message_id=message_id, allow_sending_without_reply=True)
             bot.message_deletor(15, status["chat"]["id"], status["message_id"])
             return
@@ -87,18 +87,18 @@ def AutoReply(bot, message):
                         res.append(key + ":" + rep + "\n")
                     d.writelines(res)
 
-                status = bot.sendMessage(chat_id,
+                status = bot.sendMessage(chat_id=chat_id,
                     text=msg, parse_mode="HTML",
                     reply_to_message_id=message_id, allow_sending_without_reply=True)
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
             else:
-                status = bot.sendMessage(chat_id,
+                status = bot.sendMessage(chat_id=chat_id,
                     text="<b>指令格式错误 (e.g.: " + prefix + " keyword:reply)</b>",
                     parse_mode="HTML", reply_to_message_id=message_id,
                     allow_sending_without_reply=True)
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
         else:
-            status = bot.sendMessage(chat_id,
+            status = bot.sendMessage(chat_id=chat_id,
                 text="<b>指令格式错误 (e.g.: " + prefix + "add keyword:reply)</b>",
                 parse_mode="HTML", reply_to_message_id=message_id,
                 allow_sending_without_reply=True)
@@ -106,7 +106,7 @@ def AutoReply(bot, message):
 
     elif text.split(" ")[0][:len(prefix + "del")] == prefix + "del":
         if prefix in text and str(user_id) != root_id:
-            status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
+            status = bot.sendMessage(chat_id=chat_id, text="<b>无权限</b>", parse_mode="HTML",
                 reply_to_message_id=message_id, allow_sending_without_reply=True)
             bot.message_deletor(15, status["chat"]["id"], status["message_id"])
             return
@@ -120,19 +120,19 @@ def AutoReply(bot, message):
                     for key, rep in result.items():
                         res.append(key + ":" + rep + "\n")
                     d.writelines(res)
-                status = bot.sendMessage(chat_id,
+                status = bot.sendMessage(chat_id=chat_id,
                     text="<b>删除成功</b>",
                     parse_mode="HTML",
                     reply_to_message_id=message_id, allow_sending_without_reply=True)
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
             else:
-                status = bot.sendMessage(chat_id,
+                status = bot.sendMessage(chat_id=chat_id,
                     text="<b>关键词不存在</b>",
                     parse_mode="HTML",
                     reply_to_message_id=message_id, allow_sending_without_reply=True)
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
         else:
-            status = bot.sendMessage(chat_id,
+            status = bot.sendMessage(chat_id=chat_id,
                 text="<b>指令格式错误 (e.g.: " + prefix + "del keyword)</b>",
                 parse_mode="HTML", reply_to_message_id=message_id,
                 allow_sending_without_reply=True)
@@ -140,7 +140,7 @@ def AutoReply(bot, message):
 
     elif text.split(" ")[0][:len(prefix + "clear")] == prefix + "clear":
         if prefix in text and str(user_id) != root_id:
-            status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
+            status = bot.sendMessage(chat_id=chat_id, text="<b>无权限</b>", parse_mode="HTML",
                 reply_to_message_id=message_id, allow_sending_without_reply=True)
             bot.message_deletor(15, status["chat"]["id"], status["message_id"])
             return
@@ -148,7 +148,7 @@ def AutoReply(bot, message):
         with open(data_dir, "w", encoding="utf-8") as d:
             d.seek(0)
             d.truncate()
-        status = bot.sendMessage(chat_id,
+        status = bot.sendMessage(chat_id=chat_id,
             text="<b>已清空关键词回复列表</b>",
             parse_mode="HTML",
             reply_to_message_id=message_id, allow_sending_without_reply=True)
@@ -156,7 +156,7 @@ def AutoReply(bot, message):
 
     elif text.split(" ")[0][:len(prefix + "show")] == prefix + "show":
         if prefix in text and str(user_id) != root_id:
-            status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
+            status = bot.sendMessage(chat_id=chat_id, text="<b>无权限</b>", parse_mode="HTML",
                 reply_to_message_id=message_id, allow_sending_without_reply=True)
             bot.message_deletor(15, status["chat"]["id"], status["message_id"])
             return
@@ -165,7 +165,7 @@ def AutoReply(bot, message):
         for key, val in result.items():
             msg += "<b>关键词:</b> <code>" + str(key) + "</code>\n" + \
                 "<b>回复:</b> <code>" + str(val) + "</code>\n\n"
-        status = bot.sendMessage(chat_id,
+        status = bot.sendMessage(chat_id=chat_id,
             text=msg,
             parse_mode="HTML", reply_to_message_id=message_id,
             allow_sending_without_reply=True)

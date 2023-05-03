@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-6-26
-last_modify: 2020-11-18
+last_modify: 2023-05-02
 '''
 import os
 from datetime import timedelta
@@ -27,7 +27,7 @@ def Uptime(bot, message):
         response_times = bot.response_times
         response_chats = len(bot.response_chats)
         response_users = len(bot.response_users)
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         inlineKeyboard = [
                     [
                         {"text": "详细信息", "url": detail_links}

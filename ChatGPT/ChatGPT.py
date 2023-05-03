@@ -2,7 +2,7 @@
 # Program: ChatGPT
 # Description: ChatGPT Chat Plugin
 # Creation: 2023-03-11
-# Last modification: 2023-04-10
+# Last modification: 2023-05-02
 
 import openai
 import logging
@@ -72,16 +72,16 @@ def ChatGPT(bot, message):
                 msg = ai.chat(message=text, uid=chat_id)
                 msg = msg.replace("`", "", -1)
                 bot.buffer.write(buffer=ai.user_messages)
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 bot.sendMessage(chat_id=chat_id,text=msg, reply_to_message_id=message_id)
             except Exception as e:
                 print(e)
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 bot.sendMessage(chat_id=chat_id, text="接口调用失败。", reply_to_message_id=message_id)
                 
     except Exception as e:
         print(e)
-        bot.sendChatAction(chat_id, "typing")
+        bot.sendChatAction(chat_id=chat_id, action="typing")
         bot.sendMessage(chat_id=chat_id, text="出错了。", reply_to_message_id=message_id)
 
 

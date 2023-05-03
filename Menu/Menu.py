@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2019-8-15
-last_modify: 2023-04-22
+last_modify: 2023-05-02
 '''
 import os
 
@@ -102,9 +102,9 @@ def Menu(bot, message):
                     "inline_keyboard": inlineKeyboard
                 }
                 status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=menu_str, parse_mode="HTML", reply_markup=reply_markup)
-                status = bot.answerCallbackQuery(message["callback_query_id"])
+                status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"])
             else:
-                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
+                status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
     else:
         page = 1
         if page_total == 1:
@@ -127,7 +127,7 @@ def Menu(bot, message):
 
         page, menu_str = menu_text(bot=bot, plugin_dir=plugin_dir, page=page, page_total=page_total, page_size=page_size, plugin_list=plugin_list)
 
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text=menu_str, parse_mode="HTML", reply_to_message_id=message_id, reply_markup=reply_markup)
 
         bot.message_deletor(wait_time, message["chat"]["id"], status["message_id"])

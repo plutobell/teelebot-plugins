@@ -1,6 +1,6 @@
 Metadata-version: 1.0
 Plugin-name: MessageRecorder
-Version: 1.0.2
+Version: 1.0.3
 Summary: 消息记录器，同时可生成消息词云
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)

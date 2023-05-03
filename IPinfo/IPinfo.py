@@ -16,11 +16,11 @@ def IPinfo(bot, message):
                 if len(i) > 3 or int(i) > 255 or int(i) < 0:
                     count += 1
             if len(ip.split('.')) not in [4, 8] or count != 0:
-                status = bot.sendChatAction(chat_id, "typing")
+                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="地址格式错误，请检查!", parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
             elif len(ip.split('.')) in [4, 8]:
-                status = bot.sendChatAction(chat_id, "typing")
+                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="正在查询，请稍等...", parse_mode="HTML", reply_to_message_id=message_id)
                 txt_message_id = status["message_id"]
 
@@ -47,11 +47,11 @@ def IPinfo(bot, message):
                     status = bot.editMessageText(chat_id=chat_id, message_id=txt_message_id, text="查询失败!", parse_mode="HTML")
                     bot.message_deletor(15, chat_id, txt_message_id)
         else:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="指令格式错误，请检查!", parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])
     else:
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="指令错误，请检查!", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
 

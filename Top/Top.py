@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 @creation time: 2020-3-21
-@last_modify: 2021-08-13
+@last_modify: 2023-05-02
 @The backend is powered by Pi Dashboard Go
     https://github.com/plutobell/pi-dashboard-go
 '''
@@ -37,7 +37,7 @@ def Top(bot, message):
                     if ("http://" not in url and "https://" not in url) \
                         or len(url.split(":")) != 3:
                         msg = "url格式错误，请带上协议头和端口号"
-                        bot.sendChatAction(chat_id, "typing")
+                        bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(
                             chat_id=chat_id, text=msg, parse_mode="HTML")
                         bot.message_deletor(15, chat_id, status["message_id"])
@@ -52,21 +52,21 @@ def Top(bot, message):
                             f.writelines(write_list)
 
                         msg = "Top插件后端登录信息设置成功。"
-                        bot.sendChatAction(chat_id, "typing")
+                        bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(
                             chat_id=chat_id, text=msg, parse_mode="HTML")
                         bot.message_deletor(15, chat_id, status["message_id"])
                         return
                     except:
                         msg = "Top插件后端登录信息设置失败，请重试。"
-                        bot.sendChatAction(chat_id, "typing")
+                        bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(
                             chat_id=chat_id, text=msg, parse_mode="HTML")
                         bot.message_deletor(15, chat_id, status["message_id"])
                         return
                 else:
                     msg = "指令格式错误。e.g.: /topinit url username password"
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(15, chat_id, status["message_id"])
@@ -77,7 +77,7 @@ def Top(bot, message):
             msg = "要使用Top插件请先设置后端登录信息\n" + \
                 "请Bot管理员使用以下指令设置:\n" + \
                 "e.g.: /topinit url username password"
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
             bot.message_deletor(15, chat_id, status["message_id"])
@@ -94,8 +94,8 @@ def Top(bot, message):
             username = sets[1].strip("\n")
             password = sets[2].strip("\n")
 
-        status = bot.sendChatAction(message["chat"]["id"], "typing")
-        status = bot.sendMessage(message["chat"]["id"], text="正在获取服务器信息，请稍等...", parse_mode="HTML", reply_to_message_id=message_id)
+        status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
+        status = bot.sendMessage(chat_id=message["chat"]["id"], text="正在获取服务器信息，请稍等...", parse_mode="HTML", reply_to_message_id=message_id)
         txt_message_id = status["message_id"]
         try:
             with requests.Session() as s:
@@ -179,6 +179,6 @@ def Top(bot, message):
             bot.message_deletor(15, message["chat"]["id"], status["message_id"])
 
     else:
-        status = bot.sendChatAction(message["chat"]["id"], "typing")
-        status = bot.sendMessage(message["chat"]["id"], text="抱歉，您无权操作!", parse_mode="HTML", reply_to_message_id=message_id)
+        status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
+        status = bot.sendMessage(chat_id=message["chat"]["id"], text="抱歉，您无权操作!", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])

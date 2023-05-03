@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-12
-last_modify: 2020-12-14
+last_modify: 2023-05-02
 '''
 import time
 
@@ -16,7 +16,7 @@ def Speaker(bot, message):
     prefix = "/speaker"
 
     if prefix in text and str(user_id) != root_id:
-        status = bot.sendMessage(chat_id, text="<b>无权限</b>", parse_mode="HTML",
+        status = bot.sendMessage(chat_id=chat_id, text="<b>无权限</b>", parse_mode="HTML",
             reply_to_message_id=message_id)
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])
         return
@@ -59,11 +59,11 @@ def Speaker(bot, message):
                 "成功个数: " + str(success_count) + " \n" +\
                 "失败个数: " + str(failure_count) + " \n </code>"
             bot.editMessageText(chat_id=status["chat"]["id"],
-            message_id=status["message_id"], text=msg, parse_mode="HTML")
+                message_id=status["message_id"], text=msg, parse_mode="HTML")
             bot.message_deletor(60, status["chat"]["id"], status["message_id"])
 
         else:
-            status = bot.sendMessage(chat_id,
+            status = bot.sendMessage(chat_id=chat_id,
                 text="<b>指令格式错误 (e.g.: " + prefix + " text)</b>",
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-5-28
-last_modify: 2020-11-13
+last_modify: 2023-05-02
 '''
 import requests
 import urllib.parse as ubp
@@ -10,8 +10,8 @@ def Translate(bot, message):
     prefix = "translate"
 
     if message["text"][1:len(prefix)+1] != prefix or len(message["text"].split(':')) != 2:
-        status = bot.sendChatAction(message["chat"]["id"], "typing")
-        status = bot.sendMessage(message["chat"]["id"], "翻译失败！\n请检查命令格式!", parse_mode="HTML", reply_to_message_id=message["message_id"])
+        status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
+        status = bot.sendMessage(chat_id=message["chat"]["id"], text="翻译失败！\n请检查命令格式!", parse_mode="HTML", reply_to_message_id=message["message_id"])
         return False
 
     url = "http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i="
@@ -23,11 +23,11 @@ def Translate(bot, message):
     }
     with requests.get(url + words, headers=headers) as req:#urlencode编码
         if not req.status_code == requests.codes.ok:
-            status = bot.sendChatAction(message["chat"]["id"], "typing")
+            status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
             status = bot.sendMessage(chat_id=message["chat"]["id"], text="获取失败，请重试!", parse_mode="HTML", reply_to_message_id=message["message_id"])
             bot.message_deletor(15, message["chat"]["id"], status["message_id"])
         elif req.json().get("type", "UNSUPPORTED") == "UNSUPPORTED":  # 翻译的源文字未成功识别语言
-            bot.sendChatAction(message["chat"]["id"], "typing")
+            bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
             status = bot.sendMessage(chat_id=message["chat"]["id"], text="没看出来这是什么语言\n\n" + words, parse_mode="HTML", reply_to_message_id=message["message_id"])
             bot.message_deletor(15, message["chat"]["id"], status["message_id"])
         else:
@@ -54,5 +54,5 @@ def Translate(bot, message):
                 result += "\n"
             result = "<code>" + result + "</code>"
 
-            status = bot.sendChatAction(message["chat"]["id"], "typing")
-            status = bot.sendMessage(message["chat"]["id"], text="<b>" + types[type_] + "</b>\n\n" + result, parse_mode="HTML", reply_to_message_id=message["message_id"])
+            status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
+            status = bot.sendMessage(chat_id=message["chat"]["id"], text="<b>" + types[type_] + "</b>\n\n" + result, parse_mode="HTML", reply_to_message_id=message["message_id"])

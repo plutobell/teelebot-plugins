@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-20
-last_modify: 2020-11-20
+last_modify: 2023-05-02
 '''
 import requests
 
@@ -47,22 +47,22 @@ def MusicDownload(bot, message):
                     status = bot.sendPhoto(chat_id=chat_id, photo=result["cover"],
                         caption=caption, parse_mode="HTML", reply_to_message_id=message_id)
                 else:
-                    status = bot.sendMessage(chat_id,
+                    status = bot.sendMessage(chat_id=chat_id,
                         text="获取歌曲信息失败.",
                         parse_mode="HTML", reply_to_message_id=message_id)
                     bot.message_deletor(15, status["chat"]["id"], status["message_id"])
             else:
-                status = bot.sendMessage(chat_id,
+                status = bot.sendMessage(chat_id=chat_id,
                     text="不支持的App.<b> (wy qq bd)</b>",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, status["chat"]["id"], status["message_id"])
         else:
-            status = bot.sendMessage(chat_id,
+            status = bot.sendMessage(chat_id=chat_id,
                 text="指令格式错误. <b>(e.g.: " + prefix + " app id)</b>",
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, status["chat"]["id"], status["message_id"])
     else:
-        status = bot.sendMessage(chat_id,
+        status = bot.sendMessage(chat_id=chat_id,
             text="指令格式错误. <b>(e.g.: " + prefix + " app id)</b>",
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, status["chat"]["id"], status["message_id"])

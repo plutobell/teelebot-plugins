@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-06-04
-last_modify: 2021-04-23
+last_modify: 2023-05-02
 '''
 
 def Admin(bot, message):
@@ -43,7 +43,7 @@ def Admin(bot, message):
             if str(admin_user["user"]["id"]) == str(bot_id):
                 admin_status = True
         if admin_status != True:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "权限不足，请授予全部权限以使用 Admin 插件。"
             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML")
             bot.message_deletor(30, chat_id, status["message_id"])
@@ -52,11 +52,11 @@ def Admin(bot, message):
 
 
     if message["chat"]["type"] == "private" and text[1:len(prefix)+1] == prefix: #判断是否为私人对话
-        status = bot.sendChatAction(chat_id, "typing")
-        status = bot.sendMessage(chat_id, "抱歉，该指令不支持私人会话!", parse_mode="HTML", reply_to_message_id=message_id)
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
+        status = bot.sendMessage(chat_id=chat_id, text="抱歉，该指令不支持私人会话!", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(gap, chat_id, status["message_id"])
     elif text[1:len(prefix)+1] == prefix and count == 0: #菜单
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         msg = "<b>Admin 插件功能</b>\n\n" +\
             "<b>/adminkick</b> - 踢人。格式:以回复要踢用户的消息的形式发送指令\n" +\
             "<b>/admindel</b> - 删除消息。格式:以回复要删除的消息的形式发送指令\n" +\
@@ -84,29 +84,29 @@ def Admin(bot, message):
                     status = bot.banChatMember(chat_id=chat_id, user_id=target_user_id, until_date=60)
                     status_ = bot.unbanChatMember(chat_id=chat_id, user_id=target_user_id)
                     if status != False:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id, text="已送该用户出群。", parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(gap, chat_id, status["message_id"])
                 else:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="抱歉，无权处置该用户!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
             elif text[1:len(prefix + command["/admindel"])+1] == prefix + command["/admindel"]:
                 status = bot.deleteMessage(chat_id=chat_id, message_id=target_message_id)
                 if status == False:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="删除失败!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
             elif text[1:len(prefix + command["/adminpin"])+1] == prefix + command["/adminpin"]:
                 status = bot.pinChatMessage(chat_id=chat_id, message_id=target_message_id)
                 if status == False:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="置顶失败!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
             elif text[1:len(prefix + command["/adminunpin"])+1] == prefix + command["/adminunpin"]:
                 status = bot.unpinChatMessage(chat_id=chat_id)
                 if status == False:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="取消置顶失败!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
             elif text[1:len(prefix + command["/adminmute"])+1] == prefix + command["/adminmute"]:
@@ -134,21 +134,21 @@ def Admin(bot, message):
                             time_ = text[1:].split(' ')[1]
                             time_ = time_.replace("1m", "1分钟").replace("10m", "10分钟")
                             time_ = time_.replace("1h", "1小时").replace("1d", "1天").replace("forever", "永久")
-                            status = bot.sendChatAction(chat_id, "typing")
+                            status = bot.sendChatAction(chat_id=chat_id, action="typing")
                             msg = "<b><a href='tg://user?id=" + str(target_user_id) + "'>" + str(target_user_id) + "</a></b> 已被禁言，持续时间：<b>" + str(time_) + "</b>。"
                             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message["message_id"])
                             bot.message_deletor(gap, chat_id, status["message_id"])
                         else:
-                            status = bot.sendChatAction(chat_id, "typing")
+                            status = bot.sendChatAction(chat_id=chat_id, action="typing")
                             msg = "<b><a href='tg://user?id=" + str(target_user_id) + "'>" + str(target_user_id) + "</a></b> 禁言失败!"
                             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message["message_id"])
                             bot.message_deletor(gap, chat_id, status["message_id"])
                     else:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id, text="无效指令，请检查格式!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(gap, chat_id, status["message_id"])
                 else:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="抱歉，无权处置该用户!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
             elif text[1:len(prefix + command["/adminunmute"])+1] == prefix + command["/adminunmute"]:
@@ -157,18 +157,18 @@ def Admin(bot, message):
                     permissions = status.get("permissions")
                     status = bot.restrictChatMember(chat_id=chat_id, user_id=target_user_id,permissions=permissions)
                     if status != False:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         msg = "<b><a href='tg://user?id=" + str(target_user_id) + "'>" + str(target_user_id) + "</a></b> 已被解禁。"
                         status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(gap, chat_id, status["message_id"])
                 else:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="抱歉，无权处置该用户!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
 
             elif text[1:len(prefix + command["/adminsudo"])+1] == prefix + command["/adminsudo"]:
                 if str(user_id) != root_id:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 抱歉，您无权操作.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
@@ -177,21 +177,21 @@ def Admin(bot, message):
 
                 target_user_info = bot.getChatMember(chat_id=chat_id, user_id=target_user_id)
                 if target_user_info["status"] == "creator":
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 无权处置创建者.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
                     bot.message_deletor(gap, chat_id, message_id)
                     return
                 if str(target_user_id) == bot_id:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 无权处置.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
                     bot.message_deletor(gap, chat_id, message_id)
                     return
                 if target_user_info["status"] == "administrator":
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 该用户已经是管理员了.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
@@ -242,7 +242,7 @@ def Admin(bot, message):
                             )
 
                         if ok:
-                            status = bot.sendChatAction(chat_id, "typing")
+                            status = bot.sendChatAction(chat_id=chat_id, action="typing")
                             status = bot.sendMessage(chat_id=chat_id, text="🤖 提权成功.",
                                 parse_mode="HTML", reply_to_message_id=message["message_id"])
                             bot.message_deletor(gap, chat_id, status["message_id"])
@@ -251,34 +251,34 @@ def Admin(bot, message):
                             ok = bot.setChatAdministratorCustomTitle(chat_id=chat_id,
                                 user_id=target_user_id, custom_title=title)
                             if ok:
-                                status = bot.sendChatAction(chat_id, "typing")
+                                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                                 status = bot.sendMessage(chat_id=chat_id, text="🤖 昵称设置成功.",
                                     parse_mode="HTML", reply_to_message_id=message["message_id"])
                                 bot.message_deletor(gap, chat_id, status["message_id"])
                             else:
-                                status = bot.sendChatAction(chat_id, "typing")
+                                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                                 status = bot.sendMessage(chat_id=chat_id, text="🤖 昵称设置失败.",
                                     parse_mode="HTML", reply_to_message_id=message["message_id"])
                                 bot.message_deletor(gap, chat_id, status["message_id"])
                         else:
-                            status = bot.sendChatAction(chat_id, "typing")
+                            status = bot.sendChatAction(chat_id=chat_id, action="typing")
                             status = bot.sendMessage(chat_id=chat_id, text="🤖 提权失败.",
                                 parse_mode="HTML", reply_to_message_id=message["message_id"])
                             bot.message_deletor(gap, chat_id, status["message_id"])
                     else:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id, text="🤖 bot不具备恰当的权限.",
                             parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(gap, chat_id, status["message_id"])
                 else:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 bot不具备管理员身份.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
 
             elif text[1:len(prefix + command["/adminunsudo"])+1] == prefix + command["/adminunsudo"]:
                 if str(user_id) != root_id:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 抱歉，您无权操作.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
@@ -287,14 +287,14 @@ def Admin(bot, message):
 
                 target_user_info = bot.getChatMember(chat_id=chat_id, user_id=target_user_id)
                 if target_user_info["status"] == "creator":
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 无权处置创建者.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
                     bot.message_deletor(gap, chat_id, message_id)
                     return
                 if str(target_user_id) == bot_id:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 无权处置.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
@@ -319,31 +319,31 @@ def Admin(bot, message):
                     can_promote_members = False
                     )
                     if ok:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id, text="🤖 除权成功.",
                             parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(gap, chat_id, status["message_id"])
                     else:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id, text="🤖 除权失败.",
                             parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(gap, chat_id, status["message_id"])
                 else:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 bot不具备管理员身份.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
 
             elif text[1:len(prefix + command["/admintitle"])+1] == prefix + command["/admintitle"]:
                 if str(user_id) != root_id:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 抱歉，您无权操作.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
                     bot.message_deletor(gap, chat_id, message_id)
                     return
                 if len(text.split(" ")) < 2:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 指令格式错误，请检查. \n(<b>e.g. /admintitle title</b>)",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
@@ -352,21 +352,21 @@ def Admin(bot, message):
 
                 target_user_info = bot.getChatMember(chat_id=chat_id, user_id=target_user_id)
                 if target_user_info["status"] == "creator":
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 无权处置创建者.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
                     bot.message_deletor(gap, chat_id, message_id)
                     return
                 if str(target_user_id) == bot_id:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 无权处置.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
                     bot.message_deletor(gap, chat_id, message_id)
                     return
                 # if target_user_info["status"] != "administrator":
-                #     status = bot.sendChatAction(chat_id, "typing")
+                #     status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 #     status = bot.sendMessage(chat_id=chat_id, text="🤖 不能为非管理用户设置昵称.",
                 #         parse_mode="HTML", reply_to_message_id=message["message_id"])
                 #     bot.message_deletor(gap, chat_id, status["message_id"])
@@ -380,7 +380,7 @@ def Admin(bot, message):
                     bot_permissions = bot_info
                     title = text.split(" ", 1)[1]
                     if len(title) > 16:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id, text="🤖 输入的昵称过长.",
                             parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(gap, chat_id, status["message_id"])
@@ -419,36 +419,36 @@ def Admin(bot, message):
                                     can_promote_members = False
                                 )
                         if not ok:
-                            status = bot.sendChatAction(chat_id, "typing")
+                            status = bot.sendChatAction(chat_id=chat_id, action="typing")
                             status = bot.sendMessage(chat_id=chat_id, text="🤖 提权失败，无法设置昵称.",
                                 parse_mode="HTML", reply_to_message_id=message["message_id"])
                             bot.message_deletor(gap, chat_id, status["message_id"])
                             bot.message_deletor(gap, chat_id, message_id)
                             return
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 提权成功.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
                     ok = bot.setChatAdministratorCustomTitle(chat_id=chat_id,
                         user_id=target_user_id, custom_title=title)
                     if ok:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id, text="🤖 昵称设置成功.",
                             parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(gap, chat_id, status["message_id"])
                 else:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="🤖 bot不具备管理员身份.",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(gap, chat_id, status["message_id"])
 
         else:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="抱歉，您无权操作.",
                 parse_mode="HTML", reply_to_message_id=message["message_id"])
             bot.message_deletor(gap, chat_id, status["message_id"])
     else:
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="未指定要操作的对象!",
             parse_mode="HTML", reply_to_message_id=message["message_id"])
         bot.message_deletor(gap, chat_id, status["message_id"])

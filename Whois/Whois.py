@@ -15,8 +15,8 @@ def Whois(bot, message):
         if len(text.split(' ')) == 2:
             domain = str(text.split(' ')[1])
             if len(domain.split('.')) > 1 and len(domain.split('.')) <= 2:
-                bot.sendChatAction(chat_id, "typing")
-                status = bot.sendMessage(chat_id=chat_id, text="正在查询，请稍等...", parse_mode="TEXT", reply_to_message_id=message_id)
+                bot.sendChatAction(chat_id=chat_id, action="typing")
+                status = bot.sendMessage(chat_id=chat_id, text="正在查询，请稍等...", reply_to_message_id=message_id)
                 txt_message_id = status["message_id"]
 
                 result = whois_info(domain=domain)
@@ -27,26 +27,26 @@ def Whois(bot, message):
                     msg = msg.replace("<pre>", "")
                     msg = msg.replace("</pre>", "")
                     status = bot.editMessageText(chat_id=chat_id, message_id=txt_message_id,
-                        text=msg.strip(), parse_mode="TEXT", disable_web_page_preview=True)
+                        text=msg.strip(), disable_web_page_preview=True)
                     bot.message_deletor(60, chat_id, txt_message_id)
                 else:
                     status = bot.editMessageText(chat_id=chat_id,
                         message_id=txt_message_id, text="查询失败!", parse_mode="TEXT")
                     bot.message_deletor(15, chat_id, txt_message_id)
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="域名格式错误，请检查!",
-                    parse_mode="TEXT", reply_to_message_id=message_id)
+                    reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
         else:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="指令格式错误，请检查!",
-                parse_mode="TEXT", reply_to_message_id=message_id)
+                reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])
     else:
-        bot.sendChatAction(chat_id, "typing")
+        bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="指令错误，请检查!",
-            parse_mode="TEXT", reply_to_message_id=message_id)
+            reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
 
 

@@ -14,19 +14,19 @@ def Qrcode(bot, message):
         if len(text.split(' ')) == 2:
             img = qrcode_img(data=text.split(' ')[1], proxies=proxies)
             if img != False:
-                status = bot.sendChatAction(chat_id, "typing")
+                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendPhoto(chat_id=chat_id, photo=img, caption="您的二维码已生成，消息将在不久后销毁，请尽快保存。", parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(gap, chat_id, status["message_id"])
             else:
-                status = bot.sendChatAction(chat_id, "typing")
+                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="抱歉，生成失败，请重试。", parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
         else:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="指令格式错误，请检查!", parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])
     else:
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="指令错误，请检查!", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
 

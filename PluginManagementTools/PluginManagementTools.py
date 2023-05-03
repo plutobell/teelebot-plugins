@@ -2,7 +2,7 @@
 """
 @description: Plugin Management Tools
 @creation date: 2021-06-23
-@last modification: 2023-04-19
+@last modification: 2023-05-02
 @author: Pluto (github.com/plutobell)
 """
 import os
@@ -113,7 +113,7 @@ def PluginManagementTools(bot, message):
         msg = "<b>PluginManagementTools 插件功能</b>\n\n"
         for command, description in commands_dict.items():
             msg += "<b>" + prefix + " " + command + "</b> " + description + "\n"
-        bot.sendChatAction(chat_id, "typing")
+        bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text=msg,
             parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(60, chat_id, status["message_id"])
@@ -126,7 +126,7 @@ def PluginManagementTools(bot, message):
             command_argument = sub_argument_list[1]
 
         if command not in commands_dict.keys():
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "指令 <b>" + command + "</b> 不存在。"
             status = bot.sendMessage(chat_id=chat_id, text=msg,
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -147,14 +147,14 @@ def PluginManagementTools(bot, message):
                         if url.strip(os.sep) == source_url.strip(os.sep):
                             label = source_label
                     msg = "源地址已存在：\n" + label + " " + url
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id,
                         text="<code>"+msg+"</code>", parse_mode="HTML",
                         reply_to_message_id=message_id)
                     bot.message_deletor(15, chat_id, status["message_id"])
                 elif label in sources_dict.keys():
                     msg = "标签 " + label + " 已存在：\n" + label + " " + sources_dict[label]
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id,
                         text="<code>"+msg+"</code>", parse_mode="HTML",
                         reply_to_message_id=message_id)
@@ -162,7 +162,7 @@ def PluginManagementTools(bot, message):
                 else:
                     if len(url.split("github.com/")[1].strip("/").split("/")) != 2:
                         msg = "源地址格式错误"
-                        bot.sendChatAction(chat_id, "typing")
+                        bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id,
                             text="<code>"+msg+"</code>", parse_mode="HTML",
                             reply_to_message_id=message_id)
@@ -170,7 +170,7 @@ def PluginManagementTools(bot, message):
                         return
                     if "github.com/" not in url:
                         msg = "源仅支持 GitHub 仓库地址"
-                        bot.sendChatAction(chat_id, "typing")
+                        bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id,
                             text="<code>"+msg+"</code>", parse_mode="HTML",
                             reply_to_message_id=message_id)
@@ -187,20 +187,20 @@ def PluginManagementTools(bot, message):
                         with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/sources.list"), "w", encoding="utf-8") as sources:
                             sources.writelines(write_list)
                         msg = "成功添加以下源：\n" + label + " " + sources_dict[label]
-                        bot.sendChatAction(chat_id, "typing")
+                        bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id,
                             text="<code>"+msg+"</code>", parse_mode="HTML",
                             reply_to_message_id=message_id)
                         bot.message_deletor(15, chat_id, status["message_id"])
                     except:
                         msg = "以下源添加失败：\n" + label + " " + sources_dict[label]
-                        bot.sendChatAction(chat_id, "typing")
+                        bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id,
                             text="<code>"+msg+"</code>", parse_mode="HTML",
                             reply_to_message_id=message_id)
                         bot.message_deletor(15, chat_id, status["message_id"])
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="指令格式错误。",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
@@ -221,27 +221,27 @@ def PluginManagementTools(bot, message):
                         with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/sources.list"), "w", encoding="utf-8") as sources:
                             sources.writelines(write_list)
                         msg = "成功移除以下源：\n" + label + " " + deleted_url
-                        bot.sendChatAction(chat_id, "typing")
+                        bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id,
                             text="<code>"+msg+"</code>", parse_mode="HTML",
                             reply_to_message_id=message_id)
                         bot.message_deletor(15, chat_id, status["message_id"])
                     except:
                         msg = "移除标签为 " + label + " 的源失败"
-                        bot.sendChatAction(chat_id, "typing")
+                        bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id,
                             text="<code>"+msg+"</code>", parse_mode="HTML",
                             reply_to_message_id=message_id)
                         bot.message_deletor(15, chat_id, status["message_id"])
                 else:
                     msg = "标签 " + label + " 不存在"
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id,
                         text="<code>"+msg+"</code>", parse_mode="HTML",
                         reply_to_message_id=message_id)
                     bot.message_deletor(15, chat_id, status["message_id"])
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="指令格式错误。",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
@@ -253,7 +253,7 @@ def PluginManagementTools(bot, message):
             for label, url in sources_dict.items():
                 msg += "[" + str(i) + "]" + label + " " + url + "\n\n"
                 i += 1
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id,
                 text="<code>"+msg+"</code>", parse_mode="HTML",
                 reply_to_message_id=message_id)
@@ -262,7 +262,7 @@ def PluginManagementTools(bot, message):
 
         elif command == "update":
             msg = "开始更新索引缓存\n"
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="<code>"+msg+"</code>",
                 parse_mode="HTML", reply_to_message_id=message_id)
             update_msg_id = status["message_id"]
@@ -374,7 +374,7 @@ def PluginManagementTools(bot, message):
 
         elif command == "upgrade":
             msg = "开始检查更新插件\n"
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="<code>"+msg+"</code>",
                 parse_mode="HTML", reply_to_message_id=message_id)
             update_msg_id = status["message_id"]
@@ -432,7 +432,7 @@ def PluginManagementTools(bot, message):
                 bot.message_deletor(30, chat_id, update_msg_id)
         elif command == "clean":
             msg = "正在清除本地缓存 ..."
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="<code>"+msg+"</code>",
                 parse_mode="HTML", reply_to_message_id=message_id)
             update_msg_id = status["message_id"]
@@ -456,7 +456,7 @@ def PluginManagementTools(bot, message):
             arg_list = command_argument.split(" ")
             if len(arg_list) >= 1:
                 msg = "开始安装插件\n"
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="<code>"+msg+"</code>",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 update_msg_id = status["message_id"]
@@ -571,7 +571,7 @@ def PluginManagementTools(bot, message):
                 bot.message_deletor(30, chat_id, status["message_id"])
 
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="指令格式错误。",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
@@ -580,7 +580,7 @@ def PluginManagementTools(bot, message):
             arg_list = command_argument.split(" ")
             if len(arg_list) >= 1:
                 if len(arg_list) == 1 and arg_list[0].strip(" ").replace(" ", "") in ["-d", "-dependency"]:
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="指令格式错误。",
                         parse_mode="HTML", reply_to_message_id=message_id)
                     bot.message_deletor(15, chat_id, status["message_id"])
@@ -593,7 +593,7 @@ def PluginManagementTools(bot, message):
                     arg_list = arg_list[1:]
 
                 msg = "开始卸载插件\n"
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="<code>"+msg+"</code>",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 update_msg_id = status["message_id"]
@@ -674,7 +674,7 @@ def PluginManagementTools(bot, message):
                                 message_id=update_msg_id, text="<code>"+msg+"</code>", parse_mode="HTML")
                 bot.message_deletor(30, chat_id, status["message_id"])
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="指令格式错误。",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
@@ -695,7 +695,7 @@ def PluginManagementTools(bot, message):
                 else:
                     msg += "[" + str(i+1) + "]" + plugin + "\n"
 
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="<code>"+msg+"</code>",
                 parse_mode="HTML", reply_to_message_id=message_id)
             gap = len(plugin_bridge) * 2 + 30
@@ -784,7 +784,7 @@ def PluginManagementTools(bot, message):
                 bot.message_deletor(gap, chat_id, status["message_id"])
 
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="指令格式错误。",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
@@ -881,13 +881,13 @@ def PluginManagementTools(bot, message):
                         parse_mode="HTML", reply_to_message_id=message_id)
                     bot.message_deletor(15, chat_id, status["message_id"])
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="指令格式错误。",
                     parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
 
         else:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="指令格式错误。",
                 parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])

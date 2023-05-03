@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-08-07
-last_modification: 2023-04-19
+last_modification: 2023-05-02
 '''
 import os
 import requests
@@ -47,7 +47,7 @@ def DataCenter(bot, message):
 
         admins = administrators(bot=bot, chat_id=chat_id)
         if str(user_id) not in admins:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             txt = "只有管理员能查询他人账户。"
             status = bot.sendMessage(chat_id=chat_id, text=txt,
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -55,7 +55,7 @@ def DataCenter(bot, message):
             return
 
         if str(target_user_id) in [str(root_id), str(bot_id)]:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             txt = "您无权查询该账户。"
             status = bot.sendMessage(chat_id=chat_id, text=txt,
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -65,7 +65,7 @@ def DataCenter(bot, message):
         if "username" in reply_to_message["from"].keys():
             username = reply_to_message["from"]["username"]
         else:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             txt = "您要查询的账号未设置<b>用户名</b>，无法查询。"
             status = bot.sendMessage(chat_id=chat_id, text=txt,
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -75,7 +75,7 @@ def DataCenter(bot, message):
         try:
             req = requests.get(url="https://t.me/" + username, proxies=proxies)
         except:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             txt = "获取数据失败，请重试。"
             status = bot.sendMessage(chat_id=chat_id, text=txt,
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -87,7 +87,7 @@ def DataCenter(bot, message):
         soup.decompose()
 
         if profile_photo is None:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             txt = "您要查询的账号未设置<b>头像</b>，无法查询。"
             status = bot.sendMessage(chat_id=chat_id, text=txt,
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -102,7 +102,7 @@ def DataCenter(bot, message):
         if dc in data_centers.keys():
             location = data_centers[dc]
         
-        bot.sendChatAction(chat_id, "typing")
+        bot.sendChatAction(chat_id=chat_id, action="typing")
         txt = "您查询的账号所在数据中心为 <b>" + dc + \
             "</b>, 地理位置为 <b>" + location + "</b>"
         status = bot.sendMessage(chat_id=chat_id, text=txt,
@@ -114,7 +114,7 @@ def DataCenter(bot, message):
         if "username" in message["from"].keys():
             username = message["from"]["username"]
         else:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             txt = "要查询您账号所在数据中心，请先设置<b>用户名</b>。"
             status = bot.sendMessage(chat_id=chat_id, text=txt,
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -124,7 +124,7 @@ def DataCenter(bot, message):
         try:
             req = requests.get(url="https://t.me/" + username, proxies=proxies)
         except:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             txt = "获取数据失败，请重试。"
             status = bot.sendMessage(chat_id=chat_id, text=txt,
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -136,7 +136,7 @@ def DataCenter(bot, message):
         soup.decompose()
 
         if profile_photo is None:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             txt = "要查询您账号所在数据中心，请先设置<b>头像</b>。"
             status = bot.sendMessage(chat_id=chat_id, text=txt,
                 parse_mode="HTML", reply_to_message_id=message_id)
@@ -151,7 +151,7 @@ def DataCenter(bot, message):
         if dc in data_centers.keys():
             location = data_centers[dc]
 
-        bot.sendChatAction(chat_id, "typing")
+        bot.sendChatAction(chat_id=chat_id, action="typing")
         txt = "您账号所在数据中心为 <b>" + dc + \
             "</b>, 地理位置为 <b>" + location + "</b>"
         status = bot.sendMessage(chat_id=chat_id, text=txt,
@@ -160,7 +160,7 @@ def DataCenter(bot, message):
         return
 
     else:
-        bot.sendChatAction(chat_id, "typing")
+        bot.sendChatAction(chat_id=chat_id, action="typing")
         txt = "不支持的操作。"
         status = bot.sendMessage(chat_id=chat_id, text=txt,
             parse_mode="HTML", reply_to_message_id=message_id)

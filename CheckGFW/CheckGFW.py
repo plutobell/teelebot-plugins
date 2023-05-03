@@ -30,26 +30,26 @@ def CheckGFW(bot, message):
                         "\n<code>Domain: " + str(data["domain"]) +\
                         "\nStatus: </code><b>" + str(data["msg"] + "</b>") +\
                         "\n\n<code>" + str(now.strftime("%Y-%m-%d %H:%M:%S")) + "</code>"
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text=msg,
                         parse_mode="HTML", reply_to_message_id=message_id, disable_web_page_preview=True)
                     bot.message_deletor(60, chat_id, status["message_id"])
                     if chat_type != "private" and bot_id in admins:
                         bot.message_deletor(65, chat_id, message_id)
                 else:
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="<b>Detection failed, please try again!</b>", parse_mode="HTML", reply_to_message_id=message_id)
                     bot.message_deletor(15, chat_id, status["message_id"])
             else:
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(chat_id=chat_id, text="<b>Domain name formatting error, please check!</b>", parse_mode="HTML", reply_to_message_id=message_id)
                 bot.message_deletor(15, chat_id, status["message_id"])
         else:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="<b>Command formatting error, please check!</b>", parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])
     else:
-        bot.sendChatAction(chat_id, "typing")
+        bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="<b>Command error, please check!</b>", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
 

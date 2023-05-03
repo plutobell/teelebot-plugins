@@ -13,8 +13,8 @@ def Chat(bot, message):
             "good morning", "Good morning", "good afternoom",
             "Good afternoom", "good evening", "Good evening")
     if message["text"][1:] in hello:
-        status = bot.sendChatAction(message["chat"]["id"], "typing")
-        status = bot.sendVoice(message["chat"]["id"], voice=bot.path_converter(plugin_dir + "Chat/hello.ogg"),
+        status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
+        status = bot.sendVoice(chat_id=message["chat"]["id"], voice=bot.path_converter(plugin_dir + "Chat/hello.ogg"),
             reply_to_message_id=message["message_id"])
     else:
         try:
@@ -22,7 +22,7 @@ def Chat(bot, message):
                 req.keep_alive = False
                 req.encoding = "utf-8"
                 if not req.status_code == requests.codes.ok:
-                    status = bot.sendChatAction(message["chat"]["id"], "typing")
+                    status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
                     status = bot.sendMessage(chat_id=message["chat"]["id"], text="接口调用失败!",
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(15, status["chat"]["id"], status["message_id"])
@@ -33,8 +33,8 @@ def Chat(bot, message):
                             msg = msg.split("}")[1]
                     except:
                         msg = "出错了."
-                    status = bot.sendChatAction(message["chat"]["id"], "typing")
-                    status = bot.sendMessage(message["chat"]["id"],text=msg,
+                    status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
+                    status = bot.sendMessage(chat_id=message["chat"]["id"],text=msg,
                         parse_mode="HTML", reply_to_message_id=message["message_id"])
         except Exception as e:
             print(e)

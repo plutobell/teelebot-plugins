@@ -2,7 +2,7 @@
 """
 @description: Message Recorder
 @creation date: 2023-04-07
-@last modification: 2023-04-30
+@last modification: 2023-05-02
 @author: Pluto (github.com/plutobell)
 """
 import io
@@ -94,8 +94,8 @@ def MessageRecorder(bot, message):
     if message_type == "text" and message.get("text", "") in admin_commands:
         
         if str(user_id) not in admin_list:
-            bot.sendChatAction(chat_id, "typing")
-            status = bot.sendMessage(chat_id=chat_id, text="Permission denied.", parse_mode="text", reply_to_message_id=message_id)
+            bot.sendChatAction(chat_id=chat_id, action="typing")
+            status = bot.sendMessage(chat_id=chat_id, text="Permission denied.", reply_to_message_id=message_id)
             bot.message_deletor(15, status["chat"]["id"], status["message_id"])
 
             if chat_type != "private" and str(bot_id) in admin_list:
@@ -116,8 +116,8 @@ def MessageRecorder(bot, message):
                 "lastchange": message.get("date", "")
             }
             db.update_data(table_name="activation", update=update, condition={"chatid": str(chat_id)})
-            bot.sendChatAction(chat_id, "typing")
-            status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="text", reply_to_message_id=message_id)
+            bot.sendChatAction(chat_id=chat_id, action="typing")
+            status = bot.sendMessage(chat_id=chat_id, text=msg, reply_to_message_id=message_id)
             bot.message_deletor(15, status["chat"]["id"], status["message_id"])
 
             if chat_type != "private" and str(bot_id) in admin_list:
@@ -137,8 +137,8 @@ def MessageRecorder(bot, message):
                 user_final_id = target_user_id
                 for_other_user = True
             else:
-                bot.sendChatAction(chat_id, "typing")
-                status = bot.sendMessage(chat_id=chat_id, text="Permission denied.", parse_mode="text", reply_to_message_id=message_id)
+                bot.sendChatAction(chat_id=chat_id, action="typing")
+                status = bot.sendMessage(chat_id=chat_id, text="Permission denied.", reply_to_message_id=message_id)
                 bot.message_deletor(15, status["chat"]["id"], status["message_id"])
                 if chat_type != "private" and str(bot_id) in admin_list:
                     bot.message_deletor(15, chat_id, message_id)
@@ -171,7 +171,7 @@ def MessageRecorder(bot, message):
                     if abs(int(now_timestamp) - int(r[4])) < 604800: # 30d
                         text_list.append(r[3])
                 
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 img_bytes = generate_wordcloud(
                     text_list=text_list,
                     shape_path=shape_path,
@@ -194,8 +194,8 @@ def MessageRecorder(bot, message):
                 if chat_type != "private" and str(bot_id) in admin_list:
                     bot.message_deletor(65, chat_id, message_id)
             else:
-                bot.sendChatAction(chat_id, "typing")
-                status = bot.sendMessage(chat_id=chat_id, text="No Data.", parse_mode="text", reply_to_message_id=message_id)
+                bot.sendChatAction(chat_id=chat_id, action="typing")
+                status = bot.sendMessage(chat_id=chat_id, text="No Data.", reply_to_message_id=message_id)
                 bot.message_deletor(15, status["chat"]["id"], status["message_id"])
 
                 if chat_type != "private" and str(bot_id) in admin_list:
@@ -215,7 +215,7 @@ def MessageRecorder(bot, message):
                         if abs(int(now_timestamp) - int(r[4])) < 604800: # 30d
                             text_list.append(r[3])
                     
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     img_bytes = generate_wordcloud(
                         text_list=text_list,
                         shape_path=shape_path,
@@ -229,15 +229,15 @@ def MessageRecorder(bot, message):
                     if chat_type != "private" and str(bot_id) in admin_list:
                         bot.message_deletor(65, chat_id, message_id)
                 else:
-                    bot.sendChatAction(chat_id, "typing")
-                    status = bot.sendMessage(chat_id=chat_id, text="No Data.", parse_mode="text", reply_to_message_id=message_id)
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
+                    status = bot.sendMessage(chat_id=chat_id, text="No Data.", reply_to_message_id=message_id)
                     bot.message_deletor(15, status["chat"]["id"], status["message_id"])
 
                     if chat_type != "private" and str(bot_id) in admin_list:
                         bot.message_deletor(20, chat_id, message_id)
             else:
-                bot.sendChatAction(chat_id, "typing")
-                status = bot.sendMessage(chat_id=chat_id, text="Private chat is not supported.", parse_mode="text", reply_to_message_id=message_id)
+                bot.sendChatAction(chat_id=chat_id, action="typing")
+                status = bot.sendMessage(chat_id=chat_id, text="Private chat is not supported.", reply_to_message_id=message_id)
                 bot.message_deletor(15, status["chat"]["id"], status["message_id"])
             
             

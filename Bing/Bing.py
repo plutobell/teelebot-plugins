@@ -34,12 +34,12 @@ def Bing(bot, message):
                     copyright_ = img["copyright"]
                     db.insert(enddate=dbdate, url=img["url"], copyright_=copyright_)
                 else:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="获取失败，请重试!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(15, chat_id, status["message_id"])
                     return
 
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendPhoto(chat_id=chat_id, photo=img_url, caption=copyright_+"\n\n"+date, parse_mode="HTML", reply_to_message_id=message["message_id"])
 
         elif len(text.split(" ")) == 2:
@@ -64,11 +64,11 @@ def Bing(bot, message):
                         if not result:
                             db.insert(enddate=dbdate, url=img["url"], copyright_=copyright_)
                     else:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id, text="获取失败，请重试!", parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(15, chat_id, status["message_id"])
 
-                status = bot.sendChatAction(chat_id, "typing")
+                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendPhoto(chat_id=chat_id, photo=img_url, caption=copyright_+"\n\n"+date, parse_mode="HTML", reply_to_message_id=message["message_id"])
 
             elif command == "update":
@@ -94,7 +94,7 @@ def Bing(bot, message):
                                 msg = "周期性任务队列已满."
                             else:
                                 msg = "遇到错误. \n\n <i>" + uid + "</i>"
-                    status = bot.sendMessage(chat_id, text=msg, parse_mode="HTML",
+                    status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
                         reply_to_message_id=message_id)
                     bot.message_deletor(60, status["chat"]["id"], status["message_id"])
                 else:
@@ -115,7 +115,7 @@ def Bing(bot, message):
                                     "\n\n最后更新: <code>" + str(last_updated) + "</code>"
                             else:
                                 msg = "无法开启自动更新."
-                    status = bot.sendMessage(chat_id, text=msg,
+                    status = bot.sendMessage(chat_id=chat_id, text=msg,
                         parse_mode="HTML", reply_to_message_id=message_id)
                     bot.message_deletor(30, status["chat"]["id"], status["message_id"])
             else:
@@ -129,27 +129,27 @@ def Bing(bot, message):
                         img_url = "https://cn.bing.com" + result[2] + "&ensearch=0&mkt=zh-cn"
                         copyright_ = result[3]
 
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendPhoto(chat_id=chat_id,
                             photo=img_url, caption=copyright_+"\n\n"+date,
                             parse_mode="HTML", reply_to_message_id=message["message_id"])
                     else:
                         date = dbdate[:4] + '-' + dbdate[4:6] + '-' + dbdate[6:]
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(chat_id=chat_id,
                             text="在库中未找到 <b>" + date + "</b> 的图片", parse_mode="HTML", reply_to_message_id=message["message_id"])
                         bot.message_deletor(15, chat_id, status["message_id"])
                 else:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id,
                         text="日期格式错误，请检查! <b>(e.g. 20201024)</b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
                     bot.message_deletor(15, chat_id, status["message_id"])
         else:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="指令错误，请检查!", parse_mode="HTML", reply_to_message_id=message["message_id"])
             bot.message_deletor(15, chat_id, status["message_id"])
     else:
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="指令错误，请检查!", parse_mode="HTML", reply_to_message_id=message["message_id"])
         bot.message_deletor(15, chat_id, status["message_id"])
 

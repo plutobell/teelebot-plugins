@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 @creation date: 2021-04-26
-@last modify: 2021-06-01
+@last modify: 2023-05-02
 '''
 import difflib
 import time
@@ -32,7 +32,7 @@ def MessageFloodedCheck(bot, message):
         if str(bot_id) in admins:
             admin_status = True
         if admin_status is not True:
-            bot.sendChatAction(chat_id, "typing")
+            bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "权限不足，请授予全部权限以使用 MessageFloodedCheck 插件。"
             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML")
             if status != False:
@@ -116,7 +116,7 @@ def MessageFloodedCheck(bot, message):
                     status = bot.restrictChatMember(
                         chat_id=chat_id, user_id=user_id,
                         permissions=permissions, until_date=mute_time * 60)
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(
                     chat_id=chat_id, text=msg, parse_mode="HTML")
                 if status != False:
@@ -143,7 +143,7 @@ def MessageFloodedCheck(bot, message):
                         msg = "管理员 " + user_info + ", 您似乎在重复发送相似消息\n<b>请以身作则😃</b>"
                     else:
                         msg = user_info + ", 检测到您似乎在重复发送相似消息\n<b>继续发送将被禁言，请谨言慎行</b>"
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
                     if status != False:
@@ -169,14 +169,14 @@ def MessageFloodedCheck(bot, message):
                         status = bot.restrictChatMember(
                             chat_id=chat_id, user_id=user_id,
                             permissions=permissions, until_date=mute_time * 60)
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
                     if status != False:
                         bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
                     for msg_id in reversed(list(repeat_ids)): # 删除重复消息
-                        status = bot.deleteMessage(chat_id, msg_id)
+                        status = bot.deleteMessage(chat_id=chat_id, message_id=msg_id)
                         if msg_id in record_messages.keys():
                             record_messages.pop(msg_id)
                         time.sleep(0.5)

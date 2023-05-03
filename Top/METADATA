@@ -1,6 +1,6 @@
 Metadata-version: 1.0
 Plugin-name: Top
-Version: 1.0.3
+Version: 1.0.4
 Summary: 通过Pi Dashboard Go后端接口查看服务器状态
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)

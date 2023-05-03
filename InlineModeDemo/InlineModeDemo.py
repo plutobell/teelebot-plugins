@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-09-09
-last_modification: 2021-09-11
+last_modification: 2023-05-02
 '''
 
 def InlineModeDemo(bot, message):

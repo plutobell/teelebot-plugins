@@ -30,9 +30,9 @@ def TodayInHistory(bot, message):
                         msg += "<i>" + str(sec["year"]) + "年</i> - " + str(sec["title"]) + "\n\n"
                     msg = "<b>历史上的今天: " + str(today_data[0]["today"]) + "</b>\n\n" + msg
                     status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=msg, parse_mode="HTML", reply_markup=reply_markup)
-                    status = bot.answerCallbackQuery(message["callback_query_id"])
+                    status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"])
             else:
-                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
+                status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
         elif callback_query_data[:len(page_callback_command)] == "/todayinhisthidedata":
             if click_user_id == from_user_id:
                 today_data = today_in_history()
@@ -48,9 +48,9 @@ def TodayInHistory(bot, message):
                     sec = today_data[0]
                     msg = "<b>历史上的今天: " + str(today_data[0]["today"]) + "</b>\n\n"
                     status = bot.editMessageText(chat_id=chat_id, message_id=message_id, text=msg, parse_mode="HTML", reply_markup=reply_markup)
-                    status = bot.answerCallbackQuery(message["callback_query_id"])
+                    status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"])
             else:
-                status = bot.answerCallbackQuery(message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
+                status = bot.answerCallbackQuery(callback_query_id=message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
 
     elif text[1:len(prefix)+1] == prefix:
         today_data = today_in_history()
@@ -67,15 +67,15 @@ def TodayInHistory(bot, message):
             for sec in today_data[:5]:
                 msg += "<i>" + str(sec["year"]) + "年</i> - " + str(sec["title"]) + "\n\n"
             msg = "<b>历史上的今天: " + str(today_data[0]["today"]) + "</b>\n\n" + msg + "..."
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message_id, reply_markup=reply_markup)
             bot.message_deletor(60, chat_id, status["message_id"])
         else:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(chat_id=chat_id, text="获取数据失败，请重试!", parse_mode="HTML", reply_to_message_id=message_id)
             bot.message_deletor(15, chat_id, status["message_id"])
     else:
-        status = bot.sendChatAction(chat_id, "typing")
+        status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text="指令错误，请检查!", parse_mode="HTML", reply_to_message_id=message_id)
         bot.message_deletor(15, chat_id, status["message_id"])
 

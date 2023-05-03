@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2021-10-09
+last_modify: 2023-05-02
 '''
 from collections import defaultdict
 import re
@@ -50,7 +50,7 @@ def Guard(bot, message):
         if text[:len("/guardinit")] == "/guardinit":
             if str(user_id) != str(root_id):
                 msg = "抱歉，您无权操作。"
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(
                     chat_id=chat_id, text=msg, parse_mode="HTML")
                 bot.message_deletor(15, chat_id, status["message_id"])
@@ -61,7 +61,7 @@ def Guard(bot, message):
                 logging_channel = text_list[1].replace(" ", "")
                 if logging_channel[0] != "@":
                     msg = "频道用户名格式错误，请带上'@'符号。"
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(15, chat_id, status["message_id"])
@@ -74,21 +74,21 @@ def Guard(bot, message):
                             f.write(str(id))
 
                     msg = "Guard插件日志存放频道设置成功。"
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(15, chat_id, status["message_id"])
                     return
                 except:
                     msg = "Guard插件日志存放频道设置失败，请重试。"
-                    bot.sendChatAction(chat_id, "typing")
+                    bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(15, chat_id, status["message_id"])
                     return
             else:
                 msg = "指令格式错误。e.g.: /guardinit @ channel_username"
-                bot.sendChatAction(chat_id, "typing")
+                bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(
                     chat_id=chat_id, text=msg, parse_mode="HTML")
                 bot.message_deletor(15, chat_id, status["message_id"])
@@ -97,7 +97,7 @@ def Guard(bot, message):
     if not os.path.exists(bot.path_converter(plugin_dir + "Guard/config.ini")):
         print("Guard: configuration file not found.")
         msg = "要使用Guard插件请先设置日志存放频道\n请Bot管理员使用以下指令设置:\ne.g.: /guardinit @ channel_username"
-        bot.sendChatAction(chat_id, "typing")
+        bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(
             chat_id=chat_id, text=msg, parse_mode="HTML")
         bot.message_deletor(15, chat_id, status["message_id"])
@@ -147,16 +147,16 @@ def Guard(bot, message):
                 caption=msg, parse_mode="HTML", reply_markup=reply_markup)
             if status != False:
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="刷新成功")
+                    callback_query_id=message["callback_query_id"], text="刷新成功")
             else:
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="刷新失败")
+                    callback_query_id=message["callback_query_id"], text="刷新失败")
         elif result != False and "/guardcaptchatrue" in message["callback_query_data"] and result[2] == str(user_id) and result[1] == str(chat_id):
             if message["callback_query_data"] == "/guardcaptchatrue-restricted":
                 user_status = "restricted"
 
             status = bot.answerCallbackQuery(
-                message["callback_query_id"], text="正确")
+                callback_query_id=message["callback_query_id"], text="正确")
             status = bot.getChat(chat_id=chat_id)
             chat_title = status["title"]
 
@@ -170,8 +170,8 @@ def Guard(bot, message):
             rr = db.user_insert(chat_id=chat_id, user_id=user_id)
             msg = "<b><a href='tg://user?id=" + \
                 str(user_id) + "'>" + first_name + " " + last_name + \
-                "</a></b>, 欢迎加入 <b>" + str(chat_title) + "</b>。"
-            status = bot.sendChatAction(chat_id, "typing")
+                "</a></b>, 欢迎加入 <b>" + str(chat_title) + "</b>，您将在1分钟后被解除禁言，另外，前3条消息将被检测，请您慎言。"
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
 
@@ -188,7 +188,7 @@ def Guard(bot, message):
                 user_status = "restricted"
 
             status = bot.answerCallbackQuery(
-                message["callback_query_id"], text="不正确")
+                callback_query_id=message["callback_query_id"], text="不正确")
             msg = "<b><a href='tg://user?id=" + str(user_id) + "'>" + first_name + " " + last_name + \
                 "</a></b> 验证码不正确，已刷新，请于 <b>" + \
                 str((gap + result[5])-int(time.time())) + \
@@ -203,10 +203,10 @@ def Guard(bot, message):
                 caption=msg, parse_mode="HTML", reply_markup=reply_markup)
             if status != False:
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="刷新成功")
+                    callback_query_id=message["callback_query_id"], text="刷新成功")
             else:
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="刷新失败")
+                    callback_query_id=message["callback_query_id"], text="刷新失败")
 
         elif "/guardmanual" in message["callback_query_data"] and str(user_id) in admins:
             origin_user_id = message["callback_query_data"].split("-")[1]
@@ -214,7 +214,7 @@ def Guard(bot, message):
 
             if result == False: # 消息过期
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
+                    callback_query_id=message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
                 return
 
             origin_user_info = bot.getChatMember(chat_id=chat_id, user_id=origin_user_id)["user"]
@@ -231,7 +231,7 @@ def Guard(bot, message):
                 status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
 
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="放行成功")
+                    callback_query_id=message["callback_query_id"], text="放行成功")
                 status = bot.getChat(chat_id=chat_id)
                 chat_title = status["title"]
 
@@ -246,8 +246,8 @@ def Guard(bot, message):
                     str(user_id) + "'>" + first_name + " " + last_name + "</a></b>"
                 msg = "<b><a href='tg://user?id=" + \
                     str(origin_user_id) + "'>" + origin_first_name + " " + origin_last_name + \
-                    "</a></b>, 您已被管理员 " + admin_msg + " 放行。\n欢迎加入 <b>" + str(chat_title) + "</b>。"
-                status = bot.sendChatAction(chat_id, "typing")
+                    "</a></b>, 您已被管理员 " + admin_msg + " 放行。\n欢迎加入 <b>" + str(chat_title) + "</b>，您将在1分钟后被解除禁言，另外，前3条消息将被检测，请您慎言。"
+                status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(
                     chat_id=chat_id, text=msg, parse_mode="HTML")
 
@@ -262,7 +262,7 @@ def Guard(bot, message):
                 status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
 
                 status = bot.answerCallbackQuery(
-                    message["callback_query_id"], text="驱逐成功")
+                    callback_query_id=message["callback_query_id"], text="驱逐成功")
 
                 db.delete(chat_id=chat_id, user_id=origin_user_id)
                 status = bot.banChatMember(
@@ -287,10 +287,10 @@ def Guard(bot, message):
         # 防止接收来自其他插件的CallbackQuery
         elif "/guardupdatingcaptcha" in message["callback_query_data"] or "/guardcaptcha" in message["callback_query_data"]:
             status = bot.answerCallbackQuery(
-                message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
+                callback_query_id=message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
         elif "/guardmanual" in message["callback_query_data"]:
             status = bot.answerCallbackQuery(
-                message["callback_query_id"], text="想啥呢？只有管理员可以操作！", show_alert=True)
+                callback_query_id=message["callback_query_id"], text="想啥呢？只有管理员可以操作！", show_alert=True)
 
     # 兼容 Bot API version < 5.3
     elif "new_chat_members" in message.keys() or \
@@ -311,7 +311,7 @@ def Guard(bot, message):
             if str(admin_user["user"]["id"]) == str(bot_id):
                 admin_status = True
         if admin_status != True:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "权限不足，请授予删除消息及封禁用户权限以使用 Guard 插件。"
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
@@ -348,7 +348,7 @@ def Guard(bot, message):
             msg = "<b><a href='tg://user?id=" + \
                 str(user_id) + "'>" + str(user_id) + \
                 "</a></b> 的名字<b> 违规</b>，已驱逐出境。"
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML",
                 reply_markup=reply_markup)
@@ -383,7 +383,7 @@ def Guard(bot, message):
             if str(admin_user["user"]["id"]) == str(bot_id):
                 admin_status = True
         if admin_status != True:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "权限不足，请授予删除消息及封禁用户权限以使用 Guard 插件。"
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
@@ -425,7 +425,7 @@ def Guard(bot, message):
             msg = "<b><a href='tg://user?id=" + \
                 str(user_id) + "'>" + first_name + " " + last_name + \
                 "</a></b>" + " 离开了我们。"
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
 
@@ -483,7 +483,7 @@ def Guard(bot, message):
                         msg = "<b><a href='tg://user?id=" + \
                             str(user_id) + "'>" + str(user_id) + \
                             "</a></b> 的消息<b> 违规</b>，已驱逐出境。"
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(
                             chat_id=chat_id, text=msg, parse_mode="HTML",
                             reply_markup=reply_markup)
@@ -502,13 +502,13 @@ def Guard(bot, message):
 
         # 判断是否为私人对话
         if message["chat"]["type"] == "private" and text[1:len(prefix)+1] == prefix:
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(
                 chat_id, "抱歉，该指令不支持私人会话!", parse_mode="text",
                 reply_to_message_id=message_id, allow_sending_without_reply=True)
             bot.message_deletor(gap, chat_id, status["message_id"])
         elif text[1:len(prefix)+1] == prefix and count == 0:  # 菜单
-            status = bot.sendChatAction(chat_id, "typing")
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "<b>Guard 插件功能</b>\n\n" + \
                 "<b>/guardadd</b> - 新增过滤关键词，一次只能添加一个。格式：命令后接关键词，以空格作为分隔符\n" + \
                 "<b>/guardinit</b> - 设置日志存放频道，格式：/guardinit @ channel_username\n" +\
@@ -529,35 +529,35 @@ def Guard(bot, message):
                         if repl not in result:
                             with open(bot.path_converter(plugin_dir + "Guard/keywords"), "a", encoding="utf-8") as k:
                                 k.write("\n" + keyword)
-                            status = bot.sendChatAction(chat_id, "typing")
+                            status = bot.sendChatAction(chat_id=chat_id, action="typing")
                             status = bot.sendMessage(
                                 chat_id=chat_id, text="关键词添加成功!", parse_mode="text",
                                 reply_to_message_id=message["message_id"], allow_sending_without_reply=True)
                             bot.message_deletor(
                                 gap, chat_id, status["message_id"])
                         else:
-                            status = bot.sendChatAction(chat_id, "typing")
+                            status = bot.sendChatAction(chat_id=chat_id, action="typing")
                             status = bot.sendMessage(
                                 chat_id=chat_id, text="关键词已经存在于库中!", parse_mode="text",
                                 reply_to_message_id=message["message_id"], allow_sending_without_reply=True)
                             bot.message_deletor(
                                 gap, chat_id, status["message_id"])
                     elif len(keyword) > 7:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(
                             chat_id=chat_id, text="输入的关键词过长!", parse_mode="text",
                             reply_to_message_id=message["message_id"], allow_sending_without_reply=True)
                         bot.message_deletor(gap, chat_id, status["message_id"])
                     else:
-                        status = bot.sendChatAction(chat_id, "typing")
+                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(
                             chat_id=chat_id, text="您无权操作!", parse_mode="text",
                             reply_to_message_id=message["message_id"], allow_sending_without_reply=True)
                         bot.message_deletor(gap, chat_id, status["message_id"])
                 else:
-                    status = bot.sendChatAction(chat_id, "typing")
+                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(chat_id=chat_id, text="操作失败，请检查命令格式!",
-                                            parse_mode="text", reply_to_message_id=message["message_id"],
+                                            reply_to_message_id=message["message_id"],
                                             allow_sending_without_reply=True)
                     bot.message_deletor(gap, chat_id, status["message_id"])
 
@@ -694,10 +694,10 @@ def reply_markup_dict(captcha_text, user_status, user_id):
 
 
 def handle_logging(bot, content, log_group_id, user_id, chat_id, message_id, reason, handle):
-    status = bot.getChat(log_group_id)
+    status = bot.getChat(chat_id=log_group_id)
     log_chat_username = status["username"]
 
-    status = bot.getChat(chat_id)
+    status = bot.getChat(chat_id=chat_id)
     chat_username = status.get("username", "nullusername,/")
     chat_title = ""
 
