@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2023-05-02
+last_modify: 2023-05-04
 '''
 from collections import defaultdict
 import re
@@ -43,6 +43,7 @@ def Guard(bot, message):
     message_type = message["message_type"]
 
     gap = 60
+    timestamp = time.time() + 5
     db = SqliteDB(bot, plugin_dir)
 
     if message["chat"]["type"] != "private" and message_type == "text": # 初始化
@@ -54,6 +55,7 @@ def Guard(bot, message):
                 status = bot.sendMessage(
                     chat_id=chat_id, text=msg, parse_mode="HTML")
                 bot.message_deletor(15, chat_id, status["message_id"])
+                db.close()
                 return
 
             text_list = text.strip(" ").split(" ", 1)
@@ -65,6 +67,7 @@ def Guard(bot, message):
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(15, chat_id, status["message_id"])
+                    db.close()
                     return
                 try:
                     status = bot.getChat(chat_id=logging_channel)
@@ -78,6 +81,7 @@ def Guard(bot, message):
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(15, chat_id, status["message_id"])
+                    db.close()
                     return
                 except:
                     msg = "Guard插件日志存放频道设置失败，请重试。"
@@ -85,6 +89,7 @@ def Guard(bot, message):
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")
                     bot.message_deletor(15, chat_id, status["message_id"])
+                    db.close()
                     return
             else:
                 msg = "指令格式错误。e.g.: /guardinit @ channel_username"
@@ -101,15 +106,19 @@ def Guard(bot, message):
         status = bot.sendMessage(
             chat_id=chat_id, text=msg, parse_mode="HTML")
         bot.message_deletor(15, chat_id, status["message_id"])
+        db.close()
         return
 
     with open(bot.path_converter(plugin_dir + "Guard/config.ini"), "r", encoding="utf-8") as f:
         log_group_id = f.readline().strip()
 
+    if message_type == "chat_join_request_data":
+        bot.approveChatJoinRequest(chat_id=chat_id, user_id=user_id)
+
     user_status = "member"
     result = db.select(chat_id=chat_id, user_id=user_id)
-    if "reply_markup" in message.keys() and\
-        message["message_type"] == "callback_query_data" and\
+    if "reply_markup" in message.keys() and \
+        message["message_type"] == "callback_query_data" and \
         message["chat"]["type"] != "private":
 
         admins = administrators(bot=bot, chat_id=chat_id)
@@ -142,15 +151,24 @@ def Guard(bot, message):
                 user_status=user_status, user_id=user_id)
             db.update(
                 message_id=result[3], authcode=captcha_text, chat_id=chat_id, user_id=user_id)
+            media = {
+                "type": "photo",
+                "media": "attach://captcha",
+                "caption": msg,
+                "parse_mode": "HTML"
+            }
+            files = {"captcha": bytes_image}
             status = bot.editMessageMedia(
-                chat_id=chat_id, message_id=result[3], type_="photo", media=bytes_image,
-                caption=msg, parse_mode="HTML", reply_markup=reply_markup)
+                chat_id=chat_id, message_id=result[3],
+                media=media, files=files,
+                reply_markup=reply_markup)
             if status != False:
                 status = bot.answerCallbackQuery(
                     callback_query_id=message["callback_query_id"], text="刷新成功")
             else:
                 status = bot.answerCallbackQuery(
                     callback_query_id=message["callback_query_id"], text="刷新失败")
+
         elif result != False and "/guardcaptchatrue" in message["callback_query_data"] and result[2] == str(user_id) and result[1] == str(chat_id):
             if message["callback_query_data"] == "/guardcaptchatrue-restricted":
                 user_status = "restricted"
@@ -161,16 +179,18 @@ def Guard(bot, message):
             chat_title = status["title"]
 
             permissions = status.get("permissions")
+
             if user_status != "restricted":
                 status = bot.restrictChatMember(
-                    chat_id=chat_id, user_id=result[2], permissions=permissions)
+                    chat_id=chat_id, user_id=result[2],
+                    permissions=permissions, until_date=timestamp+gap+10)
 
             status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
             db.delete(chat_id=chat_id, user_id=user_id)
             rr = db.user_insert(chat_id=chat_id, user_id=user_id)
             msg = "<b><a href='tg://user?id=" + \
                 str(user_id) + "'>" + first_name + " " + last_name + \
-                "</a></b>, 欢迎加入 <b>" + str(chat_title) + "</b>，您将在1分钟后被解除禁言，另外，前3条消息将被检测，请您慎言。"
+                "</a></b>, 欢迎加入 <b>" + str(chat_title) + "</b>，前3条消息将被检测，请您慎言。"
             status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
@@ -198,9 +218,17 @@ def Guard(bot, message):
                 user_status=user_status, user_id=user_id)
             db.update(
                 message_id=result[3], authcode=captcha_text, chat_id=chat_id, user_id=user_id)
+            media = {
+                "type": "photo",
+                "media": "attach://captcha",
+                "caption": msg,
+                "parse_mode": "HTML"
+            }
+            files = {"captcha": bytes_image}
             status = bot.editMessageMedia(
-                chat_id=chat_id, message_id=result[3], type_="photo", media=bytes_image,
-                caption=msg, parse_mode="HTML", reply_markup=reply_markup)
+                chat_id=chat_id, message_id=result[3],
+                media=media, files=files,
+                reply_markup=reply_markup)
             if status != False:
                 status = bot.answerCallbackQuery(
                     callback_query_id=message["callback_query_id"], text="刷新成功")
@@ -215,6 +243,7 @@ def Guard(bot, message):
             if result == False: # 消息过期
                 status = bot.answerCallbackQuery(
                     callback_query_id=message["callback_query_id"], text="点啥点，关你啥事？", show_alert=True)
+                db.close()
                 return
 
             origin_user_info = bot.getChatMember(chat_id=chat_id, user_id=origin_user_id)["user"]
@@ -238,7 +267,8 @@ def Guard(bot, message):
                 permissions = status.get("permissions")
                 if user_status != "restricted":
                     status = bot.restrictChatMember(
-                        chat_id=chat_id, user_id=result[2], permissions=permissions)
+                        chat_id=chat_id, user_id=result[2],
+                        permissions=permissions, until_date=timestamp+gap+10)
 
                 db.delete(chat_id=chat_id, user_id=origin_user_id)
                 rr = db.user_insert(chat_id=chat_id, user_id=origin_user_id)
@@ -246,7 +276,7 @@ def Guard(bot, message):
                     str(user_id) + "'>" + first_name + " " + last_name + "</a></b>"
                 msg = "<b><a href='tg://user?id=" + \
                     str(origin_user_id) + "'>" + origin_first_name + " " + origin_last_name + \
-                    "</a></b>, 您已被管理员 " + admin_msg + " 放行。\n欢迎加入 <b>" + str(chat_title) + "</b>，您将在1分钟后被解除禁言，另外，前3条消息将被检测，请您慎言。"
+                    "</a></b>, 您已被管理员 " + admin_msg + " 放行。\n欢迎加入 <b>" + str(chat_title) + "</b>，前3条消息将被检测，请您慎言。"
                 status = bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(
                     chat_id=chat_id, text=msg, parse_mode="HTML")
@@ -266,7 +296,7 @@ def Guard(bot, message):
 
                 db.delete(chat_id=chat_id, user_id=origin_user_id)
                 status = bot.banChatMember(
-                    chat_id=chat_id, user_id=origin_user_id, until_date=35)
+                    chat_id=chat_id, user_id=origin_user_id, until_date=timestamp+90)
                 #status = bot.unbanChatMember(chat_id=chat_id, user_id=user_id)
                 admin_msg = "<b><a href='tg://user?id=" + \
                     str(user_id) + "'>" + first_name + " " + last_name + "</a></b>"
@@ -316,11 +346,14 @@ def Guard(bot, message):
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+            db.close()
             return False
 
         if new_chat_member["status"] != "restricted":
             status = bot.restrictChatMember(
-                chat_id=chat_id, user_id=user_id, permissions=restrict_permissions, until_date=gap+5)
+                chat_id=chat_id, user_id=user_id,
+                permissions=restrict_permissions,
+                until_date=timestamp+gap+10)
 
         if "first_name" in new_chat_member["user"].keys():  # Optional (first_name or last_name)
             first_name = new_chat_member["user"]["first_name"].strip()
@@ -336,9 +369,8 @@ def Guard(bot, message):
         result = DFA.filter(name_demoji, repl)
         if (repl in result and len(name) > 9) or (len(name) > 25):
             status = bot.banChatMember(
-                chat_id=chat_id, user_id=user_id, until_date=35)
-            status = bot.deleteMessage(
-                chat_id=chat_id, message_id=message_id)
+                chat_id=chat_id, user_id=user_id, until_date=timestamp+90)
+            # status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
             log_status, reply_markup = handle_logging(bot,
                 content=name, log_group_id=log_group_id,
                 user_id=user_id, chat_id=chat_id,
@@ -388,11 +420,13 @@ def Guard(bot, message):
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML")
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+            db.close()
             return False
 
         new_chat_member = message["new_chat_member"]
         req = db.user_select(
             chat_id=message["chat"]["id"], user_id=new_chat_member["user"]["id"])
+        time.sleep(2)
         if req != False:
             db.user_delete(
                 chat_id=message["chat"]["id"], user_id=new_chat_member["user"]["id"])
@@ -419,7 +453,8 @@ def Guard(bot, message):
         name_demoji = filter_emoji(name)
         result = DFA.filter(name_demoji, repl)
         if (repl in result and len(name) > 9) or (len(name) > 25):
-            status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
+            # status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
+            pass
         else:
             # status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
             msg = "<b><a href='tg://user?id=" + \
@@ -472,7 +507,7 @@ def Guard(bot, message):
                                     message_times=req[3], spam_times=req[4])
                     if (req[3] == 1 and req[4] == 1) or req[4] >= 2:
                         bot.banChatMember(
-                            chat_id=req[1], user_id=req[2], until_date=35)
+                            chat_id=req[1], user_id=req[2], until_date=timestamp+90)
                         bot.deleteMessage(
                             chat_id=req[1], message_id=message_id)
                         log_status, reply_markup = handle_logging(bot,
@@ -570,9 +605,12 @@ def Guard(bot, message):
                                             reply_to_message_id=message["message_id"],
                                             allow_sending_without_reply=True)
                     bot.message_deletor(gap, chat_id, status["message_id"])
+    
+    db.close()
 
 
 def timer_func(bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, message_id, log_group_id):
+    timestamp = time.time() + 5
     db = SqliteDB(bot, plugin_dir)
     result = db.select(chat_id=chat_id, user_id=user_id)
     if result != False and result[2] == str(user_id) != "private":
@@ -580,7 +618,7 @@ def timer_func(bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, me
             status = bot.deleteMessage(chat_id=chat_id, message_id=result[3])
             db.delete(chat_id=chat_id, user_id=user_id)
             status = bot.banChatMember(
-                chat_id=chat_id, user_id=user_id, until_date=35)
+                chat_id=chat_id, user_id=user_id, until_date=timestamp+90)
             #status = bot.unbanChatMember(chat_id=chat_id, user_id=user_id)
             msg = "<b><a href='tg://user?id=" + \
                 str(user_id) + "'>" + first_name + " " + \
@@ -595,6 +633,8 @@ def timer_func(bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, me
                 user_id=user_id, chat_id=chat_id,
                 message_id=message_id,
                 reason="人机检测", handle="拒绝入境")
+            
+    db.close()
 
 
 def administrators(bot, chat_id):
@@ -773,7 +813,7 @@ class SqliteDB(object):
         self.cursor.execute(
             "CREATE TABLE IF NOT EXISTS new_user_list (id INTEGER PRIMARY KEY autoincrement, chat_id TEXT, user_id TEXT, message_times INTEGER, spam_times INTEGER)")
 
-    def __del__(self):
+    def close(self):
         '''
         Close the connection
         '''

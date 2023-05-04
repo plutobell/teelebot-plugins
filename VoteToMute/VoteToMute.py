@@ -1,8 +1,9 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-27
-last_modify: 2023-05-02
+last_modify: 2023-05-04
 '''
+import time
 
 def VoteToMute(bot, message):
 
@@ -171,9 +172,10 @@ def handler_func(bot, prefix, chat_id, message_id,
                 'can_pin_messages':False
             }
             if question1_voter_count > question2_voter_count:
+                timestamp = time.time()
                 status = bot.restrictChatMember(chat_id=chat_id,
                     user_id=target_user_id,permissions=permissions,
-                    until_date=mute_time)
+                    until_date=timestamp+mute_time)
                 bot.deleteMessage(chat_id=chat_id, message_id=target_message_id)
                 bot.deleteMessage(chat_id=chat_id, message_id=poll_message_id)
                 msg = "投票结束，涉及消息已被删除\n<b>被举报者</b> <b><a href='tg://user?id=" + str(target_user_id) + "'>" + str(target_user_id) + "</a></b> 已被禁言\n持续时间：<b>1小时</b>"
@@ -182,9 +184,10 @@ def handler_func(bot, prefix, chat_id, message_id,
 
             elif question1_voter_count < question2_voter_count:
                 if str(user_id) not in admins:
+                    timestamp = time.time()
                     status = bot.restrictChatMember(chat_id=chat_id,
                         user_id=user_id,permissions=permissions,
-                        until_date=mute_time)
+                        until_date=timestamp+mute_time)
                     msg = "投票结束\n<b>举报发起者</b> <b><a href='tg://user?id=" + str(user_id) + "'>" + str(user_id) + "</a></b> 已被禁言\n持续时间：<b>1小时</b>"
                 else:
                     msg = "投票结束\n<b>举报被驳回</b>\n但无权处置管理员"

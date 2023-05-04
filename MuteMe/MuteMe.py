@@ -1,9 +1,10 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-03-03
-last_modify: 2023-05-02
+last_modify: 2023-05-04
 '''
 import random
+import time
 
 def MuteMe(bot, message):
     bot_id = bot.bot_id
@@ -78,9 +79,10 @@ def MuteMe(bot, message):
             bot.message_deletor(15, chat_id, status["message_id"])
             return
 
-        mute_time = random.sample(mute_packages.keys(), 1)[0]
+        mute_time = random.sample(list(mute_packages.keys()), 1)[0]
+        timestamp = time.time()
         status = bot.restrictChatMember(chat_id=chat_id, user_id=user_id,
-            permissions=permissions, until_date=str(mute_packages[mute_time]))
+            permissions=permissions, until_date=timestamp+int(mute_packages[mute_time]))
         if status != False:
             msg = "<b><a href='tg://user?id=" + str(user_id) + "'>" + \
                 name + "</a></b>，" + "恭喜您获得了 <b>" + \
@@ -94,7 +96,9 @@ def MuteMe(bot, message):
             sticker_path = bot.path_converter(bot.plugin_dir + r"MuteMe/smile/smile1.jpg")
             if mute_time == "60分钟":
                 sticker_path = bot.path_converter(bot.plugin_dir + r"MuteMe/smile/smile0.jpg")
-            bot.sendSticker(chat_id=chat_id, sticker=sticker_path,
+            sticker = None
+            with open(sticker_path, "rb") as p: sticker = p.read()
+            bot.sendSticker(chat_id=chat_id, sticker=sticker,
                 reply_to_message_id=status["message_id"])
 
 

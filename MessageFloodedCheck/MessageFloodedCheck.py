@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 @creation date: 2021-04-26
-@last modify: 2023-05-02
+@last modify: 2023-05-04
 '''
 import difflib
 import time
@@ -113,9 +113,10 @@ def MessageFloodedCheck(bot, message):
                         'can_invite_users':False,
                         'can_pin_messages':False
                     }
+                    timestamp = time.time()
                     status = bot.restrictChatMember(
                         chat_id=chat_id, user_id=user_id,
-                        permissions=permissions, until_date=mute_time * 60)
+                        permissions=permissions, until_date=timestamp+mute_time * 60)
                 bot.sendChatAction(chat_id=chat_id, action="typing")
                 status = bot.sendMessage(
                     chat_id=chat_id, text=msg, parse_mode="HTML")
@@ -166,9 +167,10 @@ def MessageFloodedCheck(bot, message):
                             'can_invite_users':False,
                             'can_pin_messages':False
                         }
+                        timestamp = time.time()
                         status = bot.restrictChatMember(
                             chat_id=chat_id, user_id=user_id,
-                            permissions=permissions, until_date=mute_time * 60)
+                            permissions=permissions, until_date=timestamp+mute_time * 60)
                     bot.sendChatAction(chat_id=chat_id, action="typing")
                     status = bot.sendMessage(
                         chat_id=chat_id, text=msg, parse_mode="HTML")

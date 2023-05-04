@@ -1,8 +1,9 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-06-04
-last_modify: 2023-05-02
+last_modify: 2023-05-04
 '''
+import time
 
 def Admin(bot, message):
     gap = 15
@@ -81,7 +82,8 @@ def Admin(bot, message):
         if str(user_id) in admins and str(chat_id) == str(target_chat_id):
             if text[1:len(prefix + command["/adminkick"])+1] == prefix + command["/adminkick"]:
                 if str(target_user_id) not in admins:
-                    status = bot.banChatMember(chat_id=chat_id, user_id=target_user_id, until_date=60)
+                    timestamp = time.time()
+                    status = bot.banChatMember(chat_id=chat_id, user_id=target_user_id, until_date=timestamp+90)
                     status_ = bot.unbanChatMember(chat_id=chat_id, user_id=target_user_id)
                     if status != False:
                         status = bot.sendChatAction(chat_id=chat_id, action="typing")
@@ -129,7 +131,11 @@ def Admin(bot, message):
                         'can_pin_messages':False
                     }
                     if text[1:].split(' ')[1] in mute_time.keys():
-                        status = bot.restrictChatMember(chat_id=chat_id, user_id=target_user_id,permissions=permissions, until_date=mute_time[text[1:].split(' ')[1]])
+                        timestamp = time.time()
+                        status = bot.restrictChatMember(
+                            chat_id=chat_id, user_id=target_user_id,
+                            permissions=permissions,
+                            until_date=timestamp+mute_time[text[1:].split(' ')[1]])
                         if status != False:
                             time_ = text[1:].split(' ')[1]
                             time_ = time_.replace("1m", "1分钟").replace("10m", "10分钟")

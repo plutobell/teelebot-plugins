@@ -1,12 +1,12 @@
 Metadata-version: 1.0
 Plugin-name: Admin
-Version: 1.0.1
+Version: 1.1.0
 Summary: Admin群管插件
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Admin, 群管
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.0.0
 Requires-dist: 
 Source: https://github.com/plutobell/teelebot-plugins
