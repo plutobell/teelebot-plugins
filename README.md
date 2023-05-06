@@ -47,3 +47,4 @@
 33. MessageRecorder - MessageRecorder插件，消息记录器，同时可生成消息词云
 33. ChatGPT - ChatGPT插件，调用 [OpenAI](https://openai.com/) API 实现的对话程序
 33. CheckGFW - CheckGFW插件，调用 [韩小韩API](https://api.vvhan.com/) 查询域名是否被墙
+33. MagnetSearcher - MagnetSearcher插件，调用 [聚磁力API](https://www.jucili.com/) 搜索磁力链接
