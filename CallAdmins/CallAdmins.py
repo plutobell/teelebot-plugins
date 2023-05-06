@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-15
-last_modify: 2020-12-14
+last modify: 2023-05-06
 '''
 import time
 
@@ -35,7 +35,7 @@ def CallAdmins(bot, message):
 
             status = bot.sendMessage(
                 chat_id=chat_id,
-                text="🤖 正在为您呼叫管理员.", 
+                text="🤖 正在为您呼叫管理员.\n\n<code>只有私聊过Bot的管理才能被呼叫</code>", 
                 parse_mode="HTML",
                 reply_to_message_id=message_id)
 
@@ -50,11 +50,11 @@ def CallAdmins(bot, message):
             chat_username = message["chat"].get("username", chat_id)
             chat_title = message["chat"]["title"]
             for i, admin in enumerate(admins):
-
+                
                 bot.editMessageText(
                     chat_id=status["chat"]["id"],
                     message_id=status["message_id"],
-                    text="🤖 正在为您呼叫管理员 <b>" + str(i+1) + "/" + str(len(admins)) + "</b>",
+                    text="🤖 正在为您呼叫管理员 <b>" + str(i+1) + "/" + str(len(admins)) + "</b>\n\n<code>只有私聊过Bot的管理才能被呼叫</code>",
                     parse_mode="HTML")
                 inlineKeyboard = [
                     [
@@ -77,7 +77,7 @@ def CallAdmins(bot, message):
                 time.sleep(1)
 
             bot.editMessageText(chat_id=status["chat"]["id"],
-            message_id=status["message_id"], text="🤖 已通知管理员.", parse_mode="HTML")
+            message_id=status["message_id"], text="🤖 已通知管理员.\n\n<code>只有私聊过Bot的管理才能被呼叫</code>", parse_mode="HTML")
         else:
             status = bot.sendMessage(
                 chat_id=chat_id,
