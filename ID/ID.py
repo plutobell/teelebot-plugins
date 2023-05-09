@@ -49,7 +49,7 @@ def ID(bot, message):
         status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
         if str(message["from"]["id"]) == root_id:
             status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
-            status = bot.sendMessage(chat_id=message["chat"]["id"], text="主人\n" + "您的用户ID为：<b><code>" + str(message["from"]["id"]) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
+            status = bot.sendMessage(chat_id=message["chat"]["id"], text="您的用户ID为：<b><code>" + str(message["from"]["id"]) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
         else:
             status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
             first_name = str(message["from"]["first_name"])
@@ -66,7 +66,7 @@ def ID(bot, message):
             if str(bot_id) != str(target_user_id):
                 if str(message["from"]["id"]) == root_id:
                     status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
-                    status = bot.sendMessage(chat_id=message["chat"]["id"], text="主人\n您查询的用户的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
+                    status = bot.sendMessage(chat_id=message["chat"]["id"], text="您查询的用户的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
                 else:
                     status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
                     first_name = str(message["from"]["first_name"])
@@ -75,7 +75,7 @@ def ID(bot, message):
             else:
                 if str(message["from"]["id"]) == root_id:
                     status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
-                    status = bot.sendMessage(chat_id=message["chat"]["id"], text="主人，我的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
+                    status = bot.sendMessage(chat_id=message["chat"]["id"], text="我的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
                 else:
                     status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
                     status = bot.sendMessage(chat_id=message["chat"]["id"], text="抱歉，您无权查询!", reply_to_message_id=message["message_id"])
@@ -93,7 +93,7 @@ def ID(bot, message):
         if str(bot_id) == str(target_user_id):
             if str(message["from"]["id"]) == root_id:
                 status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
-                status = bot.sendMessage(chat_id=message["chat"]["id"], text="主人，我的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
+                status = bot.sendMessage(chat_id=message["chat"]["id"], text="我的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
             else:
                 status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
                 status = bot.sendMessage(chat_id=message["chat"]["id"], text="抱歉，您无权查询!", reply_to_message_id=message["message_id"])
@@ -101,7 +101,7 @@ def ID(bot, message):
         else:
             if str(message["from"]["id"]) == root_id:
                 status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
-                status = bot.sendMessage(chat_id=message["chat"]["id"], text="主人\n您查询的用户的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
+                status = bot.sendMessage(chat_id=message["chat"]["id"], text="您查询的用户的ID为：<b><code>" + str(target_user_id) + "</code></b>", parse_mode="HTML", reply_to_message_id=message["message_id"])
             elif message["chat"]["id"] == target_user_id:
                 status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
                 first_name = str(message["from"]["first_name"])
