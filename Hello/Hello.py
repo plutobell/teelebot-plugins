@@ -4,8 +4,9 @@ def Hello(bot, message):
     #print("你好,世界!")
 
     photo = None
-    with open(bot.path_converter(bot.plugin_dir + "Hello/helloworld.png"), "rb") as p:
+    with open(bot.join_plugin_path("helloworld.png"), "rb") as p:
         photo = p.read()
 
     bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
-    bot.sendPhoto(chat_id=message["chat"]["id"], photo=photo, reply_to_message_id=message["message_id"])
+    bot.sendPhoto(chat_id=message["chat"]["id"], photo=photo,
+                    reply_to_message_id=message["message_id"])
