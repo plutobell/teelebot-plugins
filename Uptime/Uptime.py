@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-6-26
-last_modify: 2023-05-02
+last_modify: 2023-05-12
 '''
 import os
 from datetime import timedelta
@@ -27,6 +27,7 @@ def Uptime(bot, message):
         response_times = bot.response_times
         response_chats = len(bot.response_chats)
         response_users = len(bot.response_users)
+        installed_plugin = len(bot.plugin_bridge)
         status = bot.sendChatAction(chat_id=chat_id, action="typing")
         inlineKeyboard = [
                     [
@@ -39,13 +40,16 @@ def Uptime(bot, message):
             }
         else:
             reply_markup = None
-        msg = "<code>感谢您的关心</code> <b>(￣ε ￣)</b> \n\n<code>我已经运行 <b>" +  str(time_second) + "</b> 秒\n" +\
-                "即：<b>" + str(time_format) + "</b>\n\n" +\
-                "在此期间：\n" +\
-                "响应指令 <b>" + str(response_times) + "</b> 次\n" +\
-                "服务群组 <b>" + str(response_chats) + "</b> 个\n" +\
-                "服务用户 <b>" + str(response_users) + "</b> 名\n\n</code>" +\
+        msg = "<code>感谢您的关心</code> <b>(￣ε ￣)</b> \n\n<code>我已运行 <b>" +  str(time_second) + "</b> 秒\n" + \
+                "即：<b>" + str(time_format) + "</b>\n\n" + \
+                "我的状态如下:\n" + \
+                "响应指令: <b>" + str(response_times) + "</b> 次\n" + \
+                "服务用户: <b>" + str(response_users) + "</b> 位\n" + \
+                "服务群组: <b>" + str(response_chats) + "</b> 个\n" + \
+                "安装插件: <b>" + str(installed_plugin) + "</b> 个\n\n</code>" + \
                 "<code>v" + str(VERSION) + "</code>"
 
-        status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML", reply_to_message_id=message_id, reply_markup=reply_markup)
-        bot.message_deletor(15, chat_id, status["message_id"])
+        status = bot.sendMessage(
+            chat_id=chat_id, text=msg, parse_mode="HTML",
+            reply_to_message_id=message_id, reply_markup=reply_markup)
+        bot.message_deletor(30, chat_id, status["message_id"])
