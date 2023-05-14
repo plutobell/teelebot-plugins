@@ -2,7 +2,7 @@
 """
 @description: Plugin Management Tools
 @creation date: 2021-06-23
-@last modification: 2023-05-13
+@last modification: 2023-05-15
 @author: Pluto (github.com/plutobell)
 """
 import os
@@ -950,27 +950,18 @@ def get_metadata(bot, plugin_dir, plugin_name, bot_version):
             ])
 
     plugin_metadata_dict = {}
-    ok, data = bot.metadata.read(plugin_name=plugin_name)
+    ok, data = bot.metadata.read(plugin_name=plugin_name, plugin_dir=plugin_dir)
     if ok:
         plugin_metadata_dict = data
-    # with open(metadata_path, "r", encoding="UTF-8") as metadata:
-    #     lines = metadata.readlines()
-
-    #     for line in lines:
-    #         line_list = line.strip("\n").strip(" ").split(":", 1)
-    #         if len(line_list) == 2:
-    #             plugin_metadata_dict[line_list[0].replace(" ", "")] = line_list[1].strip(" ")
-    #         elif len(line_list) == 1:
-    #             plugin_metadata_dict[line_list[0].replace(" ", "")] = ""
 
     if "Source" not in plugin_metadata_dict.keys():
         plugin_metadata_dict["Source"] = ""
-        bot.metadata.write(plugin_name=plugin_name, metadata=plugin_metadata_dict)
-        # with open(metadata_path, "w", encoding="UTF-8") as metadata:
-        #     write_list = []
-        #     for key, value in plugin_metadata_dict.items():
-        #         write_list.append(key + ": " + value + "\n")
-        #     metadata.writelines(write_list)
+        bot.metadata.write(
+            plugin_name=plugin_name,
+            metadata=plugin_metadata_dict,
+            plugin_dir=plugin_dir
+        )
+
     ok, data = bot.metadata.template()
     if len(plugin_metadata_dict) == len(data) and \
         "None" not in plugin_metadata_dict.keys():
