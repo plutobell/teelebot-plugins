@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 @creation date: 2021-04-26
-@last modify: 2023-05-04
+@last modify: 2023-05-12
 '''
 import difflib
 import time
@@ -20,8 +20,9 @@ def MessageFloodedCheck(bot, message):
     chat_type = message["chat"]["type"]
 
     prefix = ""
-    with open(bot.path_converter(bot.plugin_dir + "MessageFloodedCheck/__init__.py"), "r", encoding="utf-8") as init:
-        prefix = init.readline()[1:].strip()
+    ok, metadata = bot.metadata.read()
+    if ok:
+        prefix = metadata.get("Command", "")
 
     admins = []
     if chat_type == "private": #判断是否为私人对话

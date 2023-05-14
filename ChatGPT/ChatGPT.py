@@ -2,7 +2,7 @@
 # Program: ChatGPT
 # Description: ChatGPT Chat Plugin
 # Creation: 2023-03-11
-# Last modification: 2023-05-02
+# Last modification: 2023-05-12
 
 import openai
 import logging

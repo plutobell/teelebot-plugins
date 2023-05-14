@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: ID
-Version: 1.0.2
-Summary: 获取用户ID或者群组ID
+Command: /id
+Buffer-permissions: False:False
+Version: 1.1.0
+Summary: 获取用户ID或群组ID，获取群组ID请使用 /idchat
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: ID
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: 
 Source: https://github.com/plutobell/teelebot-plugins

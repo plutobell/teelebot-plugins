@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: Bing
-Version: 1.0.1
-Summary: Bing插件，获取每日必应壁纸
+Command: /bing
+Buffer-permissions: False:False
+Version: 1.1.0
+Summary: 获取必应壁纸 获取当日:/bing 随机获取:/bing rand 指定日期:/bing 20201024 自动更新:/bing update
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Bing, 必应
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins

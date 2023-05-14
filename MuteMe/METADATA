@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: MuteMe
-Version: 1.1.0
-Summary: 我禁我自己插件
+Command: /muteme
+Buffer-permissions: False:False
+Version: 1.2.0
+Summary: 随机获取禁言礼包(1min~15min、30min、60min)
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: MuteMe, 禁言
-Requires-teelebot: >=2.0.0
+Requires-teelebot: >=2.3.0
 Requires-dist: 
 Source: https://github.com/plutobell/teelebot-plugins

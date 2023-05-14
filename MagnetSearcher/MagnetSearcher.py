@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 # @creation: 2023-05-05
-# @modification: 2023-05-06
+# @modification: 2023-05-12
 import time
 from random import choice
 
@@ -15,9 +15,9 @@ def MagnetSearcher(bot, message):
     chat_type = message["chat"]["type"]
 
     prefix = ""
-    with open(bot.path_converter(bot.plugin_dir + "MagnetSearcher/__init__.py"), "r",
-            encoding="utf-8") as init:
-        prefix = init.readline()[1:].strip()
+    ok, metadata = bot.metadata.read()
+    if ok:
+        prefix = metadata.get("Command", "")
 
     if message_type not in ["text", "callback_query_data"] or \
         chat_type == "channel": return

@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: Firefoxmoniter
-Version: 1.1.0
-Summary: 通过Firfox Moniter搜索电子邮件泄漏情况
+Command: /scan
+Buffer-permissions: False:False
+Version: 1.2.0
+Summary: (格式: 命令后接email地址,以空格作为分隔符)调用Firefox Moniter,搜索自2007年起的公开数据外泄事件当中,是否包含您的电子邮件地址。
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Firefoxmoniter, email, breach, data
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: requests, bs4
 Source: https://github.com/plutobell/teelebot-plugins

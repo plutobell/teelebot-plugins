@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: CallAdmins
-Version: 1.0.2
-Summary: CallAdmins插件，在群组中呼叫管理员
+Command: /110
+Buffer-permissions: False:False
+Version: 1.1.0
+Summary: 一键呼叫群组管理员 指令格式: /110 reason
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: CallAdmins, 呼叫
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: 
 Source: https://github.com/plutobell/teelebot-plugins

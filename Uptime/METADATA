@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: Uptime
-Version: 1.1.0
-Summary: 获取Bot运行状态
+Command: /uptime
+Buffer-permissions: False:False
+Version: 1.2.0
+Summary: 查看Bot运行状态
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Uptime, Bot, 运行状态
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: 
 Source: https://github.com/plutobell/teelebot-plugins

@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: PaperFinder
-Version: 1.0.2
-Summary: arXiv论文检索器
+Command: /paper
+Buffer-permissions: False:False
+Version: 1.1.0
+Summary: 论文检索器, 在arXiv中检索论文
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: arXiv, Paper, 论文
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins

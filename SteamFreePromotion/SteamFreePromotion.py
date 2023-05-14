@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 """
 @Creation: 2021-05-30
-@Last modify: 2023-05-02
+@Last modify: 2023-05-12
 """
 import re
 import requests
@@ -18,8 +18,9 @@ def SteamFreePromotion(bot, message):
     message_id = message["message_id"]
 
     prefix = ""
-    with open(bot.path_converter(bot.plugin_dir + "SteamFreePromotion/__init__.py"), "r", encoding="utf-8") as init:
-        prefix = init.readline()[1:].strip()
+    ok, metadata = bot.metadata.read()
+    if ok:
+        prefix = metadata.get("Command", "")
 
     with open(bot.path_converter(bot.plugin_dir + "SteamFreePromotion/steam_logo.png"), "rb") as p:
         photo = p.read()

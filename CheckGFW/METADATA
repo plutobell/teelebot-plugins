@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: CheckGFW
-Version: 1.0.1
-Summary: 被墙检测插件
+Command: /gfw
+Buffer-permissions: False:False
+Version: 1.1.0
+Summary: 查询域名是否被墙
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3 
 Keywords: check, GFW, blocked, 被墙, 墙, 检测
-Requires-teelebot: >=1.23.0
+Requires-teelebot: >=2.3.0
 Requires-dist: requests, validators
 Source: https://github.com/plutobell/teelebot-plugins

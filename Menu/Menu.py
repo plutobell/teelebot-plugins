@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2019-8-15
-last_modify: 2023-05-02
+last_modify: 2023-05-12
 '''
 import os
 
@@ -62,7 +62,7 @@ def Menu(bot, message):
         if callback_query_data[:len(page_callback_command)] == page_callback_command:
             if click_user_id == from_user_id:
                 page = int(callback_query_data.split('=')[1])
-                page, menu_str = menu_text(bot, plugin_dir=plugin_dir, page=page, page_total=page_total, page_size=page_size, plugin_list=plugin_list)
+                page, menu_str = menu_text(bot, page=page, page_total=page_total, page_size=page_size, plugin_list=plugin_list)
                 previous_page = page - 1
                 if previous_page < 1:
                     previous_page = 1
@@ -125,14 +125,14 @@ def Menu(bot, message):
             "inline_keyboard": inlineKeyboard
         }
 
-        page, menu_str = menu_text(bot=bot, plugin_dir=plugin_dir, page=page, page_total=page_total, page_size=page_size, plugin_list=plugin_list)
+        page, menu_str = menu_text(bot=bot, page=page, page_total=page_total, page_size=page_size, plugin_list=plugin_list)
 
         status = bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text=menu_str, parse_mode="HTML", reply_to_message_id=message_id, reply_markup=reply_markup)
 
         bot.message_deletor(wait_time, message["chat"]["id"], status["message_id"])
 
-def menu_text(bot, plugin_dir, page, page_total, page_size, plugin_list):
+def menu_text(bot, page, page_total, page_size, plugin_list):
     VERSION = bot.version
     if page < 1:
         page = 1
@@ -144,15 +144,12 @@ def menu_text(bot, plugin_dir, page, page_total, page_size, plugin_list):
         plugin_range = range(page*page_size-page_size, page*page_size-1+1)
         for i, plugin in enumerate(plugin_list): #(now_page*page_size-page_size,now_page*page_size-1)
             if i in plugin_range:
-                with open(bot.path_converter(plugin_dir + plugin + r"/__init__.py"), encoding="utf-8") as f:
-                    line_1 = ""
-                    line_2 = ""
-                    for i in range(2):
-                        if i == 0:
-                            line_1 = f.readline().strip()[1:]
-                        elif i == 1:
-                            line_2 = f.readline().strip()[1:]
-                    menu_str += "<b>" + line_1 + "</b> - " + line_2 + "\n\n"
+                ok, data = bot.metadata.read(plugin_name=plugin)
+                # print(ok, data)
+                if ok:
+                    menu_str += "<b>" + data["Command"] + "</b> - <b>" + data["Plugin-name"] + "</b>: " + data["Summary"] + "\n\n"
+                else:
+                    continue
         menu_str = "<b>插件列表 [" + str(page) + "/" + str(page_total) + "]</b>\n\n" + menu_str + "\n<code>v" + VERSION + "</code>"
 
         return page, menu_str

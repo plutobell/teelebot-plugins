@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: Chat
-Version: 1.0.1
+Command: @
+Buffer-permissions: False:False
+Version: 1.1.0
 Summary: 人工智障在线陪聊
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Chat, Bot, 聊天
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins

@@ -8,8 +8,9 @@ def Whois(bot, message):
     txt_message_id = 0
 
     prefix = ""
-    with open(bot.path_converter(bot.plugin_dir + "Whois/__init__.py"), "r", encoding="utf-8") as init:
-        prefix = init.readline()[1:].strip()
+    ok, metadata = bot.metadata.read()
+    if ok:
+        prefix = metadata.get("Command", "")
 
     if text[:len(prefix)] == prefix:
         if len(text.split(' ')) == 2:

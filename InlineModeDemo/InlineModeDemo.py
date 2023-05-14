@@ -1,14 +1,15 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-09-09
-last_modification: 2023-05-02
+last_modification: 2023-05-12
 '''
 
 def InlineModeDemo(bot, message):
 
     prefix = ""
-    with open(bot.path_converter(bot.plugin_dir + "InlineModeDemo/__init__.py"), "r", encoding="utf-8") as init:
-        prefix = init.readline()[1:].strip()
+    ok, metadata = bot.metadata.read()
+    if ok:
+        prefix = metadata.get("Command", "")
 
     results = [
         {

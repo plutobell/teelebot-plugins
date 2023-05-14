@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: MusicDownload
-Version: 1.0.1
-Summary: 音乐下载插件
+Command: /musicd
+Buffer-permissions: False:False
+Version: 1.1.0
+Summary: 根据音乐ID下载网易云、QQ、百度的音乐 指令格式:/musicd app uid (app只能是wy, qq, bd)
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: MusicDownload, 音乐下载
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins

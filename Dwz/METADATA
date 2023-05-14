@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: Dwz
-Version: 1.1.1
-Summary: 短网址生成插件
+Command: /dwz
+Buffer-permissions: False:False
+Version: 1.2.0
+Summary: 生成短网址。格式：命令后接网址，以空格作为分隔符（网址需带协议头）
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Dwz, 短网址
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins

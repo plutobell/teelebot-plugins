@@ -1,12 +1,16 @@
 # -*- coding:utf-8 -*-
+import re
 import requests
 from bs4 import BeautifulSoup
 
 def Firefoxmoniter(bot, message):
-    plugin_dir = bot.plugin_dir
-    with open(bot.path_converter(plugin_dir + "Firefoxmoniter/__init__.py"), encoding="utf-8") as f:
-        h = f.readline()[1:]
-    if len(message["text"]) < len(h):
+    command = ""
+    ok, metadata = bot.metadata.read()
+    if ok:
+        command = metadata.get("Command", "")
+    email = message["text"][len(command):]
+    email = email.strip()
+    if email in [None, "", " "]:
         status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
         status = bot.sendMessage(
             chat_id=message["chat"]["id"],
@@ -16,13 +20,7 @@ def Firefoxmoniter(bot, message):
         )
         bot.message_deletor(15, message["chat"]["id"], status["message_id"])
         return False
-    email = message["text"][len(h)-1:]
-    email = email.strip()
-    if all([ '@' in email, '.' in email.split('@')[1] ]):
-        pass
-        # ehash = hashlib.sha1(email.encode("utf-8")) #经测试由sha1加密
-        # emailhash = ehash.hexdigest()
-    else:
+    if not is_valid_email(email):
         status = bot.sendChatAction(chat_id=message["chat"]["id"], action="typing")
         status = bot.sendMessage(
             chat_id=message["chat"]["id"],
@@ -163,3 +161,11 @@ def Firefoxmoniter(bot, message):
             bot.message_deletor(15, message["chat"]["id"], status["message_id"])
 
 
+
+
+def is_valid_email(email):
+    regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+    if re.fullmatch(regex, email):
+        return True
+    else:
+        return False

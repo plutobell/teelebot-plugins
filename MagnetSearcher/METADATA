@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: MagnetSearcher
-Version: 1.0.0
+Command: /bt
+Buffer-permissions: False:False
+Version: 1.1.0
 Summary: 磁力链接搜索
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3 
 Keywords: 磁力, 磁力链接, 搜索, Magnet, Search
-Requires-teelebot: >=2.0.1
+Requires-teelebot: >=2.3.0
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins 

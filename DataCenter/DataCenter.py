@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-08-07
-last_modification: 2023-05-02
+last_modification: 2023-05-12
 '''
 import os
 import requests
@@ -35,8 +35,9 @@ def DataCenter(bot, message):
     chat_type = message["chat"]["type"]
 
     prefix = ""
-    with open(bot.path_converter(bot.plugin_dir + "DataCenter/__init__.py"), "r", encoding="utf-8") as init:
-        prefix = init.readline()[1:].strip()
+    ok, metadata = bot.metadata.read()
+    if ok:
+        prefix = metadata.get("Command", "")
 
     if "reply_to_message" in message.keys() and \
         chat_type != "private":

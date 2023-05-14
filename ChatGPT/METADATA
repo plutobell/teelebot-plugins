@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: ChatGPT
-Version: 1.1.1
-Summary: ChatGPT聊天
+Command: 
+Buffer-permissions: False:False
+Version: 1.2.0
+Summary: ChatGPT 人工智能在线陪聊
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Chat, Bot, 聊天, ChatGPT
-Requires-teelebot: >=1.21.0
+Requires-teelebot: >=2.3.0
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins

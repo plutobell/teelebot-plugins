@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: PluginCTL
-Version: 1.0.2
-Summary: 插件控制插件
+Command: /pluginctl
+Buffer-permissions: False:False
+Version: 1.1.0
+Summary: 插件控制插件，在群聊中控制插件开关
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: PluginCTL, 插件控制, 插件开关
-Requires-teelebot: >=1.17.0
+Requires-teelebot: >=2.3.0
 Requires-dist: 
 Source: https://github.com/plutobell/teelebot-plugins

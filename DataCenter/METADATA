@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: DataCenter
-Version: 1.2.1
+Command: /dc
+Buffer-permissions: False:False
+Version: 1.3.0
 Summary: 获取账号所在数据中心
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: DataCenter, 数据中心
-Requires-teelebot: >=1.23.1
+Requires-teelebot: >=2.3.0
 Requires-dist: requests, bs4
 Source: https://github.com/plutobell/teelebot-plugins

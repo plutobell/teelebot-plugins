@@ -2,7 +2,7 @@
 """
 @description: Plugin Management Tools
 @creation date: 2021-06-23
-@last modification: 2023-05-02
+@last modification: 2023-05-13
 @author: Pluto (github.com/plutobell)
 """
 import os
@@ -32,8 +32,9 @@ def PluginManagementTools(bot, message):
         text = message["text"]
 
     prefix = ""
-    with open(bot.path_converter(bot.plugin_dir + "PluginManagementTools/__init__.py"), "r", encoding="utf-8") as init:
-        prefix = init.readline()[1:].strip()
+    ok, metadata = bot.metadata.read()
+    if ok:
+        prefix = metadata.get("Command", "")
 
     if str(user_id) != str(root_id):
         msg = "无权限。"
@@ -341,7 +342,7 @@ def PluginManagementTools(bot, message):
 
             all_can_upgrade_plugins = []
             for label in sources_info_dict.keys():
-                can_upgrade_plugins = checking_plugins_can_upgrade(
+                can_upgrade_plugins = checking_plugins_can_upgrade(bot, 
                     plugins=plugin_bridge.keys(), plugin_dir=plugin_dir,
                     sources_cache_path=sources_cache_path, label=label,
                     source_url=sources_dict[label], bot_version=version)
@@ -490,9 +491,9 @@ def PluginManagementTools(bot, message):
                             source_plugin_list.append(item)
 
                     if plugin_name in plugin_bridge.keys():
-                        ok, metadata = get_metadata(plugin_dir, plugin_name, version)
+                        ok, metadata = get_metadata(bot, plugin_dir, plugin_name, version)
                     elif plugin_name in source_plugin_list:
-                        ok, metadata = get_metadata(
+                        ok, metadata = get_metadata(bot,
                             sources_cache_path + os.sep + label + os.sep,
                             plugin_name, version)
                     else:
@@ -612,7 +613,7 @@ def PluginManagementTools(bot, message):
                         bot.editMessageText(chat_id=chat_id,
                             message_id=update_msg_id, text="<code>"+msg+"</code>", parse_mode="HTML")
                     else:
-                        ok, metadata = get_metadata(plugin_dir, plugin_name, version)
+                        ok, metadata = get_metadata(bot, plugin_dir, plugin_name, version)
 
                         if ok and label is None:
                             for source_label, url in sources_dict.items():
@@ -682,7 +683,7 @@ def PluginManagementTools(bot, message):
         elif command == "list":
             msg = "已安装 "+ str(len(plugin_bridge.keys())) +" 个插件:\n"
             for i, plugin in enumerate(sorted(plugin_bridge.keys())):
-                ok, metadata = get_metadata(plugin_dir, plugin, version)
+                ok, metadata = get_metadata(bot, plugin_dir, plugin, version)
                 if ok:
                     label = ""
                     for label_tmp, url in sources_dict.items():
@@ -729,7 +730,7 @@ def PluginManagementTools(bot, message):
                             source_plugin_list.append(item)
 
                     for plugin in source_plugin_list:
-                        ok, metadata = get_metadata(
+                        ok, metadata = get_metadata(bot, 
                             sources_cache_path + os.sep + search_label + os.sep,
                             plugin, version)
                         if ok:
@@ -746,7 +747,7 @@ def PluginManagementTools(bot, message):
                                 }
 
                                 if plugin in plugin_bridge.keys():
-                                    ok, metadata = get_metadata(plugin_dir, plugin, version)
+                                    ok, metadata = get_metadata(bot, plugin_dir, plugin, version)
                                     if ok:
                                         if sources_dict[search_label].strip(os.sep) == metadata["Source"].strip(os.sep) \
                                             and search_result[search_label + "/" + plugin]["Source"] not in ["", None] \
@@ -832,9 +833,9 @@ def PluginManagementTools(bot, message):
                         return
 
                 if label is None:
-                    ok, metadata = get_metadata(plugin_dir, plugin_name, version)
+                    ok, metadata = get_metadata(bot, plugin_dir, plugin_name, version)
                 else:
-                    ok, metadata = get_metadata(
+                    ok, metadata = get_metadata(bot, 
                         sources_cache_path + os.sep + label + os.sep,
                         plugin_name, version)
 
@@ -851,6 +852,8 @@ def PluginManagementTools(bot, message):
                     metadata.pop("Metadata-version")
                     metadata.pop("Source")
                     metadata.pop("Keywords")
+                    metadata.pop("Command")
+                    metadata.pop("Buffer-permissions")
 
                     if label is not None:
                         msg = "源 "+ label +" 中的 " + plugin_name + " 插件的信息如下:\n\n"
@@ -902,15 +905,15 @@ def return_source_plugins(sources_cache_path, label):
 
     return source_plugins
 
-def checking_plugins_can_upgrade(plugins, plugin_dir, sources_cache_path, label, source_url, bot_version):
+def checking_plugins_can_upgrade(bot, plugins, plugin_dir, sources_cache_path, label, source_url, bot_version):
     source_plugins = return_source_plugins(sources_cache_path, label)
 
     can_upgrade_plugins = []
     for plugin in plugins:
         plugin_info = {}
         if plugin in source_plugins:
-            old_ok, old_metadata_dict = get_metadata(plugin_dir, plugin, bot_version)
-            new_ok, new_metadata_dict = get_metadata(sources_cache_path + os.sep + label + os.sep, plugin, bot_version)
+            old_ok, old_metadata_dict = get_metadata(bot, plugin_dir, plugin, bot_version)
+            new_ok, new_metadata_dict = get_metadata(bot, sources_cache_path + os.sep + label + os.sep, plugin, bot_version)
             if old_ok and new_ok:
                 if old_metadata_dict["Version"] != new_metadata_dict["Version"]:
                     if old_metadata_dict["Source"].strip(os.sep) == \
@@ -923,15 +926,17 @@ def checking_plugins_can_upgrade(plugins, plugin_dir, sources_cache_path, label,
 
     return can_upgrade_plugins
 
-def get_metadata(plugin_dir, plugin_name, bot_version):
-    '''Metadata-version: 1.0
+def get_metadata(bot, plugin_dir, plugin_name, bot_version):
+    '''Metadata-version: 1.1
     '''
     metadata_path = plugin_dir + plugin_name + os.sep + "METADATA"
     if not os.path.exists(metadata_path):
         with open(metadata_path, "w", encoding='utf-8') as metadata:
             metadata.writelines([
-                "Metadata-version: 1.0\n",
+                "Metadata-version: 1.1\n",
                 "Plugin-name: " + plugin_name + "\n",
+                "Command: /" + plugin_name.lower() + "\n",
+                "Buffer-permissions: False:False\n",
                 "Version: 0.1.0\n",
                 "Summary: \n",
                 "Home-page: \n",
@@ -945,25 +950,29 @@ def get_metadata(plugin_dir, plugin_name, bot_version):
             ])
 
     plugin_metadata_dict = {}
-    with open(metadata_path, "r", encoding="UTF-8") as metadata:
-        lines = metadata.readlines()
+    ok, data = bot.metadata.read(plugin_name=plugin_name)
+    if ok:
+        plugin_metadata_dict = data
+    # with open(metadata_path, "r", encoding="UTF-8") as metadata:
+    #     lines = metadata.readlines()
 
-        for line in lines:
-            line_list = line.strip("\n").strip(" ").split(":", 1)
-            if len(line_list) == 2:
-                plugin_metadata_dict[line_list[0].replace(" ", "")] = line_list[1].strip(" ")
-            elif len(line_list) == 1:
-                plugin_metadata_dict[line_list[0].replace(" ", "")] = ""
+    #     for line in lines:
+    #         line_list = line.strip("\n").strip(" ").split(":", 1)
+    #         if len(line_list) == 2:
+    #             plugin_metadata_dict[line_list[0].replace(" ", "")] = line_list[1].strip(" ")
+    #         elif len(line_list) == 1:
+    #             plugin_metadata_dict[line_list[0].replace(" ", "")] = ""
 
     if "Source" not in plugin_metadata_dict.keys():
         plugin_metadata_dict["Source"] = ""
-        with open(metadata_path, "w", encoding="UTF-8") as metadata:
-            write_list = []
-            for key, value in plugin_metadata_dict.items():
-                write_list.append(key + ": " + value + "\n")
-            metadata.writelines(write_list)
-
-    if len(plugin_metadata_dict) == 12 and \
+        bot.metadata.write(plugin_name=plugin_name, metadata=plugin_metadata_dict)
+        # with open(metadata_path, "w", encoding="UTF-8") as metadata:
+        #     write_list = []
+        #     for key, value in plugin_metadata_dict.items():
+        #         write_list.append(key + ": " + value + "\n")
+        #     metadata.writelines(write_list)
+    ok, data = bot.metadata.template()
+    if len(plugin_metadata_dict) == len(data) and \
         "None" not in plugin_metadata_dict.keys():
         return True, plugin_metadata_dict
     else:

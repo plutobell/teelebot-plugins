@@ -15,8 +15,9 @@ def CheckGFW(bot, message):
         admins = chat_admin_list(bot=bot, chat_id=chat_id)
 
     prefix = ""
-    with open(bot.path_converter(bot.plugin_dir + "CheckGFW/__init__.py"), "r", encoding="utf-8") as init:
-        prefix = init.readline()[1:].strip()
+    ok, metadata = bot.metadata.read()
+    if ok:
+        prefix = metadata.get("Command", "")
 
     if text[:len(prefix)] == prefix:
         if len(text.split(' ')) == 2:

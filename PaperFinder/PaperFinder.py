@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2021-06-06
-last_modify: 2023-05-02
+last_modify: 2023-05-12
 '''
 try:
     import xml.etree.cElementTree as ET
@@ -22,8 +22,9 @@ def PaperFinder(bot, message):
         return
 
     prefix = ""
-    with open(bot.path_converter(bot.plugin_dir + "PaperFinder/__init__.py"), "r", encoding="utf-8") as init:
-        prefix = init.readline()[1:].strip()
+    ok, metadata = bot.metadata.read()
+    if ok:
+        prefix = metadata.get("Command", "")
 
     page_size = 10
 

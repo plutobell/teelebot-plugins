@@ -1,12 +1,14 @@
-Metadata-version: 1.0
+Metadata-version: 1.1
 Plugin-name: Qrcode
-Version: 1.1.1
-Summary: 二维码生成插件
+Command: /qrcode
+Buffer-permissions: False:False
+Version: 1.2.0
+Summary: 调用Google API生成二维码 (格式：命令后接数据，以空格作为分隔符。)
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Qrcode, 二维码
-Requires-teelebot: >=1.23.1
+Requires-teelebot: >=2.3.0
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins
