@@ -9,6 +9,6 @@ Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: pmt, Plugin, Management, 插件安装, 插件卸载
-Requires-teelebot: >=2.3.0
+Requires-teelebot: >=2.3.1
 Requires-dist: requests
 Source: https://github.com/plutobell/teelebot-plugins
