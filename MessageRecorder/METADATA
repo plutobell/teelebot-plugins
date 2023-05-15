@@ -2,7 +2,7 @@ Metadata-version: 1.1
 Plugin-name: MessageRecorder
 Command: 
 Buffer-permissions: False:False
-Version: 1.1.0
+Version: 1.1.1
 Summary: 消息记录器，同时可生成消息词云 (/mrwc /mrgwc /mron /mroff default to off.)
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)

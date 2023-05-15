@@ -33,16 +33,15 @@ def ChatGPT(bot, message):
     if "entities" in message.keys():
         entities = message.get("entities")
         for e in entities:
-            match e["type"]:
-                case "mention":
-                    e_offset = int(e["offset"])
-                    e_length = int(e["length"])
-                    mention_username = text[e_offset:e_offset+e_length]
-                    # print(mention_username, bot_username)
-                    if mention_username == "@"+bot_username:
-                        is_mention = True
-                case "bot_command":
-                    is_bot_command = True
+            if e["type"] == "mention":
+                e_offset = int(e["offset"])
+                e_length = int(e["length"])
+                mention_username = text[e_offset:e_offset+e_length]
+                # print(mention_username, bot_username)
+                if mention_username == "@"+bot_username:
+                    is_mention = True
+            elif e["type"] == "bot_command":
+                is_bot_command = True
     
     if is_bot_command:
         return

@@ -248,13 +248,13 @@ def MessageRecorder(bot, message):
     if int(activation_status) == 0:
         return
 
-    match str(message_type):
-        case "text":
-            content = message.get("text", "")
-        case "sticker":
-            content = message.get(str(message_type), {}).get("file_unique_id", "")
-        case _:
-            content = ""
+
+    if str(message_type) == "text":
+        content = message.get("text", "")
+    elif str(message_type) == "sticker":
+        content = message.get(str(message_type), {}).get("file_unique_id", "")
+    else:
+        content = ""
     data = {
         "userid": str(user_id),
         "type": str(message_type),

@@ -2,7 +2,7 @@ Metadata-version: 1.1
 Plugin-name: ChatGPT
 Command: 
 Buffer-permissions: False:False
-Version: 1.2.0
+Version: 1.2.1
 Summary: ChatGPT 人工智能在线陪聊
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
