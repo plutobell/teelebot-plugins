@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-06-04
-last_modify: 2023-05-12
+last_modify: 2023-05-15
 '''
 import time
 
@@ -130,7 +130,8 @@ def Admin(bot, message):
                         'can_invite_users':False,
                         'can_pin_messages':False
                     }
-                    if text[1:].split(' ')[1] in mute_time.keys():
+                    if len(text[1:].split(' ')) == 2 and \
+                        text[1:].split(' ')[1] in mute_time.keys():
                         timestamp = time.time()
                         status = bot.restrictChatMember(
                             chat_id=chat_id, user_id=target_user_id,
