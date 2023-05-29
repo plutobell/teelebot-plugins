@@ -2,7 +2,7 @@ Metadata-version: 1.1
 Plugin-name: Acg
 Command: /acg
 Buffer-permissions: False:False
-Version: 1.1.0
+Version: 1.2.0
 Summary: 随机获取一张ACG图片
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)

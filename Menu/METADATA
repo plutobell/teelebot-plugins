@@ -2,7 +2,7 @@ Metadata-version: 1.1
 Plugin-name: Menu
 Command: /start
 Buffer-permissions: False:False
-Version: 1.1.0
+Version: 1.2.0
 Summary: 自动生成的插件菜单
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)

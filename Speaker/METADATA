@@ -2,7 +2,7 @@ Metadata-version: 1.1
 Plugin-name: Speaker
 Command: /speaker
 Buffer-permissions: False:False
-Version: 1.1.0
+Version: 1.2.0
 Summary: 群发消息至Bot存在的群组，目前仅支持文本类
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)

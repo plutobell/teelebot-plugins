@@ -2,7 +2,7 @@ Metadata-version: 1.1
 Plugin-name: IPinfo
 Command: /ipinfo
 Buffer-permissions: False:False
-Version: 1.1.0
+Version: 1.2.0
 Summary: 获取IP信息 (格式：命令后接IP地址，以空格作为分隔符。)
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)

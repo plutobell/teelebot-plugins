@@ -2,7 +2,7 @@ Metadata-version: 1.1
 Plugin-name: MagnetSearcher
 Command: /bt
 Buffer-permissions: False:False
-Version: 1.1.0
+Version: 1.2.0
 Summary: 磁力链接搜索
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)

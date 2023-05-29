@@ -5,7 +5,7 @@
 '''
 import difflib
 import time
-from langconv import Converter
+from .langconv import Converter
 
 def MessageFloodedCheck(bot, message):
 
