@@ -5,6 +5,40 @@ import sqlite3
 import requests
 import datetime
 
+def Init(bot):
+    if not os.path.exists(bot.path_converter(bot.plugin_dir + "Bing/uid.txt")):
+        msg = ""
+        with open(bot.path_converter(bot.plugin_dir + "Bing/uid.txt"), "w", encoding="utf-8") as s:
+            ok, uid = bot.schedule.add(86520, update_func, (bot, bot.plugin_dir))
+            if ok:
+                s.write(uid)
+                # print("成功开启自动更新\n周期性任务池标识为: " + str(uid))
+            else:
+                if uid == "Full":
+                    # print("周期性任务队列已满.")
+                    pass
+                else:
+                    # print("遇到错误. \n\n " + uid)
+                    pass
+    else:
+        uid = ""
+        with open(bot.path_converter(bot.plugin_dir + "Bing/uid.txt"), "r", encoding="utf-8") as s:
+            uid = s.read().strip()
+        ok, uid = bot.schedule.find(uid)
+        if ok:
+            # print("任务存在于周期性任务池中\n标识为: " + str(uid))
+            pass
+        else:
+            with open(bot.path_converter(bot.plugin_dir + "Bing/uid.txt"), "w", encoding="utf-8") as s:
+                ok, uid = bot.schedule.add(86520, update_func, (bot, bot.plugin_dir))
+                if ok:
+                    s.write(uid)
+                    # print("成功开启自动更新\n周期性任务池标识为: " + str(uid))
+                else:
+                    # print("无法开启自动更新.")
+                    pass
+
+
 def Bing(bot, message):
     prefix = "bing"
     text = message["text"]
