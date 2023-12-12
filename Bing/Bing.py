@@ -12,31 +12,25 @@ def Init(bot):
             ok, uid = bot.schedule.add(86520, update_func, (bot, bot.plugin_dir))
             if ok:
                 s.write(uid)
-                # print("成功开启自动更新\n周期性任务池标识为: " + str(uid))
             else:
                 if uid == "Full":
-                    # print("周期性任务队列已满.")
-                    pass
+                    raise Exception("周期性任务队列已满.")
                 else:
-                    # print("遇到错误. \n\n " + uid)
-                    pass
+                    raise Exception("遇到错误. \n\n " + uid)
     else:
         uid = ""
         with open(bot.path_converter(bot.plugin_dir + "Bing/uid.txt"), "r", encoding="utf-8") as s:
             uid = s.read().strip()
         ok, uid = bot.schedule.find(uid)
         if ok:
-            # print("任务存在于周期性任务池中\n标识为: " + str(uid))
-            pass
-        else:
-            with open(bot.path_converter(bot.plugin_dir + "Bing/uid.txt"), "w", encoding="utf-8") as s:
-                ok, uid = bot.schedule.add(86520, update_func, (bot, bot.plugin_dir))
-                if ok:
-                    s.write(uid)
-                    # print("成功开启自动更新\n周期性任务池标识为: " + str(uid))
-                else:
-                    # print("无法开启自动更新.")
-                    pass
+            bot.schedule.delete(uid)
+
+        with open(bot.path_converter(bot.plugin_dir + "Bing/uid.txt"), "w", encoding="utf-8") as s:
+            ok, uid = bot.schedule.add(86520, update_func, (bot, bot.plugin_dir))
+            if ok:
+                s.write(uid)
+            else:
+                raise Exception("无法开启自动更新.")
 
 
 def Bing(bot, message):
