@@ -2,7 +2,7 @@
 # Program: Reminder
 # Description: Reminder Plugin
 # Creation: 2023-12-11
-# Last modification: 2023-12-12
+# Last modification: 2023-12-14
 
 import os
 import time
@@ -56,6 +56,8 @@ def Reminder(bot, message):
         f'{command}del': ["删除提醒事项", _del],
         f'{command}clear': ["清空事项列表", _clear],
         f'{command}show': ["显示提醒事项列表", _show],
+        f'{command}status': ["显示统计信息", _status],
+        f'{command}register': ["手动注册周期性任务池", _register],
     }
 
     text = message.get("text", "").strip()
@@ -245,13 +247,95 @@ def _show(db, bot, chat_id, user_id, message_id, chat_type, text, subcommand):
         bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
                         reply_to_message_id=message_id)
-        bot.message_deletor(10 * (len(req[1])+1), chat_id, status["message_id"])
+        bot.message_deletor(10 * (len(req[1])+1), status["chat"]["id"], status["message_id"])
     except Exception as e:
         print(e)
         bot.sendChatAction(chat_id=chat_id, action="typing")
         bot.sendMessage(chat_id=chat_id, text="获取列表失败", parse_mode="HTML",
                         reply_to_message_id=message_id)
 
+def _status(db, bot, chat_id, user_id, message_id, chat_type, text, subcommand):
+    try:
+        req = db.query_reminders()
+        if not req[0]:
+            bot.sendChatAction(chat_id=chat_id, action="typing")
+            bot.sendMessage(chat_id=chat_id, text=f"获取统计信息失败", parse_mode="HTML",
+                            reply_to_message_id=message_id)
+            return
+        
+        register_status = "未注册"
+        uid = ""
+        if os.path.exists(bot.join_plugin_path("uid.txt")):
+            with open(bot.join_plugin_path("uid.txt"), "r", encoding="utf-8") as s:
+                uid = s.read().strip()
+            ok, uid = bot.schedule.find(uid)
+            if ok:
+                register_status = "已注册"
+            else:
+                uid = ""
+
+        users = []
+        for reminder in req[1]:
+            userid = reminder[1]
+            if userid not in list(users):
+                users.append(userid)
+
+        reminder_counts = len(req[1])
+        user_counts = len(users)
+        now_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+        msg = f"<b>Reminder 统计信息</b>\n\n"
+        msg += f'<code>用户数量: {user_counts} 位</code>\n'
+        msg += f'<code>事项条数: {reminder_counts} 条</code>\n'
+        msg += f'<code>任务池注册状态: {register_status}</code>\n'
+        msg += f'<code>任务池标识: </code><code>{uid}</code>\n\n'
+        msg += f'<code>查询时间: {now_time}</code>\n'
+
+        bot.sendChatAction(chat_id=chat_id, action="typing")
+        status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
+                        reply_to_message_id=message_id)
+        bot.message_deletor(60, status["chat"]["id"], status["message_id"])
+    except Exception as e:
+        print(e)
+        bot.sendChatAction(chat_id=chat_id, action="typing")
+        bot.sendMessage(chat_id=chat_id, text="获取统计信息失败", parse_mode="HTML",
+                        reply_to_message_id=message_id)
+
+def _register(db, bot, chat_id, user_id, message_id, chat_type, text, subcommand):
+    if not os.path.exists(bot.join_plugin_path("uid.txt")):
+        msg = ""
+        with open(bot.join_plugin_path("uid.txt"), "w", encoding="utf-8") as s:
+            ok, uid = bot.schedule.add(60, reminder_func, (bot,))
+            if ok:
+                s.write(uid)
+                msg = "注册成功\n周期性任务池标识为: <code>" + str(uid) + "</code>"
+            else:
+                if uid == "Full":
+                    msg = "周期性任务队列已满."
+                else:
+                    msg = "遇到错误. \n\n <i>" + uid + "</i>"
+        status = bot.sendMessage(chat_id=chat_id, text=msg, parse_mode="HTML",
+            reply_to_message_id=message_id)
+        bot.message_deletor(60, status["chat"]["id"], status["message_id"])
+    else:
+        uid = ""
+        msg = ""
+        with open(bot.join_plugin_path("uid.txt"), "r", encoding="utf-8") as s:
+            uid = s.read().strip()
+        ok, uid = bot.schedule.find(uid)
+        if ok:
+            msg = "任务存在于周期性任务池中\n标识为: <code>" + str(uid) + "</code>"
+        else:
+            with open(bot.join_plugin_path("uid.txt"), "w", encoding="utf-8") as s:
+                ok, uid = bot.schedule.add(60, reminder_func, (bot,))
+                if ok:
+                    s.write(uid)
+                    msg = "注册成功\n周期性任务池标识为: <code>" + str(uid) + "</code>"
+                else:
+                    msg = "无法注册."
+        status = bot.sendMessage(chat_id=chat_id, text=msg,
+            parse_mode="HTML", reply_to_message_id=message_id)
+        bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
 def is_valid_datetime(date_string, format_string="%Y-%m-%d %H:%M:%S"):
     try:
