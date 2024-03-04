@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 @creation date: 2021-04-26
-@last modify: 2023-05-12
+@last modify: 2024-03-04
 '''
 import difflib
 import time
@@ -46,18 +46,24 @@ def MessageFloodedCheck(bot, message):
         if "caption" not in message.keys():
             return
 
-    ok, buf = bot.buffer.read()
-    buf.setdefault(str(chat_id), {}).setdefault(str(user_id), {})
+    ok, buf = bot.buffer.select(idx=0)
+    data = {}
+    if ok and len(buf) == 1:
+        data = buf[0]["data"]
+    else:
+        bot.buffer.insert(data={"data": data})
+    data.setdefault(str(chat_id), {}).setdefault(str(user_id), {})
+    # print(data)
     if ok:
-        chat_record_messages = buf[str(chat_id)] # 清除群组范围内的无效数据
+        chat_record_messages = data[str(chat_id)] # 清除群组范围内的无效数据
         for user_id, value in dict(chat_record_messages).items():
             timestamp_ = value.setdefault("timestamp", int(time.time()))
             if (int(time.time()) - timestamp_) > 60:
-                buf[str(chat_id)].pop(str(user_id))
+                data[str(chat_id)].pop(str(user_id))
 
-        buf[str(chat_id)].setdefault(str(user_id), {})
-        record_messages = buf[str(chat_id)][str(user_id)].setdefault("record_messages", {})
-        timestamp = buf[str(chat_id)][str(user_id)].setdefault("timestamp", int(time.time()))
+        data[str(chat_id)].setdefault(str(user_id), {})
+        record_messages = data[str(chat_id)][str(user_id)].setdefault("record_messages", {})
+        timestamp = data[str(chat_id)][str(user_id)].setdefault("timestamp", int(time.time()))
 
         message_text = ""
         if message_type == "text":
@@ -131,9 +137,9 @@ def MessageFloodedCheck(bot, message):
                 timestamp = int(time.time())
                 record_messages = {}
 
-                buf[str(chat_id)][str(user_id)]["record_messages"] = record_messages
-                buf[str(chat_id)][str(user_id)]["timestamp"] = timestamp
-                ok, _ = bot.buffer.write(buf)
+                data[str(chat_id)][str(user_id)]["record_messages"] = record_messages
+                data[str(chat_id)][str(user_id)]["timestamp"] = timestamp
+                ok, _ = bot.buffer.update(idx=0, data={"data": data})
                 return
 
             for msg_dict in list(no_repeat_msg_repeat_ids.values()):
@@ -189,9 +195,9 @@ def MessageFloodedCheck(bot, message):
             timestamp = int(time.time())
             record_messages = {}
 
-        buf[str(chat_id)][str(user_id)]["record_messages"] = record_messages
-        buf[str(chat_id)][str(user_id)]["timestamp"] = timestamp
-        ok, _ = bot.buffer.write(buf)
+        data[str(chat_id)][str(user_id)]["record_messages"] = record_messages
+        data[str(chat_id)][str(user_id)]["timestamp"] = timestamp
+        ok, _ = bot.buffer.update(idx=0, data={"data": data})
 
 
 def string_similar(str1, str2):

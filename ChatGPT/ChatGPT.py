@@ -2,14 +2,14 @@
 # Program: ChatGPT
 # Description: ChatGPT Chat Plugin
 # Creation: 2023-03-11
-# Last modification: 2023-05-12
+# Last modification: 2024-03-04
 
 import openai
 import logging
 import requests
-from time import sleep
 
 logging.getLogger("openai").setLevel(logging.CRITICAL)
+logging.getLogger("httpx").setLevel(logging.CRITICAL)
 requests.adapters.DEFAULT_RETRIES = 5
 
 def ChatGPT(bot, message):
@@ -64,13 +64,17 @@ def ChatGPT(bot, message):
 
             try:
                 conf_path = bot.path_converter(bot.plugin_dir + "ChatGPT/config.ini")
-                ok, user_messages = bot.buffer.read()
+                user_messages = {}
+                ok, buf = bot.buffer.select(idx=0)
+                if ok and len(buf) == 1:
+                    user_messages = buf[0]["user_messages"]
+                else:
+                    bot.buffer.insert(data={"user_messages": user_messages})
                 # print(user_messages)
-                if not ok: user_messages = {}
                 ai = ChatAI(conf_path=conf_path, user_messages=user_messages)
                 msg = ai.chat(message=text, uid=chat_id)
                 msg = msg.replace("`", "", -1)
-                bot.buffer.write(buffer=ai.user_messages)
+                bot.buffer.update(idx=0, data={"user_messages": ai.user_messages})
                 bot.sendChatAction(chat_id=chat_id, action="typing")
                 bot.sendMessage(chat_id=chat_id,text=msg, reply_to_message_id=message_id)
             except Exception as e:
@@ -101,7 +105,8 @@ class ChatAI:
                 self.__session_cap = 16
                 openai.proxy = ""
                 self.__bot_setting = ""
-
+        
+        self.__client = openai.OpenAI(api_key=openai.api_key)
         self.user_messages = user_messages
         self.__bot_setting_message = {"role": "system", "content": self.__bot_setting}
 
@@ -116,11 +121,11 @@ class ChatAI:
             self.user_messages[str(uid)].pop(1)
         self.user_messages[str(uid)].append({"role": "user", "content": user_msg})
 
-        response = openai.ChatCompletion.create(
+        completion = self.__client.chat.completions.create(
         model=self.__model,
         messages=self.user_messages[str(uid)])
-        
-        assistant_req = response["choices"][0]["message"]["content"]
+
+        assistant_req = completion.choices[0].message.content
         if len(self.user_messages[str(uid)]) > self.__session_cap:
             self.user_messages[str(uid)].pop(1)
         self.user_messages[str(uid)].append({"role": "assistant", "content": assistant_req})
