@@ -45,7 +45,8 @@
 32. PaperFinder - PaperFinder插件，论文检索器，在 [arXiv](https://arxiv.org) 中检索论文
 33. DataCenter - DataCenter插件，获取账号所在数据中心
 34. MessageRecorder - MessageRecorder插件，消息记录器，同时可生成消息词云
-35. ChatGPT - ChatGPT插件，调用 [OpenAI](https://openai.com/) API 实现的对话程序
+35. ChatGPT - ChatGPT插件，调用 [OpenAI](https://openai.com/) API 实现的对话插件
 36. CheckGFW - CheckGFW插件，调用 [韩小韩API](https://api.vvhan.com/) 查询域名是否被墙
 37. MagnetSearcher - MagnetSearcher插件，调用 [聚磁力API](https://www.jucili.com/) 搜索磁力链接
 38. Reminder - Reminder插件，提醒事项管理
+39. WorkersAIChat - WorkersAIChat插件，调用 [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/) API 实现的对话插件

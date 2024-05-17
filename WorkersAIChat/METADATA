@@ -1,0 +1,14 @@
+Metadata-version: 1.1
+Plugin-name: WorkersAIChat
+Command: 
+Buffer-permissions: False:False
+Version: 1.0.0
+Summary: 基于 Cloudflare Workers AI 对话模型的聊天插件
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: Chat, Bot, 聊天, Cloudflare, Workers, AI
+Requires-teelebot: >=2.5.3
+Requires-dist: requests
+Source: https://github.com/plutobell/teelebot-plugins
