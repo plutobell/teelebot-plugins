@@ -2,7 +2,7 @@
 # Program: Reminder
 # Description: Reminder Plugin
 # Creation: 2023-12-11
-# Last modification: 2023-12-14
+# Last modification: 2024-05-17
 
 import os
 import time
@@ -382,10 +382,9 @@ def reminder_func(bot):
             req = db.modify_reminder(reminder_id=id, new_status="reminded")
         
         if is_expiring:
-            bot.sendChatAction(chat_id=user_id, action="typing")
-            bot.sendMessage(chat_id=user_id, text=msg, parse_mode="HTML")
+            bot.sendChatAction(run_in_thread=True, chat_id=user_id, action="typing")
+            bot.sendMessage(run_in_thread=True, chat_id=user_id, text=msg, parse_mode="HTML")
 
-        time.sleep(0.3)
 
 class ReminderDB:
     def __init__(self, db_name):
