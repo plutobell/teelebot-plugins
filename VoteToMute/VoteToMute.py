@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-11-27
-last_modify: 2023-05-12
+last_modify: 2024-05-18
 '''
 import time
 
@@ -81,7 +81,7 @@ def VoteToMute(bot, message):
             poll_message_id = status["message_id"]
             poll_id = status["poll"]["id"]
 
-            bot.timer(vote_time, handler_func, args=(bot, prefix, chat_id,
+            bot.timer(vote_time, handler_func, (bot, prefix, chat_id,
                 vote_message_id,target_message_id, poll_message_id,
                 poll_id, click_user_id, target_user_id, admins, mute_time))
 
@@ -139,7 +139,7 @@ def VoteToMute(bot, message):
             poll_message_id = status["message_id"]
             poll_id = status["poll"]["id"]
 
-            bot.timer(vote_time, handler_func, args=(bot, prefix, chat_id,
+            bot.timer(vote_time, handler_func, (bot, prefix, chat_id,
                 message_id,target_message_id, poll_message_id,
                 poll_id, user_id, target_user_id, admins, mute_time))
     else:
