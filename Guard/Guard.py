@@ -1,14 +1,14 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2023-05-12
+last_modify: 2025-05-06
 '''
-from collections import defaultdict
 import re
 import os
 import string
 import sqlite3
 import time
+import requests
 from random import shuffle, randint
 from threading import Timer
 from captcha.image import ImageCaptcha
@@ -28,15 +28,12 @@ restrict_permissions = {
 
 def Guard(bot, message):
 
-    if message["chat"]["type"] == "channel":
+    if message["chat"]["type"] == "channel" or message["chat"]["type"] == "private":
         return
 
     bot_id = bot.bot_id
     root_id = bot.root_id
     plugin_dir = bot.plugin_dir
-    repl = "<*>"
-    DFA = DFAFilter()
-    DFA.parse(bot.path_converter(plugin_dir + "Guard/keywords"))
     message_id = message["message_id"]
     chat_id = message["chat"]["id"]
     user_id = message["from"]["id"]
@@ -46,62 +43,9 @@ def Guard(bot, message):
     timestamp = time.time() + 5
     db = SqliteDB(bot, plugin_dir)
 
-    if message["chat"]["type"] != "private" and message_type == "text": # 初始化
-        text = message["text"]
-        if text[:len("/guardinit")] == "/guardinit":
-            if str(user_id) != str(root_id):
-                msg = "抱歉，您无权操作。"
-                bot.sendChatAction(chat_id=chat_id, action="typing")
-                status = bot.sendMessage(
-                    chat_id=chat_id, text=msg, parse_mode="HTML")
-                bot.message_deletor(15, chat_id, status["message_id"])
-                db.close()
-                return
-
-            text_list = text.strip(" ").split(" ", 1)
-            if len(text_list) == 2:
-                logging_channel = text_list[1].replace(" ", "")
-                if logging_channel[0] != "@":
-                    msg = "频道用户名格式错误，请带上'@'符号。"
-                    bot.sendChatAction(chat_id=chat_id, action="typing")
-                    status = bot.sendMessage(
-                        chat_id=chat_id, text=msg, parse_mode="HTML")
-                    bot.message_deletor(15, chat_id, status["message_id"])
-                    db.close()
-                    return
-                try:
-                    status = bot.getChat(chat_id=logging_channel)
-                    if status != False:
-                        id = status["id"]
-                        with open(bot.path_converter(plugin_dir + "Guard/config.ini"), "w", encoding="utf-8") as f:
-                            f.write(str(id))
-
-                    msg = "Guard插件日志存放频道设置成功。"
-                    bot.sendChatAction(chat_id=chat_id, action="typing")
-                    status = bot.sendMessage(
-                        chat_id=chat_id, text=msg, parse_mode="HTML")
-                    bot.message_deletor(15, chat_id, status["message_id"])
-                    db.close()
-                    return
-                except:
-                    msg = "Guard插件日志存放频道设置失败，请重试。"
-                    bot.sendChatAction(chat_id=chat_id, action="typing")
-                    status = bot.sendMessage(
-                        chat_id=chat_id, text=msg, parse_mode="HTML")
-                    bot.message_deletor(15, chat_id, status["message_id"])
-                    db.close()
-                    return
-            else:
-                msg = "指令格式错误。e.g.: /guardinit @ channel_username"
-                bot.sendChatAction(chat_id=chat_id, action="typing")
-                status = bot.sendMessage(
-                    chat_id=chat_id, text=msg, parse_mode="HTML")
-                bot.message_deletor(15, chat_id, status["message_id"])
-                return
-
     if not os.path.exists(bot.path_converter(plugin_dir + "Guard/config.ini")):
         print("Guard: configuration file not found.")
-        msg = "要使用Guard插件请先设置日志存放频道\n请Bot管理员使用以下指令设置:\ne.g.: /guardinit @ channel_username"
+        msg = "要使用 Guard 插件，请bot管理员先设置 config.ini 文件。"
         bot.sendChatAction(chat_id=chat_id, action="typing")
         status = bot.sendMessage(
             chat_id=chat_id, text=msg, parse_mode="HTML")
@@ -109,8 +53,21 @@ def Guard(bot, message):
         db.close()
         return
 
-    with open(bot.path_converter(plugin_dir + "Guard/config.ini"), "r", encoding="utf-8") as f:
-        log_group_id = f.readline().strip()
+    with open(bot.join_plugin_path("config.ini"), "r", encoding="utf-8") as conf:
+        lines = conf.readlines()
+        if len(lines) >= 4:
+            ACCOUNT_ID = lines[0].strip()
+            AUTH_TOKEN = lines[1].strip()
+            MODEL = lines[2].strip()
+            LOG_GROUP_ID = lines[3].strip()
+        else:
+            status = bot.sendChatAction(chat_id=chat_id, action="typing")
+            msg = "要使用 Guard 插件，请bot管理员先设置 config.ini 文件。"
+            status = bot.sendMessage(
+                chat_id=chat_id, text=msg, parse_mode="HTML")
+            bot.message_deletor(30, status["chat"]["id"], status["message_id"])
+            db.close()
+            return False
 
     if message_type == "chat_join_request_data":
         bot.approveChatJoinRequest(chat_id=chat_id, user_id=user_id)
@@ -198,7 +155,7 @@ def Guard(bot, message):
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
             log_status, reply_markup = handle_logging(bot,
-                content=None, log_group_id=log_group_id,
+                content=None, log_group_id=LOG_GROUP_ID,
                 user_id=user_id, chat_id=chat_id,
                 message_id=message_id,
                 reason="人机检测", handle="准许入境")
@@ -284,7 +241,7 @@ def Guard(bot, message):
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
                 log_status, reply_markup = handle_logging(bot,
-                    content="由管理员 " + admin_msg + " 放行", log_group_id=log_group_id,
+                    content="由管理员 " + admin_msg + " 放行", log_group_id=LOG_GROUP_ID,
                     user_id=origin_user_id, chat_id=chat_id,
                     message_id=message_id,
                     reason="人机检测", handle="准许入境")
@@ -309,7 +266,7 @@ def Guard(bot, message):
                 bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
                 log_status, reply_markup = handle_logging(bot,
-                    content="由管理员 " + admin_msg + " 驱逐", log_group_id=log_group_id,
+                    content="由管理员 " + admin_msg + " 驱逐", log_group_id=LOG_GROUP_ID,
                     user_id=origin_user_id, chat_id=chat_id,
                     message_id=message_id,
                     reason="人机检测", handle="拒绝入境")
@@ -366,13 +323,14 @@ def Guard(bot, message):
         name = str(first_name + last_name).strip()
         #print("New Member：", user_id, first_name)
         name_demoji = filter_emoji(name)
-        result = DFA.filter(name_demoji, repl)
-        if (repl in result and len(name) > 9) or (len(name) > 25):
+        is_spam = isSpamMessage(
+            ACCOUNT_ID=ACCOUNT_ID, AUTH_TOKEN=AUTH_TOKEN,  message=name_demoji, MODEL=MODEL)
+        if is_spam == "yes":
             status = bot.banChatMember(
                 chat_id=chat_id, user_id=user_id, until_date=timestamp+90)
             # status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
             log_status, reply_markup = handle_logging(bot,
-                content=name, log_group_id=log_group_id,
+                content=name, log_group_id=LOG_GROUP_ID,
                 user_id=user_id, chat_id=chat_id,
                 message_id=message_id,
                 reason="名字违规", handle="驱逐出境")
@@ -402,7 +360,7 @@ def Guard(bot, message):
             db.insert(chat_id=chat_id, user_id=user_id,
                         message_id=status["message_id"], authcode=captcha_text)
             timer = Timer(
-                gap + 1, timer_func, args=[bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, message_id, log_group_id])
+                gap + 1, timer_func, args=[bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, message_id, LOG_GROUP_ID])
             timer.start()
 
     # 离群
@@ -451,8 +409,10 @@ def Guard(bot, message):
         name = str(first_name + last_name).strip()
 
         name_demoji = filter_emoji(name)
-        result = DFA.filter(name_demoji, repl)
-        if (repl in result and len(name) > 9) or (len(name) > 25):
+        is_spam = isSpamMessage(
+            ACCOUNT_ID=ACCOUNT_ID, AUTH_TOKEN=AUTH_TOKEN,
+            message=name_demoji, MODEL=MODEL)
+        if is_spam == "yes":
             # status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
             pass
         else:
@@ -472,28 +432,21 @@ def Guard(bot, message):
             text += message["text"]
         if "caption" in message.keys():
             text += message["caption"]
-        prefix = "guard"
         gap = 15
-
-        command = {
-            "/guardadd": "add"
-        }
-        count = 0
-        for c in command.keys():
-            if c in str(text):
-                count += 1
 
         if message["chat"]["type"] != "private":  # 监测群链接广告
             req = db.user_select(chat_id, user_id)
             if req != False:
                 req = list(req)
-                if req[3] < 3:
+                if req[3] < 2: # 监测前三条消息
                     req[3] += 1
                     db.user_update(chat_id=chat_id, user_id=user_id,
                                 message_times=req[3], spam_times=req[4])
                     text_demoji = filter_emoji(text.strip())
-                    result = DFA.filter(text_demoji, repl)
-                    if (repl in result and len(text) > 9) or (len(text) > 200):
+                    is_spam = isSpamMessage(
+                        ACCOUNT_ID=ACCOUNT_ID, AUTH_TOKEN=AUTH_TOKEN,
+                        message=text_demoji, MODEL=MODEL)
+                    if is_spam == "yes":
                         req[4] += 2
                         db.user_update(chat_id=chat_id, user_id=user_id,
                                     message_times=req[3], spam_times=req[4])
@@ -511,7 +464,7 @@ def Guard(bot, message):
                         bot.deleteMessage(
                             chat_id=req[1], message_id=message_id)
                         log_status, reply_markup = handle_logging(bot,
-                            content=text, log_group_id=log_group_id,
+                            content=text, log_group_id=LOG_GROUP_ID,
                             user_id=user_id, chat_id=chat_id,
                             message_id=message_id,
                             reason="消息违规", handle="驱逐出境")
@@ -527,89 +480,15 @@ def Guard(bot, message):
                 else:
                     db.user_delete(chat_id, user_id)
 
-        if count > 0 or text[1:len(prefix)+1] == prefix:  # 在命令列表则删除用户指令
-            bot.message_deletor(gap, chat_id, message_id)
-
         if message["chat"]["type"] != "private":
             admins = administrators(bot=bot, chat_id=chat_id)
             if str(root_id) not in admins:
                 admins.append(str(root_id))  # root permission
 
-        # 判断是否为私人对话
-        if message["chat"]["type"] == "private" and text[1:len(prefix)+1] == prefix:
-            status = bot.sendChatAction(chat_id=chat_id, action="typing")
-            status = bot.sendMessage(
-                chat_id=chat_id,
-                text="抱歉，该指令不支持私人会话!",
-                reply_to_message_id=message_id,
-                allow_sending_without_reply=True)
-            bot.message_deletor(gap, chat_id, status["message_id"])
-        elif text[1:len(prefix)+1] == prefix and count == 0:  # 菜单
-            status = bot.sendChatAction(chat_id=chat_id, action="typing")
-            msg = "<b>Guard 插件功能</b>\n\n" + \
-                "<b>/guardadd</b> - 新增过滤关键词，一次只能添加一个。格式：命令后接关键词，以空格作为分隔符\n" + \
-                "<b>/guardinit</b> - 设置日志存放频道，格式：/guardinit @ channel_username\n" +\
-                "\n"
-            status = bot.sendMessage(
-                chat_id=chat_id, text=msg, parse_mode="HTML",
-                reply_to_message_id=message["message_id"], allow_sending_without_reply=True)
-
-            bot.message_deletor(30, chat_id, status["message_id"])
-        elif count > 0:
-            if text[1:len(prefix + command["/guardadd"])+1] == prefix + command["/guardadd"]:
-                if len(text.split(' ')) == 2:
-                    keyword = (text.split(' ')[1]).strip()
-                    keyword_demoji = filter_emoji(keyword)
-                    # if str(user_id) in admins and len(keyword) <= 7:
-                    if str(user_id) == str(root_id) and len(keyword) <= 7:
-                        result = DFA.filter(keyword_demoji, repl)
-                        if repl not in result:
-                            with open(bot.path_converter(plugin_dir + "Guard/keywords"), "a", encoding="utf-8") as k:
-                                k.write("\n" + keyword)
-                            status = bot.sendChatAction(chat_id=chat_id, action="typing")
-                            status = bot.sendMessage(
-                                chat_id=chat_id,
-                                text="关键词添加成功!",
-                                reply_to_message_id=message["message_id"],
-                                allow_sending_without_reply=True)
-                            bot.message_deletor(
-                                gap, chat_id, status["message_id"])
-                        else:
-                            status = bot.sendChatAction(chat_id=chat_id, action="typing")
-                            status = bot.sendMessage(
-                                chat_id=chat_id,
-                                text="关键词已经存在于库中!",
-                                reply_to_message_id=message["message_id"],
-                                allow_sending_without_reply=True)
-                            bot.message_deletor(
-                                gap, chat_id, status["message_id"])
-                    elif len(keyword) > 7:
-                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
-                        status = bot.sendMessage(
-                            chat_id=chat_id,
-                            text="输入的关键词过长!",
-                            reply_to_message_id=message["message_id"],
-                            allow_sending_without_reply=True)
-                        bot.message_deletor(gap, chat_id, status["message_id"])
-                    else:
-                        status = bot.sendChatAction(chat_id=chat_id, action="typing")
-                        status = bot.sendMessage(
-                            chat_id=chat_id,
-                            text="您无权操作!",
-                            reply_to_message_id=message["message_id"],
-                            allow_sending_without_reply=True)
-                        bot.message_deletor(gap, chat_id, status["message_id"])
-                else:
-                    status = bot.sendChatAction(chat_id=chat_id, action="typing")
-                    status = bot.sendMessage(chat_id=chat_id, text="操作失败，请检查命令格式!",
-                                            reply_to_message_id=message["message_id"],
-                                            allow_sending_without_reply=True)
-                    bot.message_deletor(gap, chat_id, status["message_id"])
-    
     db.close()
 
 
-def timer_func(bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, message_id, log_group_id):
+def timer_func(bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, message_id, LOG_GROUP_ID):
     timestamp = time.time() + 5
     db = SqliteDB(bot, plugin_dir)
     result = db.select(chat_id=chat_id, user_id=user_id)
@@ -629,7 +508,7 @@ def timer_func(bot, plugin_dir, gap, chat_id, user_id, first_name, last_name, me
             bot.message_deletor(30, status["chat"]["id"], status["message_id"])
 
             log_status, reply_markup = handle_logging(bot,
-                content=None, log_group_id=log_group_id,
+                content=None, log_group_id=LOG_GROUP_ID,
                 user_id=user_id, chat_id=chat_id,
                 message_id=message_id,
                 reason="人机检测", handle="拒绝入境")
@@ -931,82 +810,39 @@ class SqliteDB(object):
             return False
 
 
-class DFAFilter():
+def isSpamMessage(ACCOUNT_ID: str, AUTH_TOKEN: str, message: str,
+                    MODEL="@cf/qwen/qwen1.5-7b-chat-awq") -> str:
+    url = f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/{MODEL}"
+    headers = {
+        "Authorization": f"Bearer {AUTH_TOKEN}",
+        "Content-Type": "application/json"
+    }
 
-    '''Filter Messages from keywords
+    system_prompt = (
+        "你是一个垃圾消息分类助手。你只回答 'yes' 或 'no'，用于判断用户在群聊中发送的消息是否为垃圾信息"
+        "（如广告、刷屏、钓鱼链接、骚扰等）。不要输出其他内容。"
+    )
 
-    Use DFA to keep algorithm perform constantly
+    user_prompt = f"内容：{message}\n请用 yes 或 no 回答，这是否是垃圾信息？"
 
-    >>> f = DFAFilter()
-    >>> f.add("sexy")
-    >>> f.filter("hello sexy baby")
-    hello **** baby
-    '''
+    payload = {
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+    }
 
-    def __init__(self):
-        self.keyword_chains = {}
-        self.delimit = '\x00'
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        result = response.json()
+        # print(result)
+        ai_reply = result["result"]["response"].strip().lower()
 
-    def add(self, keyword):
-        if not isinstance(keyword, str):
-            keyword = keyword.decode('utf-8')
-        keyword = keyword.lower()
-        chars = keyword.strip()
-        if not chars:
-            return
-        level = self.keyword_chains
-        for i in range(len(chars)):
-            if chars[i] in level:
-                level = level[chars[i]]
-            else:
-                if not isinstance(level, dict):
-                    break
-                for j in range(i, len(chars)):
-                    level[chars[j]] = {}
-                    last_level, last_char = level, chars[j]
-                    level = level[chars[j]]
-                last_level[last_char] = {self.delimit: 0}
-                break
-        if i == len(chars) - 1:
-            level[self.delimit] = 0
+        if ai_reply.startswith("yes") or ai_reply.startswith("是"):
+            return "yes"
+        return "no"
 
-    def parse(self, path):
-        with open(path, encoding='UTF-8') as f:
-            for keyword in f:
-                self.add(keyword.strip())
-
-    def filter(self, message, repl="*"):
-        if not isinstance(message, str):
-            message = message.decode('utf-8')
-        message = message.lower()
-        ret = []
-        start = 0
-        while start < len(message):
-            level = self.keyword_chains
-            step_ins = 0
-            for char in message[start:]:
-                if char in level:
-                    step_ins += 1
-                    if self.delimit not in level[char]:
-                        level = level[char]
-                    else:
-                        ret.append(repl * step_ins)
-                        start += step_ins - 1
-                        break
-                else:
-                    ret.append(message[start])
-                    break
-            else:
-                ret.append(message[start])
-            start += 1
-
-        return ''.join(ret)
-
-
-if __name__ == "__main__":
-    gl = DFAFilter()
-    gl.parse("keywords")
-    import time
-    t = time.time()
-    print(gl.filter("免费出售", "*"))
-    print(time.time() - t)
+    except Exception as e:
+        print("AI 判断失败：", e)
+        return "no"

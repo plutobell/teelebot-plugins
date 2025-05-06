@@ -1,1 +1,4 @@
+<your cloudflare account id>
+<your cloudflare WorkersAI token>
+@cf/qwen/qwen1.5-7b-chat-awq
 <your log group ID>
