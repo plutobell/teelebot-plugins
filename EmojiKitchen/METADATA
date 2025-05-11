@@ -1,0 +1,14 @@
+Metadata-version: 1.1
+Plugin-name: EmojiKitchen
+Command: /emk
+Buffer-permissions: False:False
+Version: 1.0.0
+Summary: Emoji Kitchen 插件，组合两个emoji来制作贴纸
+Home-page: https://github.com/plutobell/teelebot
+Author: Pluto (github.com/plutobell)
+Author-email: hi#ojoll.com (#==@)
+License: GPLv3
+Keywords: EmojiKitchen, Emoji, Kitchen
+Requires-teelebot: >=2.5.3
+Requires-dist: requests
+Source: https://github.com/plutobell/teelebot-plugins
