@@ -45,3 +45,4 @@
 37. MagnetSearcher - MagnetSearcher插件，调用 [聚磁力API](https://www.jucili.com/) 搜索磁力链接
 38. Reminder - Reminder插件，提醒事项管理
 39. WorkersAIChat - WorkersAIChat插件，调用 [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/) API 实现的对话插件
+40. EmojiKitchen - EmojiKitchen插件，调用 [Emoji Kitchen API](https://emoji-kitchen.vercel.app/) 实现的贴纸制作插件
