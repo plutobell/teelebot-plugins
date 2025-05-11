@@ -10,5 +10,5 @@ Author-email: hi#ojoll.com (#==@)
 License: GPLv3
 Keywords: Guard, 入群验证, 消息过滤, Workers, AI, Cloudflare
 Requires-teelebot: >=2.3.0
-Requires-dist: captcha
+Requires-dist: captcha, requests
 Source: https://github.com/plutobell/teelebot-plugins
