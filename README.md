@@ -9,7 +9,7 @@
 1. Menu - 自动生成的插件菜单
 2. Chat - 调用 [青云客聊天机器人API](http://api.qingyunke.com/) 实现的对话功能
 3. About - 关于
-4. Uptime - 获取Bot运行状态
+4. Uptime - 获取Bot运行状态，监控Bot运行状态
 5. ID - 获取用户ID和群组ID
 6. PluginCTL - 插件分群开关控制
 7. PluginManagementTools - 插件包管理工具
