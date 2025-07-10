@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2025-05-06
+last_modify: 2025-07-10
 '''
 import re
 import os
@@ -341,7 +341,7 @@ def Guard(bot, message):
             status = bot.sendChatAction(chat_id=chat_id, action="typing")
             status = bot.sendMessage(
                 chat_id=chat_id, text=msg, parse_mode="HTML",
-                reply_markup=reply_markup)
+                reply_markup=reply_markup, del_msg_after=60)
 
             # bot.message_deletor(
             #     30, status["chat"]["id"], status["message_id"])
@@ -474,7 +474,7 @@ def Guard(bot, message):
                         status = bot.sendChatAction(chat_id=chat_id, action="typing")
                         status = bot.sendMessage(
                             chat_id=chat_id, text=msg, parse_mode="HTML",
-                            reply_markup=reply_markup)
+                            reply_markup=reply_markup, del_msg_after=60)
                         #bot.message_deletor(30, status["chat"]["id"], status["message_id"])
                         db.user_delete(chat_id, user_id)
                 else:
@@ -811,24 +811,60 @@ class SqliteDB(object):
 
 
 def isSpamMessage(ACCOUNT_ID: str, AUTH_TOKEN: str, message: str,
-                    MODEL="@cf/qwen/qwen1.5-7b-chat-awq") -> str:
+                    MODEL="@cf/qwen/qwen1.5-14b-chat-awq") -> str:
     url = f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/{MODEL}"
     headers = {
         "Authorization": f"Bearer {AUTH_TOKEN}",
         "Content-Type": "application/json"
     }
 
-    system_prompt = (
-        "你是一个垃圾消息分类助手。你只回答 'yes' 或 'no'，用于判断用户在群聊中发送的消息是否为垃圾信息"
-        "（如广告、刷屏、钓鱼链接、骚扰等）。不要输出其他内容。"
+    prompt = (
+        "你是一个广告检测 API，用于判断用户在群聊中发送的消息是否属于广告、诈骗或色情信息。\n\n"
+
+        "以下内容才被视为广告或不良信息（判定为 yes）：\n"
+        "1. 明确的产品推广、代购、引流行为；\n"
+        "2. 发送群号、拉人入群、发邀请码等内容；\n"
+        "3. 包含外部链接（如网址、公众号、QQ群、Telegram 等）；\n"
+        "4. 推广加密货币、空投、赌博、色情、诈骗等违规内容；\n"
+        "5. 含有 ‘@用户名’ 或 ‘联系我’ 等明确引导联系行为，并且伴随高额收益承诺的，判定为广告（yes）。\n"
+        "6. 使用“加入我们”、“私聊我”、“免费领取”、“点击链接”等具有引导意图的用语。\n"
+        "7. 出现“自动发卡”、“自动下单”、“秒到账”等带有明确交易导向的服务术语；\n\n"
+
+        "以下内容不属于广告（判定为 no）：\n"
+        "- 正常聊天、吐槽、玩笑内容；\n"
+        "- 含有 BT、VPN、AI 等词但无推广意图；\n"
+        "- 模糊词汇、网友昵称、视频标题、无害信息；\n"
+        "- 表情符号（如“🌚”、“😂”、“👍”）单独出现或连续重复时，不构成广告，判定为 no；\n"
+        "- 单个字、无意义短语或极短内容，且无明确推广语句，判定为 no；\n"
+        "- 品牌词（如小米、澳柯玛、抖音等）单独出现，除非有明确推广意图；\n"
+        "- 明确列出“返现”、“返佣”、“返利”等词，如果无引导语句，则判定为 no。\n\n"
+
+        "请不要根据关键词联想、隐含暗示或语义猜测判断广告，"
+        "仅当出现明确的广告行为（如推广、引流、链接、联系方式）时才判定为广告（yes）。\n"
+        "上下文不足或者无法判断时，判定为 no。\n\n"
+
+        "例子：\n"
+        "“加入我们，点击链接” → yes\n"
+        "“币安有返现” → no\n"
+        "“BT资源丰富” → no\n"
+        "“拉群邀请码” → yes\n"
+        "“卖” → no\n"
+        "“买卖” → no\n"
+        "“点击购买” → yes\n"
+        "“🌚🌚🌚” → no\n"
+        "“啊” → no\n"
+        "“……” → no\n"
+        "“有” → no\n\n"
+
+        "最终输出只能是小写英文 yes 或 no，两者选其一，不得包含任何标点、换行、中文或解释说明。\n\n"
+
+        f"消息内容：{message}\n\n请回答 yes 或 no。"
     )
 
-    user_prompt = f"内容：{message}\n请用 yes 或 no 回答，这是否是垃圾信息？"
 
     payload = {
         "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
+            {"role": "user", "content": prompt}
         ]
     }
 
