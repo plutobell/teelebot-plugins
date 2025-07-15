@@ -2,7 +2,7 @@ Metadata-version: 1.1
 Plugin-name: Guard
 Command: 
 Buffer-permissions: False:False
-Version: 1.4.2
+Version: 1.4.3
 Summary: 垃圾消息过滤，使用 Cloudflare Workers AI 对消息进行过滤；入群验证码人机检测
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
