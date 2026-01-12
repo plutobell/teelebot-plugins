@@ -2,13 +2,13 @@ Metadata-version: 1.1
 Plugin-name: Guard
 Command: 
 Buffer-permissions: False:False
-Version: 1.4.4
-Summary: 垃圾消息过滤，使用 Cloudflare Workers AI 对消息进行过滤；入群验证码人机检测
+Version: 1.5.0
+Summary: 垃圾消息过滤，使用 Cerebras Cloud API 对消息进行过滤；入群验证码人机检测
 Home-page: https://github.com/plutobell/teelebot
 Author: Pluto (github.com/plutobell)
 Author-email: hi#ojoll.com (#==@)
 License: GPLv3
-Keywords: Guard, 入群验证, 消息过滤, Workers, AI, Cloudflare
+Keywords: Guard, 入群验证, 消息过滤, AI, Cerebras
 Requires-teelebot: >=2.3.0
-Requires-dist: captcha, requests
+Requires-dist: captcha, cerebras
 Source: https://github.com/plutobell/teelebot-plugins

@@ -1,14 +1,14 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2025-07-16
+last_modify: 2026-01-12
 '''
 import re
 import os
 import string
 import sqlite3
 import time
-import requests
+from cerebras.cloud.sdk import Cerebras
 from random import shuffle, randint
 from threading import Timer
 from captcha.image import ImageCaptcha
@@ -55,11 +55,10 @@ def Guard(bot, message):
 
     with open(bot.join_plugin_path("config.ini"), "r", encoding="utf-8") as conf:
         lines = conf.readlines()
-        if len(lines) >= 4:
-            ACCOUNT_ID = lines[0].strip()
-            AUTH_TOKEN = lines[1].strip()
-            MODEL = lines[2].strip()
-            LOG_GROUP_ID = lines[3].strip()
+        if len(lines) >= 3:
+            API_KEY = lines[0].strip()
+            MODEL = lines[1].strip()
+            LOG_GROUP_ID = lines[2].strip()
         else:
             status = bot.sendChatAction(chat_id=chat_id, action="typing")
             msg = "要使用 Guard 插件，请bot管理员先设置 config.ini 文件。"
@@ -323,8 +322,7 @@ def Guard(bot, message):
         name = str(first_name + last_name).strip()
         #print("New Member：", user_id, first_name)
         name_demoji = filter_emoji(name)
-        is_spam = isSpamMessage(
-            ACCOUNT_ID=ACCOUNT_ID, AUTH_TOKEN=AUTH_TOKEN,  message=name_demoji, MODEL=MODEL)
+        is_spam = isSpamMessage(API_KEY=API_KEY, message=name_demoji, MODEL=MODEL)
         if is_spam == "yes":
             status = bot.banChatMember(
                 chat_id=chat_id, user_id=user_id, until_date=timestamp+90)
@@ -409,9 +407,7 @@ def Guard(bot, message):
         name = str(first_name + last_name).strip()
 
         name_demoji = filter_emoji(name)
-        is_spam = isSpamMessage(
-            ACCOUNT_ID=ACCOUNT_ID, AUTH_TOKEN=AUTH_TOKEN,
-            message=name_demoji, MODEL=MODEL)
+        is_spam = isSpamMessage(API_KEY=API_KEY, message=name_demoji, MODEL=MODEL)
         if is_spam == "yes":
             # status = bot.deleteMessage(chat_id=chat_id, message_id=message_id)
             pass
@@ -443,9 +439,7 @@ def Guard(bot, message):
                     db.user_update(chat_id=chat_id, user_id=user_id,
                                 message_times=req[3], spam_times=req[4])
                     text_demoji = filter_emoji(text.strip())
-                    is_spam = isSpamMessage(
-                        ACCOUNT_ID=ACCOUNT_ID, AUTH_TOKEN=AUTH_TOKEN,
-                        message=text_demoji, MODEL=MODEL)
+                    is_spam = isSpamMessage(API_KEY=API_KEY, message=text_demoji, MODEL=MODEL)
                     if is_spam == "yes":
                         req[4] += 2
                         db.user_update(chat_id=chat_id, user_id=user_id,
@@ -810,14 +804,7 @@ class SqliteDB(object):
             return False
 
 
-def isSpamMessage(ACCOUNT_ID: str, AUTH_TOKEN: str, message: str,
-                    MODEL="@cf/qwen/qwen1.5-14b-chat-awq") -> str:
-    url = f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/{MODEL}"
-    headers = {
-        "Authorization": f"Bearer {AUTH_TOKEN}",
-        "Content-Type": "application/json"
-    }
-
+def isSpamMessage(API_KEY: str, message: str, MODEL="qwen-3-32b") -> str:
     prompt = (
         "你是一个广告检测 API，用于判断用户在群聊中发送的消息是否属于广告、诈骗或色情信息。\n\n"
 
@@ -886,25 +873,33 @@ def isSpamMessage(ACCOUNT_ID: str, AUTH_TOKEN: str, message: str,
         "“RM ᴡʜᴀᴛˢᴀᴘᴘ ⁺¹²³⁻⁴⁵⁶⁻⁷⁸⁹⁰” → no\n"
         "“？？？？？” → no\n\n"
 
-        "最终输出只能为英文小写 yes 或 no，仅返回其一，禁止包含标点、换行、解释或其他字符。\n\n"
-
-        f"消息内容：{message}\n\n请直接回答 yes 或 no。"
+        "最终输出只能为英文小写 yes 或 no，仅返回其一，禁止包含标点、换行、解释或其他字符。"
     )
 
-    payload = {
-        "messages": [
-            {"role": "user", "content": prompt}
-        ]
-    }
-
     try:
-        response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()
-        result = response.json()
-        # print(result)
-        ai_reply = result["result"]["response"].strip().lower()
+        client = Cerebras(
+            api_key= API_KEY,
+        )
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": prompt
+                },
+                {
+                    "role": "user",
+                    "content": f"{message}"
+                }
+            ],
+            extra_body={
+                "disable_reasoning": True
+            },
+            model=MODEL
+        )
 
-        if ai_reply.startswith("yes") or ai_reply.startswith("是"):
+        req = chat_completion.choices[0].message.content.strip()
+
+        if req.startswith("yes") or req.startswith("是"):
             return "yes"
         return "no"
 

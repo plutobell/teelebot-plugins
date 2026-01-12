@@ -19,7 +19,7 @@
 11. Bing -  获取每日必应壁纸
 12. Top - 通过 [Pi Dashboard Go](https://github.com/plutobell/pi-dashboard-go) 后端接口查看服务器状态
 13. Translate - 调用 [有道翻译](http://fanyi.youdao.com/) API 对文字进行翻译
-14. Guard - 垃圾消息过滤，使用 [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/) 对消息进行过滤；入群验证码人机检测
+14. Guard - 垃圾消息过滤，使用 [Cerebras Cloud API](https://cloud.cerebras.ai/) 对消息进行过滤；入群验证码人机检测
 15. Admin - 群管插件，管理员可通过指令对群进行管理(踢人、禁言等)
 16. Qrcode - 二维码生成插件，调用 [Goole API](https://google.com) 生成二维码
 17. IPinfo - 查询IP地址信息，调用 [ip-api](https://ip-api.com/) 查询IP信息
