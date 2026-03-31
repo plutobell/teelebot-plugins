@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 creation time: 2020-05-28
-last_modify: 2026-01-12
+last_modify: 2026-03-31
 '''
 import re
 import os
@@ -892,7 +892,7 @@ def isSpamMessage(API_KEY: str, message: str, MODEL="qwen-3-32b") -> str:
                 }
             ],
             extra_body={
-                "disable_reasoning": True
+                # "disable_reasoning": True
             },
             model=MODEL
         )
